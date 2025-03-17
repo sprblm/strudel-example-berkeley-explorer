@@ -27,11 +27,11 @@ export class NOAAAdapter implements DataSourceAdapter {
       baseUrl: params.baseUrl || 'https://www.ncdc.noaa.gov/cdo-web/api/v2',
       headers: {
         'Content-Type': 'application/json',
-        'token': params.apiKey || 'YOUR_API_KEY_HERE', // Replace with actual API key in production
+        'token': process.env.NOAA_API_KEY, // Read API key from environment variable
       },
       timeout: params.timeout,
     });
-    this.apiKey = params.apiKey || '';
+    this.apiKey = process.env.NOAA_API_KEY || '';
   }
 
   /**

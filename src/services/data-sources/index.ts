@@ -13,7 +13,11 @@ import { UserContributedAdapter } from './user-contributed-adapter';
  */
 export function createDataSources(params: ApiParams = {}): DataSourceAdapter[] {
   return [
-    new NOAAAdapter(params),
+    new NOAAAdapter({
+      ...params,
+      baseUrl: process.env.VITE_NOAA_API_URL,
+      apiKey: import.meta.env.VITE_NOAA_API_KEY,
+    }),
     new NASAAdapter(params),
     new WorldClimAdapter(params),
     new CMIP6Adapter(params),
@@ -31,7 +35,11 @@ export function createDataSources(params: ApiParams = {}): DataSourceAdapter[] {
 export function createDataSource(sourceId: string, params: ApiParams = {}): DataSourceAdapter | undefined {
   switch (sourceId.toLowerCase()) {
     case 'noaa':
-      return new NOAAAdapter(params);
+      return new NOAAAdapter({
+        ...params,
+        baseUrl: process.env.VITE_NOAA_API_URL,
+        apiKey: import.meta.env.VITE_NOAA_API_KEY,
+      });
     case 'nasa':
       return new NASAAdapter(params);
     case 'worldclim':

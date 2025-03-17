@@ -97,5 +97,6 @@ export interface DatasetAttachment {
  */
 export interface ApiParams {
   baseUrl?: string;
+  apiKey?: string;
   timeout?: number;
 }
