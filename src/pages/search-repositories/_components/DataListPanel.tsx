@@ -10,6 +10,7 @@ import {
   Stack,
   TextField,
   Typography,
+  ListItemText,
 } from '@mui/material';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DataListCard } from './DataListCard';
@@ -159,7 +160,20 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
                 item={item}
                 previewItem={previewItem}
                 setPreviewItem={setPreviewItem}
-              />
+              >
+                <ListItemText
+                  primary={
+                    <Typography component="div" variant="body2">
+                      {item.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography component="div" variant="caption" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  }
+                />
+              </DataListCard>
             ))}
           </Stack>
         )}
@@ -171,7 +185,20 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
                 item={item}
                 previewItem={previewItem}
                 setPreviewItem={setPreviewItem}
-              />
+              >
+                <ListItemText
+                  primary={
+                    <Typography component="div" variant="body2">
+                      {item.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography component="div" variant="caption" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  }
+                />
+              </DataListCard>
             ))}
           </Stack>
         )}

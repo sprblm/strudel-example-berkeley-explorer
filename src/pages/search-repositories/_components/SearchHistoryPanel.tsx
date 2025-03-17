@@ -33,16 +33,15 @@ function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
-    <Box
+    <div
       role="tabpanel"
       hidden={value !== index}
-      id={`search-history-tabpanel-${index}`}
-      aria-labelledby={`search-history-tab-${index}`}
-      sx={{ overflowY: 'auto', maxHeight: '400px' }}
       {...other}
     >
-      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
-    </Box>
+      <Box sx={{ p: 3 }}>
+        <Typography component="div">{children}</Typography>
+      </Box>
+    </div>
   );
 }
 
@@ -174,68 +173,37 @@ export const SearchHistoryPanel: React.FC = () => {
         </Tabs>
       </Box>
       
-      <TabPanel value={tabValue} index={0}>
-        <Typography component="div" variant="body1" sx={{ p: 3 }}>
-          Recent Searches
-        </Typography>
-        
-        {searchHistory.length === 0 ? (
-          <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            No search history yet
-          </Typography>
-        ) : (
-          <List disablePadding>
-            {searchHistory.map((item) => (
-              <React.Fragment key={item.id}>
-                <ListItem
-                  disablePadding
-                  secondaryAction={
-                    <Box>
-                      <Tooltip title="Save Search">
-                        <IconButton edge="end" size="small" onClick={() => handleSaveSearch(item)}>
-                          <BookmarkBorderIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete from History">
-                        <IconButton edge="end" size="small" onClick={() => handleDeleteHistory(item.id)}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  }
-                >
-                  <ListItemButton 
-                    dense 
-                    onClick={() => handleApplySearch(item)}
-                    sx={{ pr: 16 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <SearchIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary={item.name}
-                      secondary={
-                        <React.Fragment>
-                          <Typography component="div" variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                            {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString()}
-                          </Typography>
-                          <Box sx={{ mt: 0.5 }}>
-                            {Object.entries(item.filters).map(([key, value]) => (
-                              <Typography key={key} component="div" variant="caption" sx={{ mr: 1 }}>
-                                {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : value}</strong>
-                              </Typography>
-                            ))}
-                          </Box>
-                        </React.Fragment>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
-          </List>
-        )}
+      <TabPanel value={tabValue} index={0} sx={{ p: 0 }}>
+        <List>
+          {searchHistory.map((item) => (
+            <ListItemButton key={item.id}>
+              <ListItemText
+                primary={
+                  <Typography component="div" variant="body2">
+                    {item.name}
+                  </Typography>
+                }
+                secondary={
+                  <Typography component="div" variant="caption" color="text.secondary">
+                    {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString()}
+                  </Typography>
+                }
+              />
+              <Box>
+                <Tooltip title="Save Search">
+                  <IconButton edge="end" size="small" onClick={() => handleSaveSearch(item)}>
+                    <BookmarkBorderIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete from History">
+                  <IconButton edge="end" size="small" onClick={() => handleDeleteHistory(item.id)}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </ListItemButton>
+          ))}
+        </List>
       </TabPanel>
       
       <TabPanel value={tabValue} index={1}>
