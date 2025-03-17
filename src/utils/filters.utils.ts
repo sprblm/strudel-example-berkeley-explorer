@@ -14,9 +14,11 @@ export const filterBySearchText = (allData: any[], searchText?: string) => {
 
 export const filterByDataFilters = (
   allData: any[],
-  filters: DataFilter[],
-  filterConfigs: FilterConfig[]
+  filters: DataFilter[] | null,
+  filterConfigs: FilterConfig[] | null
 ) => {
+  if (!filters) return allData;
+
   let filteredData = allData;
   if (filters.length > 0) {
     // Pre build map of filter to operator for performance boost

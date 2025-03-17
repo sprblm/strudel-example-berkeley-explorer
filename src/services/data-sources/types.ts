@@ -15,21 +15,6 @@ export interface DataSourceAdapter {
   name: string;
   
   /**
-   * URL to the data source homepage
-   */
-  homepageUrl: string;
-  
-  /**
-   * URL to the data source logo
-   */
-  logoUrl: string;
-  
-  /**
-   * Description of the data source
-   */
-  description: string;
-  
-  /**
    * Search for datasets in this data source with optional filters
    */
   searchDatasets(options: SearchOptions): Promise<SearchResult>;
@@ -111,7 +96,6 @@ export interface DatasetAttachment {
  * Common parameters for all APIs
  */
 export interface ApiParams {
-  apiKey?: string;
-  baseUrl: string;
+  baseUrl?: string;
   timeout?: number;
 }

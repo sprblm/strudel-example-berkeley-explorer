@@ -1,5 +1,4 @@
 import { ApiParams, DataSourceAdapter } from './types';
-import { HttpClient } from './http-client';
 import { NOAAAdapter } from './noaa-adapter';
 import { NASAAdapter } from './nasa-adapter';
 import { WorldClimAdapter } from './worldclim-adapter';
@@ -48,12 +47,10 @@ export function createDataSource(sourceId: string, params: ApiParams = {}): Data
   }
 }
 
-// Export all adapter classes and utility types
-export { HttpClient };
+// Export all adapter classes
 export { NOAAAdapter };
 export { NASAAdapter };
 export { WorldClimAdapter };
 export { CMIP6Adapter };
 export { ERA5Adapter };
 export { UserContributedAdapter };
-export * from './types';

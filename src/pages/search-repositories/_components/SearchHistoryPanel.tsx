@@ -175,12 +175,12 @@ export const SearchHistoryPanel: React.FC = () => {
       </Box>
       
       <TabPanel value={tabValue} index={0}>
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+        <Typography component="div" variant="body1" sx={{ p: 3 }}>
           Recent Searches
         </Typography>
         
         {searchHistory.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+          <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
             No search history yet
           </Typography>
         ) : (
@@ -216,12 +216,12 @@ export const SearchHistoryPanel: React.FC = () => {
                       primary={item.name}
                       secondary={
                         <React.Fragment>
-                          <Typography component="span" variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                          <Typography component="div" variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                             {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString()}
                           </Typography>
                           <Box sx={{ mt: 0.5 }}>
                             {Object.entries(item.filters).map(([key, value]) => (
-                              <Typography key={key} component="span" variant="caption" sx={{ mr: 1 }}>
+                              <Typography key={key} component="div" variant="caption" sx={{ mr: 1 }}>
                                 {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : value}</strong>
                               </Typography>
                             ))}
@@ -239,12 +239,12 @@ export const SearchHistoryPanel: React.FC = () => {
       </TabPanel>
       
       <TabPanel value={tabValue} index={1}>
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+        <Typography component="div" variant="body1" sx={{ p: 3 }}>
           Saved Searches
         </Typography>
         
         {savedSearches.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+          <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
             No saved searches yet
           </Typography>
         ) : (
@@ -274,7 +274,7 @@ export const SearchHistoryPanel: React.FC = () => {
                       secondary={
                         <Box sx={{ mt: 0.5 }}>
                           {Object.entries(item.filters).map(([key, value]) => (
-                            <Typography key={key} component="span" variant="caption" sx={{ mr: 1 }}>
+                            <Typography key={key} component="div" variant="caption" sx={{ mr: 1 }}>
                               {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : value}</strong>
                             </Typography>
                           ))}

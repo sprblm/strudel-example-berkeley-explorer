@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 /**
  * HTTP client for making requests to external APIs
  */
-export class HttpClient {
+class HttpClient {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
   private timeout: number;
@@ -89,3 +89,5 @@ export class HttpClient {
     }
   }
 }
+
+export { HttpClient };

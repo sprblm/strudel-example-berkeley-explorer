@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { DataListCard } from './DataListCard';
 import { taskflow } from '../_config/taskflow.config';
 import { useFilters } from '../../../components/FilterContext';
@@ -53,10 +53,17 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
     queryMode,
     staticParams: taskflow.data.list.staticParams,
   });
-  const cards =
-    queryMode === 'server'
-      ? data.results
-      : filterData(data, activeFilters, filterConfigs, searchTerm);
+
+  const filteredData = useMemo(() => {
+    try {
+      return filterData(data, activeFilters ?? {}, filterConfigs, searchTerm);
+    } catch (error) {
+      console.error('Filter error:', error);
+      return [];
+    }
+  }, [data, activeFilters, filterConfigs, searchTerm]);
+
+  const cards = queryMode === 'server' ? data.results : filteredData;
   const emptyRows = new Array(pageSize).fill(null);
   const indexedRows = emptyRows.map((row, i) => i);
 
