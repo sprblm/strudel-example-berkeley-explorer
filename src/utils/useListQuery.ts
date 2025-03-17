@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { DataFilter } from '../components/FilterContext';
 import { FilterConfig } from '../types/filters.types';
 import { createFilterParams, fetchData } from './queryParams.utils';
+import { useRef, useEffect } from 'react';
 
 interface DataQueryConfig {
   activeFilters: DataFilter[];
@@ -19,6 +20,17 @@ interface DataQueryConfig {
  * options specified in the taskflow config as well as other filtering options.
  */
 export const useListQuery = (dataQueryConfig: DataQueryConfig): any => {
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Clean up any pending requests when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   // If in server mode, create query params from the active filters
   let queryParams =
     dataQueryConfig.queryMode === 'server'
@@ -63,12 +75,19 @@ export const useListQuery = (dataQueryConfig: DataQueryConfig): any => {
   const { isPending, isFetching, isError, data, error } = useQuery({
     queryKey,
     queryFn: async (): Promise<any> => {
+      // Create a new AbortController for this request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
       const queryString = queryParams.toString();
       let fullDataSourcePath = dataQueryConfig.dataSource;
       if (queryString && queryString.length > 0) {
         fullDataSourcePath = `${dataQueryConfig.dataSource}?${queryString}`;
       }
-      const results = await fetchData(fullDataSourcePath);
+      
+      const results = await fetchData(fullDataSourcePath, abortControllerRef.current.signal);
       return results;
     },
     placeholderData: keepPreviousData,

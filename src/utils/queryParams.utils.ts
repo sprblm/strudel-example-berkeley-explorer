@@ -153,7 +153,7 @@ export const cleanPath = (url: string) => {
  * Fetch data from a local CSV, TSV, or JSON, or an external API
  * that returns JSON.
  */
-export const fetchData = async (dataSource: string) => {
+export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
   // Get the base portion of the URL. Will be blank when running locally.
   const base = document.querySelector('base')?.getAttribute('href') ?? '';
   // Use the VITE_BASE_URL env variable to specify a path prefix that
@@ -166,13 +166,36 @@ export const fetchData = async (dataSource: string) => {
     ? cleanUrl(dataSource)
     : cleanUrl(`${basename}/${dataSource}`);
   let data: any = [];
-  if (fileExtension === 'csv') {
-    data = await d3.csv(dataSourcePath);
-  } else if (fileExtension === 'tsv') {
-    data = await d3.tsv(dataSourcePath);
-  } else if (fileExtension === 'json' || isExternal) {
-    const response = await fetch(dataSourcePath);
-    data = await response.json();
+  
+  try {
+    if (fileExtension === 'csv') {
+      // d3-fetch doesn't support AbortController, so we'll use fetch directly
+      if (signal) {
+        const response = await fetch(dataSourcePath, { signal });
+        const text = await response.text();
+        data = d3.csvParse(text);
+      } else {
+        data = await d3.csv(dataSourcePath);
+      }
+    } else if (fileExtension === 'tsv') {
+      if (signal) {
+        const response = await fetch(dataSourcePath, { signal });
+        const text = await response.text();
+        data = d3.tsvParse(text);
+      } else {
+        data = await d3.tsv(dataSourcePath);
+      }
+    } else if (fileExtension === 'json' || isExternal) {
+      const response = await fetch(dataSourcePath, { signal });
+      data = await response.json();
+    }
+    return data;
+  } catch (error) {
+    // Don't throw if it's an abort error
+    if (error.name === 'AbortError') {
+      console.log('Fetch request was cancelled');
+      return null;
+    }
+    throw error;
   }
-  return data;
 };
