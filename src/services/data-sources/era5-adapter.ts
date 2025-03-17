@@ -1,11 +1,11 @@
 import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
 import { HttpClient } from './http-client';
 import { 
-  ApiParams, 
   DataSourceAdapter, 
   SearchOptions, 
   SearchResult, 
-  SourceMetadata 
+  SourceMetadata,
+  HttpClientConfig
 } from './types';
 
 /**
@@ -13,22 +13,16 @@ import {
  * ERA5 is ECMWF's fifth generation reanalysis for the global climate and weather
  */
 export class ERA5Adapter implements DataSourceAdapter {
-  public id = 'era5';
-  public name = 'ERA5 Reanalysis Data';
-  public homepageUrl = 'https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era5';
-  public logoUrl = 'https://climate.copernicus.eu/sites/default/files/2018-09/logo-C3S-Copernicus.png';
-  public description = 'ERA5 is the fifth generation ECMWF atmospheric reanalysis of the global climate. Reanalysis combines model data with observations to provide a globally complete and consistent dataset using the laws of physics. ERA5 provides hourly estimates of atmospheric variables, land-surface variables, and ocean wave variables.';
+  public readonly id = 'era5';
+  public readonly name = 'ERA5 Reanalysis';
+  public readonly homepageUrl = 'https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era5';
+  public readonly logoUrl = 'https://climate.copernicus.eu/sites/default/files/2018-09/logo-C3S-Copernicus.png';
+  public readonly description = 'ERA5 is the fifth generation ECMWF atmospheric reanalysis of the global climate. Reanalysis combines model data with observations to provide a globally complete and consistent dataset using the laws of physics. ERA5 provides hourly estimates of atmospheric variables, land-surface variables, and ocean wave variables.';
 
   private client: HttpClient;
 
-  constructor(params: ApiParams) {
-    this.client = new HttpClient({
-      baseUrl: params.baseUrl || 'https://cds.climate.copernicus.eu/api/v2',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: params.timeout,
-    });
+  constructor(params: HttpClientConfig) {
+    this.client = new HttpClient(params);
   }
 
   /**
@@ -75,7 +69,7 @@ export class ERA5Adapter implements DataSourceAdapter {
         throw new Error(`Dataset not found: ${datasetId}`);
       }
       
-      return dataset;
+      return this.createRepository(dataset);
     } catch (error) {
       console.error(`Error fetching ERA5 dataset details for ${datasetId}:`, error);
       throw error;
@@ -488,5 +482,14 @@ export class ERA5Adapter implements DataSourceAdapter {
         ],
       },
     ];
+  }
+
+  private createRepository(dataset: any): Repository {
+    return {
+      id: dataset.id,
+      name: dataset.name,
+      description: dataset.description,
+      variables: dataset.variables?.map(String)
+    };
   }
 }

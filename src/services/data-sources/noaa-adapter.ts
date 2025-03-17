@@ -1,11 +1,11 @@
 import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
 import { HttpClient } from './http-client';
 import { 
-  ApiParams, 
   DataSourceAdapter, 
   SearchOptions, 
   SearchResult, 
-  SourceMetadata 
+  SourceMetadata,
+  HttpClientConfig
 } from './types';
 
 /**
@@ -20,18 +20,21 @@ export class NOAAAdapter implements DataSourceAdapter {
   public description = 'NOAA\'s Climate Data Online (CDO) provides free access to NCDC\'s archive of historical weather and climate data in addition to station history information.';
 
   private client: HttpClient;
-  private apiKey: string | null;
 
-  constructor(params: ApiParams) {
+  constructor(params: HttpClientConfig) {
+    const apiKey = import.meta.env.VITE_NOAA_API_KEY as string;
+    if (!apiKey) {
+      throw new Error('NOAA API key missing');
+    }
+    
     this.client = new HttpClient({
-      baseUrl: params.baseUrl || 'https://www.ncdc.noaa.gov/cdo-web/api/v2',
+      ...params,
       headers: {
+        ...params.headers,
         'Content-Type': 'application/json',
-        'token': process.env.VITE_NOAA_API_KEY, // Read API key from environment variable
+        Authorization: `Bearer ${apiKey}`
       },
-      timeout: params.timeout,
     });
-    this.apiKey = process.env.VITE_NOAA_API_KEY ?? null;
   }
 
   /**

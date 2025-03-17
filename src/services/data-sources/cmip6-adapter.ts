@@ -1,7 +1,7 @@
 import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
 import { HttpClient } from './http-client';
+import { HttpClientConfig } from './types';
 import { 
-  ApiParams, 
   DataSourceAdapter, 
   SearchOptions, 
   SearchResult, 
@@ -13,22 +13,17 @@ import {
  * For accessing data from the Coupled Model Intercomparison Project Phase 6
  */
 export class CMIP6Adapter implements DataSourceAdapter {
-  public id = 'cmip6';
-  public name = 'CMIP6 Climate Model Outputs';
-  public homepageUrl = 'https://esgf-node.llnl.gov/projects/cmip6/';
-  public logoUrl = 'https://pcmdi.llnl.gov/CMIP6/ArchiveStatistics/CMIP6_logo_web.png';
-  public description = 'The Coupled Model Intercomparison Project Phase 6 (CMIP6) is the sixth phase of an ongoing coordinated international climate model experiment. CMIP6 provides a framework for climate model simulations that inform the IPCC assessment reports.';
+  public readonly id = 'cmip6';
+  public readonly name = 'CMIP6 Climate Models';
+  public readonly homepageUrl = 'https://esgf-node.llnl.gov/projects/cmip6/';
+  public readonly logoUrl = 'https://pcmdi.llnl.gov/CMIP6/ArchiveStatistics/CMIP6_logo_web.png';
+  public readonly description = 'The Coupled Model Intercomparison Project Phase 6 (CMIP6) is the sixth phase of an ongoing coordinated international climate model experiment. CMIP6 provides a framework for climate model simulations that inform the IPCC assessment reports.';
 
   private client: HttpClient;
+  private cache = new Map<string, any>();
 
-  constructor(params: ApiParams) {
-    this.client = new HttpClient({
-      baseUrl: params.baseUrl || 'https://esgf-node.llnl.gov/esg-search/search',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: params.timeout,
-    });
+  constructor(params: HttpClientConfig) {
+    this.client = new HttpClient(params);
   }
 
   /**
@@ -75,7 +70,7 @@ export class CMIP6Adapter implements DataSourceAdapter {
         throw new Error(`Dataset not found: ${datasetId}`);
       }
       
-      return dataset;
+      return this.createRepository(dataset);
     } catch (error) {
       console.error(`Error fetching CMIP6 dataset details for ${datasetId}:`, error);
       throw error;
@@ -230,6 +225,18 @@ export class CMIP6Adapter implements DataSourceAdapter {
       
       return true;
     });
+  }
+
+  private createRepository(dataset: any): Repository {
+    return {
+      id: dataset.id,
+      name: dataset.name,
+      description: dataset.description,
+      variables: dataset.variables?.map(String),
+      spatial_coverage: dataset.spatial_range 
+        ? `${dataset.spatial_range.minLat}-${dataset.spatial_range.maxLat}, ${dataset.spatial_range.minLon}-${dataset.spatial_range.maxLon}`
+        : undefined
+    };
   }
 
   /**

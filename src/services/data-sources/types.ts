@@ -93,10 +93,55 @@ export interface DatasetAttachment {
 }
 
 /**
- * Common parameters for all APIs
+ * Interface for a repository
  */
-export interface ApiParams {
-  baseUrl?: string;
-  apiKey?: string;
+export interface Repository {
+  id: string;
+  name: string;
+  description: string;
+  title?: string;
+  summary?: string;
+  variables?: string[];
+  spatial_coverage?: string;
+  temporal_resolution?: string;
+  type?: string;
+  quality?: string;
+  tags?: string[];
+  models?: string[];
+  levels?: string[];
+}
+
+/**
+ * Interface for a dataset variable
+ */
+export interface DatasetVariable {
+  name: string;
+  values: unknown[];
+}
+
+/**
+ * Interface for a spatial range
+ */
+export interface SpatialRange {
+  minLat: number;
+  maxLat: number;
+  minLon: number;
+  maxLon: number;
+}
+
+/**
+ * Interface for a temporal resolution
+ */
+export interface TemporalResolution {
+  unit: string;
+  value: number;
+}
+
+/**
+ * Interface for HttpClient configuration
+ */
+export interface HttpClientConfig {
+  baseUrl: string;
+  headers?: Record<string, string>;
   timeout?: number;
 }

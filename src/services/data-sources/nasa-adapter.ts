@@ -1,11 +1,11 @@
 import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
 import { HttpClient } from './http-client';
 import { 
-  ApiParams, 
   DataSourceAdapter, 
   SearchOptions, 
   SearchResult, 
-  SourceMetadata 
+  SourceMetadata,
+  HttpClientConfig
 } from './types';
 
 /**
@@ -21,14 +21,8 @@ export class NASAAdapter implements DataSourceAdapter {
 
   private client: HttpClient;
 
-  constructor(params: ApiParams) {
-    this.client = new HttpClient({
-      baseUrl: params.baseUrl || 'https://neo.gsfc.nasa.gov/api/v1',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: params.timeout,
-    });
+  constructor(params: HttpClientConfig) {
+    this.client = new HttpClient(params);
   }
 
   /**

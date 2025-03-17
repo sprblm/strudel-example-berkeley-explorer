@@ -1,4 +1,3 @@
-import { ApiParams, DataSourceAdapter } from './types';
 import { NOAAAdapter } from './noaa-adapter';
 import { NASAAdapter } from './nasa-adapter';
 import { WorldClimAdapter } from './worldclim-adapter';
@@ -11,7 +10,6 @@ import { UserContributedAdapter } from './user-contributed-adapter';
  * @param params Optional API parameters that will be applied to all adapters
  * @returns Array of all data source adapters
  */
-export function createDataSources(params: ApiParams = {}): DataSourceAdapter[] {
   return [
     new NOAAAdapter({
       ...params,
@@ -32,7 +30,6 @@ export function createDataSources(params: ApiParams = {}): DataSourceAdapter[] {
  * @param params Optional API parameters
  * @returns The requested data source adapter or undefined if not found
  */
-export function createDataSource(sourceId: string, params: ApiParams = {}): DataSourceAdapter | undefined {
   switch (sourceId.toLowerCase()) {
     case 'noaa':
       return new NOAAAdapter({

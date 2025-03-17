@@ -1,21 +1,21 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 /**
  * HTTP client for making requests to external APIs
  */
 class HttpClient {
-  private baseUrl: string;
-  private defaultHeaders: Record<string, string>;
-  private timeout: number;
+  private instance: AxiosInstance;
 
   constructor(options: {
     baseUrl: string;
     headers?: Record<string, string>;
     timeout?: number;
   }) {
-    this.baseUrl = options.baseUrl;
-    this.defaultHeaders = options.headers || {};
-    this.timeout = options.timeout || 30000; // Default timeout of 30 seconds
+    this.instance = axios.create({
+      baseURL: options.baseUrl,
+      headers: options.headers,
+      timeout: options.timeout || 30000, // Default timeout of 30 seconds
+    });
   }
 
   /**
@@ -28,15 +28,11 @@ class HttpClient {
   ): Promise<T> {
     const config: AxiosRequestConfig = {
       params,
-      headers: { ...this.defaultHeaders, ...headers },
-      timeout: this.timeout,
+      headers: headers,
     };
 
     try {
-      const response: AxiosResponse<T> = await axios.get<T>(
-        `${this.baseUrl}${path}`,
-        config
-      );
+      const response: AxiosResponse<T> = await this.instance.get<T>(path, config);
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -53,16 +49,11 @@ class HttpClient {
     headers?: Record<string, string>
   ): Promise<T> {
     const config: AxiosRequestConfig = {
-      headers: { ...this.defaultHeaders, ...headers },
-      timeout: this.timeout,
+      headers: headers,
     };
 
     try {
-      const response: AxiosResponse<T> = await axios.post<T>(
-        `${this.baseUrl}${path}`,
-        data,
-        config
-      );
+      const response: AxiosResponse<T> = await this.instance.post<T>(path, data, config);
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -73,20 +64,12 @@ class HttpClient {
   /**
    * Handle errors from API requests
    */
-  private handleError(error: any): void {
+  private handleError(error: unknown): void {
     if (axios.isAxiosError(error)) {
-      const status = error.response?.status;
       const message = error.response?.data?.message || error.message;
-
-      // Log the error
-      console.error(`API Error (${status}): ${message}`);
-
-      // Rethrow with more context
       throw new Error(`API request failed: ${message}`);
-    } else {
-      console.error('Unexpected error:', error);
-      throw error;
     }
+    throw error;
   }
 }
 

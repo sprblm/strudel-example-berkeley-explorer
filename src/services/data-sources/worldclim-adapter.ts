@@ -1,7 +1,6 @@
 import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
 import { HttpClient } from './http-client';
 import { 
-  ApiParams, 
   DataSourceAdapter, 
   SearchOptions, 
   SearchResult, 
@@ -21,7 +20,6 @@ export class WorldClimAdapter implements DataSourceAdapter {
 
   private client: HttpClient;
 
-  constructor(params: ApiParams) {
     this.client = new HttpClient({
       baseUrl: params.baseUrl || 'https://www.worldclim.org/data',
       headers: {
