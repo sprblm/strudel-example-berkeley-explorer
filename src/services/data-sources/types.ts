@@ -1,5 +1,3 @@
-import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
-
 /**
  * Common interface for all climate data source adapters
  */
@@ -65,17 +63,22 @@ export interface SearchResult {
  * Metadata about a data source
  */
 export interface SourceMetadata {
-  variables: string[];
-  regions: string[];
-  resolutions: {
+  name: string;
+  description: string;
+  url: string;
+  variables?: string[];
+  regions?: string[];
+  resolutions?: {
     spatial: string[];
     temporal: string[];
   };
-  types: string[];
-  timePeriod: {
+  types?: string[];
+  timePeriod?: {
     start: string;
     end: string;
   };
+  models?: string[];
+  levels?: string[];
 }
 
 /**
@@ -93,7 +96,7 @@ export interface DatasetAttachment {
 }
 
 /**
- * Interface for a repository
+ * Interface representing a repository or dataset in a data source
  */
 export interface Repository {
   id: string;
@@ -102,13 +105,29 @@ export interface Repository {
   title?: string;
   summary?: string;
   variables?: string[];
-  spatial_coverage?: string;
-  temporal_resolution?: string;
-  type?: string;
-  quality?: string;
-  tags?: string[];
-  models?: string[];
-  levels?: string[];
+  url?: string;
+  citation?: string;
+  license?: string;
+  keywords?: string[];
+  dataFormat?: string;
+  spatialCoverage?: {
+    type: string;
+    coordinates: number[][];
+  };
+  temporalCoverage?: {
+    startDate: string;
+    endDate: string;
+  };
+  version?: string;
+  sourceUrl?: string;
+  downloadUrl?: string;
+  size?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  publisher?: string;
+  authors?: string[];
+  contributors?: string[];
+  category?: string;
 }
 
 /**

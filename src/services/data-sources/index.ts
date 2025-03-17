@@ -4,23 +4,39 @@ import { WorldClimAdapter } from './worldclim-adapter';
 import { CMIP6Adapter } from './cmip6-adapter';
 import { ERA5Adapter } from './era5-adapter';
 import { UserContributedAdapter } from './user-contributed-adapter';
+import { DataSourceAdapter, HttpClientConfig } from './types';
 
 /**
  * Factory function to create all data source adapters
  * @param params Optional API parameters that will be applied to all adapters
  * @returns Array of all data source adapters
  */
+export function createAllDataSources(params: Partial<HttpClientConfig> = {}): DataSourceAdapter[] {
   return [
     new NOAAAdapter({
+      baseUrl: import.meta.env.VITE_NOAA_API_URL as string || '',
       ...params,
-      baseUrl: process.env.VITE_NOAA_API_URL,
-      apiKey: import.meta.env.VITE_NOAA_API_KEY,
     }),
-    new NASAAdapter(params),
-    new WorldClimAdapter(params),
-    new CMIP6Adapter(params),
-    new ERA5Adapter(params),
-    new UserContributedAdapter(params),
+    new NASAAdapter({
+      baseUrl: import.meta.env.VITE_NASA_API_URL as string || '',
+      ...params,
+    }),
+    new WorldClimAdapter({
+      baseUrl: import.meta.env.VITE_WORLDCLIM_API_URL as string || '',
+      ...params,
+    }),
+    new CMIP6Adapter({
+      baseUrl: import.meta.env.VITE_CMIP6_API_URL as string || '',
+      ...params,
+    }),
+    new ERA5Adapter({
+      baseUrl: import.meta.env.VITE_ERA5_API_URL as string || '',
+      ...params,
+    }),
+    new UserContributedAdapter({
+      baseUrl: import.meta.env.VITE_USER_CONTRIBUTED_API_URL as string || '',
+      ...params,
+    }),
   ];
 }
 
@@ -30,23 +46,38 @@ import { UserContributedAdapter } from './user-contributed-adapter';
  * @param params Optional API parameters
  * @returns The requested data source adapter or undefined if not found
  */
+export function createDataSource(sourceId: string, params: Partial<HttpClientConfig> = {}): DataSourceAdapter | undefined {
   switch (sourceId.toLowerCase()) {
     case 'noaa':
       return new NOAAAdapter({
+        baseUrl: import.meta.env.VITE_NOAA_API_URL as string || '',
         ...params,
-        baseUrl: process.env.VITE_NOAA_API_URL,
-        apiKey: import.meta.env.VITE_NOAA_API_KEY,
       });
     case 'nasa':
-      return new NASAAdapter(params);
+      return new NASAAdapter({
+        baseUrl: import.meta.env.VITE_NASA_API_URL as string || '',
+        ...params,
+      });
     case 'worldclim':
-      return new WorldClimAdapter(params);
+      return new WorldClimAdapter({
+        baseUrl: import.meta.env.VITE_WORLDCLIM_API_URL as string || '',
+        ...params,
+      });
     case 'cmip6':
-      return new CMIP6Adapter(params);
+      return new CMIP6Adapter({
+        baseUrl: import.meta.env.VITE_CMIP6_API_URL as string || '',
+        ...params,
+      });
     case 'era5':
-      return new ERA5Adapter(params);
+      return new ERA5Adapter({
+        baseUrl: import.meta.env.VITE_ERA5_API_URL as string || '',
+        ...params,
+      });
     case 'user-contributed':
-      return new UserContributedAdapter(params);
+      return new UserContributedAdapter({
+        baseUrl: import.meta.env.VITE_USER_CONTRIBUTED_API_URL as string || '',
+        ...params,
+      });
     default:
       return undefined;
   }

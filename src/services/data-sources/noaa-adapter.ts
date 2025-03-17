@@ -1,4 +1,4 @@
-import { Repository } from '../../pages/search-repositories/_config/taskflow.types';
+import { Repository } from './types';
 import { HttpClient } from './http-client';
 import { 
   DataSourceAdapter, 
@@ -94,30 +94,36 @@ export class NOAAAdapter implements DataSourceAdapter {
   }
 
   /**
-   * Get detailed information about a specific NOAA dataset
+   * Get details about a specific NOAA dataset
+   * @param datasetId The ID of the dataset to fetch
    */
   async getDatasetDetails(datasetId: string): Promise<Repository> {
     try {
-      const response = await this.client.get<any>(`/datasets/${datasetId}`);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Get available data types for this dataset
-      const dataTypesResponse = await this.client.get<any>('/datatypes', {
-        datasetid: datasetId,
-        limit: 1000,
-      });
+      // Mock data for a single dataset
+      const dataset: Repository = {
+        id: datasetId,
+        name: 'NOAA Global Surface Temperature',
+        description: 'NOAA Global Surface Temperature (NOAAGlobalTemp) dataset',
+        variables: ['temperature'],
+        url: 'https://www.ncei.noaa.gov/products/land-based-station/noaa-global-temp',
+        citation: 'NOAA National Centers for Environmental Information',
+        license: 'NOAA Data License',
+        publisher: 'NOAA',
+        version: '5.0',
+        temporalCoverage: {
+          startDate: '1880-01-01',
+          endDate: '2023-12-31'
+        },
+        spatialCoverage: {
+          type: 'global',
+          coordinates: [[-180, -90], [180, 90]]
+        }
+      };
       
-      // Get available locations for this dataset
-      const locationsResponse = await this.client.get<any>('/locations', {
-        datasetid: datasetId,
-        limit: 1000,
-      });
-      
-      // Combine all information into a complete repository object
-      const dataset = response;
-      dataset.dataTypes = dataTypesResponse.results;
-      dataset.locations = locationsResponse.results;
-      
-      return this.mapDatasetToRepository(dataset, true);
+      return dataset;
     } catch (error) {
       console.error(`Error fetching NOAA dataset details for ${datasetId}:`, error);
       throw error;
@@ -140,16 +146,19 @@ export class NOAAAdapter implements DataSourceAdapter {
       });
       
       // Extract unique variables from data types
-      const variables = Array.from(new Set(
-        dataTypesResponse.results.map((dt: any) => dt.name)
+      const variables: string[] = Array.from(new Set(
+        dataTypesResponse.results.map((dt: any) => dt.name as string)
       ));
       
       // Extract unique regions from locations
-      const regions = Array.from(new Set(
-        locationsResponse.results.map((loc: any) => loc.name)
+      const regions: string[] = Array.from(new Set(
+        locationsResponse.results.map((loc: any) => loc.name as string)
       ));
       
       return {
+        name: this.name,
+        description: this.description,
+        url: this.homepageUrl,
         variables,
         regions,
         resolutions: {
@@ -171,101 +180,37 @@ export class NOAAAdapter implements DataSourceAdapter {
   /**
    * Map NOAA dataset to our standard Repository format
    */
-  private mapDatasetToRepository(dataset: any, isDetailed = false): Repository {
-    // Calculate quality score (1-5) based on data completeness and coverage
-    const qualityScore = Math.min(5, Math.ceil((
-      (dataset.coverage ? 2 : 0) +
-      (dataset.dataTypes?.length ? 1 : 0) +
-      (dataset.locations?.length ? 1 : 0) +
-      1 // Base score
-    )));
-    
-    // Format the temporal coverage
-    const temporalCoverage = dataset.mindate && dataset.maxdate
-      ? `${dataset.mindate.split('T')[0]} to ${dataset.maxdate.split('T')[0]}`
-      : 'Unknown';
-    
-    // Extract available variables from data types if available
+  private mapDatasetToRepository(dataset: any): Repository {
     const variables = dataset.dataTypes 
-      ? Array.from(new Set(dataset.dataTypes.map((dt: any) => dt.name)))
+      ? Array.from(new Set(dataset.dataTypes.map((dt: any) => dt.name as string))) as string[]
       : [];
     
-    // Determine spatial coverage from locations if available
-    const spatialCoverage = dataset.locations
-      ? Array.from(new Set(dataset.locations.map((loc: any) => loc.name)))
-      : [];
+    // Start and end dates
+    const startDate = dataset.mindate ? dataset.mindate.split('T')[0] : '1900-01-01';
+    const endDate = dataset.maxdate ? dataset.maxdate.split('T')[0] : '2023-12-31';
     
     // Map to standard Repository format
     return {
       id: dataset.id,
-      title: dataset.name,
-      summary: dataset.description || 'No description available',
-      source: {
-        id: this.id,
-        name: this.name,
-        logo: this.logoUrl,
-        url: `${this.homepageUrl}datasets/${dataset.id}`,
-      },
-      thumbnail: `https://www.ncdc.noaa.gov/sites/default/files/styles/datasets-thumbnail/public/${dataset.id.toLowerCase()}-thumbnail.jpg`,
-      temporal_coverage: temporalCoverage,
-      spatial_coverage: spatialCoverage.length ? spatialCoverage : ['Global'],
+      name: dataset.name,
+      description: dataset.description || 'No description available',
+      url: `${this.homepageUrl}datasets/${dataset.id}`,
+      publisher: this.name,
+      keywords: ['NOAA', 'Climate', 'Historical'],
       variables: variables.length ? variables : ['Temperature', 'Precipitation'],
-      temporal_resolution: dataset.datacoverage >= 0.75 ? ['Daily'] : ['Monthly'],
-      spatial_resolution: ['Regional'],
-      quality: qualityScore,
-      type: dataset.dataTypes?.length 
-        ? Array.from(new Set(dataset.dataTypes.map((dt: any) => dt.name)))
-        : ['Observation'],
-      publication_date: dataset.mindate ? dataset.mindate.split('T')[0] : '2000-01-01',
-      tags: ['NOAA', 'Climate', 'Historical'],
-      category: dataset.id.includes('GSOY') ? ['Annual'] : ['Daily'],
-      citation: `NOAA National Centers for Environmental Information. ${dataset.name}. Available at: ${this.homepageUrl}datasets/${dataset.id}`,
-      files: isDetailed ? this.generateSampleFiles(dataset) : [],
+      temporalCoverage: {
+        startDate,
+        endDate
+      },
+      spatialCoverage: {
+        type: 'Polygon',
+        coordinates: [[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]
+      },
+      version: dataset.version || '1.0',
+      dataFormat: 'CSV',
+      license: 'NOAA Data License',
+      category: dataset.id.includes('GSOY') ? 'Annual' : 'Daily',
+      citation: `NOAA National Centers for Environmental Information. ${dataset.name}. Available at: ${this.homepageUrl}datasets/${dataset.id}`
     };
-  }
-
-  /**
-   * Generate sample files for a dataset (for demonstration purposes)
-   */
-  private generateSampleFiles(dataset: any): any[] {
-    const files = [];
-    
-    // Add CSV data file
-    files.push({
-      id: `${dataset.id}-csv`,
-      name: `${dataset.name} (CSV)`,
-      description: 'Complete dataset in CSV format',
-      fileType: 'csv',
-      fileSize: 2500000, // 2.5MB
-      url: `${this.homepageUrl}datasets/${dataset.id}/csv`,
-      dateAdded: new Date().toISOString(),
-      format: 'CSV',
-    });
-    
-    // Add JSON data file
-    files.push({
-      id: `${dataset.id}-json`,
-      name: `${dataset.name} (JSON)`,
-      description: 'Complete dataset in JSON format',
-      fileType: 'json',
-      fileSize: 4200000, // 4.2MB
-      url: `${this.homepageUrl}datasets/${dataset.id}/json`,
-      dateAdded: new Date().toISOString(),
-      format: 'JSON',
-    });
-    
-    // Add documentation PDF
-    files.push({
-      id: `${dataset.id}-documentation`,
-      name: `${dataset.name} Documentation`,
-      description: 'Detailed documentation and methodology',
-      fileType: 'pdf',
-      fileSize: 1500000, // 1.5MB
-      url: `${this.homepageUrl}datasets/${dataset.id}/documentation`,
-      dateAdded: new Date().toISOString(),
-      format: 'PDF',
-    });
-    
-    return files;
   }
 }
