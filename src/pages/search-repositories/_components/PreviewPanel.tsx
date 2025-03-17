@@ -2,13 +2,20 @@ import React from 'react';
 import {
   Box,
   Button,
+  Chip,
+  Divider,
   IconButton,
   Link,
   Paper,
+  Rating,
   Stack,
   Typography,
+  Grid,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ShareIcon from '@mui/icons-material/Share';
 import { Link as RouterLink } from 'react-router-dom';
 import { LabelValueTable } from '../../../components/LabelValueTable';
 import { DataGrid } from '@mui/x-data-grid';
@@ -25,10 +32,15 @@ const attachedFilesColumns: GridColDef[] = [
     flex: 1,
   },
   {
+    field: 'file_type',
+    headerName: 'Type',
+    width: 120,
+  },
+  {
     field: 'file_size',
     headerName: 'Size',
     type: 'number',
-    width: 150,
+    width: 100,
   },
 ];
 
@@ -37,16 +49,24 @@ const attachedFilesColumns: GridColDef[] = [
  */
 const attachedFiles = [
   {
-    file_name: 'file1.csv',
+    file_name: 'temperature_data_2020.nc',
+    file_type: 'NetCDF',
     file_size: '15 MB',
   },
   {
-    file_name: 'file2.json',
+    file_name: 'precipitation_daily.csv',
+    file_type: 'CSV',
     file_size: '117 MB',
   },
   {
-    file_name: 'file3.json',
+    file_name: 'dataset_metadata.json',
+    file_type: 'JSON',
     file_size: '4 MB',
+  },
+  {
+    file_name: 'region_boundaries.geojson',
+    file_type: 'GeoJSON',
+    file_size: '8 MB',
   },
 ];
 
@@ -62,7 +82,7 @@ interface PreviewPanelProps {
 }
 
 /**
- * Panel to show extra information about a card in a separate panel
+ * Panel to show detailed information about a climate dataset
  * next to the `<DataListPanel>`.
  */
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({
@@ -78,11 +98,13 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
       sx={{
         height: '100%',
         padding: 2,
+        overflowY: 'auto',
       }}
     >
       <Stack spacing={3}>
+        {/* Header Section */}
         <Stack spacing={1}>
-          <Stack direction="row">
+          <Stack direction="row" alignItems="center">
             <Typography variant="h6" component="h3" flex={1}>
               <Link
                 component={RouterLink}
@@ -96,77 +118,209 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
               <CloseIcon />
             </IconButton>
           </Stack>
-          <Typography variant="body2">
-            (Optional) Entity description or helper text.
-          </Typography>
+          
+          {/* Source and Quality */}
+          <Stack direction="row" spacing={2} alignItems="center">
+            {previewItem[cardFields.source] && (
+              <Chip 
+                label={previewItem[cardFields.source]} 
+                color="primary" 
+                variant="outlined" 
+                size="small"
+              />
+            )}
+            
+            {previewItem[cardFields.quality] && (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" color="text.secondary">Quality:</Typography>
+                <Rating 
+                  value={previewItem[cardFields.quality]} 
+                  readOnly 
+                  size="small"
+                  precision={0.5}
+                />
+              </Stack>
+            )}
+          </Stack>
         </Stack>
-        <Box>
-          <Typography fontWeight="medium" mb={1}>
-            Dates
-          </Typography>
-          <LabelValueTable
-            rows={[
-              { label: 'Publication Date', value: '2019-01-01' },
-              { label: 'Start Date', value: '2019-01-01' },
-              { label: 'End Date', value: '2019-01-01' },
-            ]}
-          />
-        </Box>
-        <Box>
-          <Typography fontWeight="medium" mb={1}>
-            Citation
-          </Typography>
-          <Typography>
-            Labore proident do aute et esse adipisicing veniam eiusmod culpa
-            pariatur sunt officia.
-          </Typography>
-        </Box>
-        {cardFields.content && (
+
+        {/* Dataset Thumbnail/Map */}
+        {previewItem[cardFields.thumbnail] && (
+          <Box
+            sx={{
+              height: '200px',
+              width: '100%',
+              overflow: 'hidden',
+              backgroundColor: 'neutral.light'
+            }}
+          >
+            <Box
+              component="img"
+              src={previewItem[cardFields.thumbnail]} 
+              alt={previewItem[cardFields.title]} 
+              sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </Box>
+        )}
+        
+        {/* Summary */}
+        {previewItem[cardFields.content] && (
           <Box>
-            <Typography fontWeight="medium" mb={1}>
+            <Typography variant="h6" gutterBottom>
               Summary
             </Typography>
             <Typography>{previewItem[cardFields.content]}</Typography>
           </Box>
         )}
-        {cardFields.tags && (
+        
+        <Divider />
+        
+        {/* Dataset Details */}
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Dataset Details
+          </Typography>
+          
+          <Grid container spacing={2}>
+            {/* Temporal Coverage */}
+            {previewItem[cardFields.temporal_coverage] && (
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Time Period
+                </Typography>
+                <Typography>
+                  {previewItem[cardFields.temporal_coverage]}
+                </Typography>
+              </Grid>
+            )}
+            
+            {/* Spatial Coverage */}
+            {previewItem[cardFields.spatial_coverage] && (
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Geographic Region
+                </Typography>
+                <Typography>
+                  {previewItem[cardFields.spatial_coverage]}
+                </Typography>
+              </Grid>
+            )}
+            
+            {/* Resolution */}
+            {previewItem[cardFields.resolution] && (
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Resolution
+                </Typography>
+                <Typography>
+                  {previewItem[cardFields.resolution]}
+                </Typography>
+              </Grid>
+            )}
+            
+            {/* Publication Date */}
+            {previewItem.publication_date && (
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Publication Date
+                </Typography>
+                <Typography>
+                  {previewItem.publication_date}
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+        
+        {/* Climate Variables */}
+        {previewItem[cardFields.variables] && previewItem[cardFields.variables].length > 0 && (
           <Box>
-            <Typography fontWeight="medium" mb={1}>
+            <Typography variant="h6" gutterBottom>
+              Climate Variables
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {previewItem[cardFields.variables].map((variable: string, i: number) => (
+                <Chip 
+                  key={`${variable}-${i}`}
+                  label={variable}
+                  color="secondary"
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
+        
+        {/* Tags */}
+        {previewItem[cardFields.tags] && previewItem[cardFields.tags].length > 0 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
               Tags
             </Typography>
-            <Typography>
-              {previewItem[cardFields.tags].map((tag: string, i: number) => {
-                if (
-                  cardFields.tags &&
-                  i < previewItem[cardFields.tags].length - 1
-                ) {
-                  return <span key={`${tag}-${i}`}>{`${tag}, `}</span>;
-                } else {
-                  return <span key={`${tag}-${i}`}>{tag}</span>;
-                }
-              })}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {previewItem[cardFields.tags].map((tag: string, i: number) => (
+                <Chip 
+                  key={`${tag}-${i}`}
+                  label={tag}
+                  variant="outlined"
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
+        
+        {/* Citation */}
+        {previewItem[cardFields.citation] && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Citation
+            </Typography>
+            <Typography variant="body2" sx={{ fontStyle: 'italic', padding: 2, backgroundColor: 'background.paper', borderLeft: '4px solid', borderColor: 'primary.main', borderRadius: 1 }}>
+              {previewItem[cardFields.citation]}
             </Typography>
           </Box>
         )}
+        
+        <Divider />
+        
+        {/* Attached Files */}
         <Box>
-          <Typography fontWeight="medium" mb={1}>
-            Attached Files
+          <Typography variant="h6" gutterBottom>
+            Available Files
           </Typography>
           <DataGrid
             getRowId={(row) => row.file_name}
             rows={attachedFiles}
             columns={attachedFilesColumns}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: { pageSize: 5 } },
-            }}
+            autoHeight
+            hideFooterPagination
+            hideFooter
+            sx={{ minHeight: 200 }}
           />
         </Box>
-        <Stack direction="row">
-          <Link component={RouterLink} to={`./${previewItem.id}`}>
-            <Button variant="contained">View datasets</Button>
-          </Link>
-          <Button variant="outlined">Download files</Button>
+        
+        {/* Action Buttons */}
+        <Stack direction="row" spacing={2}>
+          <Button 
+            variant="contained" 
+            component={RouterLink} 
+            to={`./${previewItem.id}`}
+            startIcon={<DownloadIcon />}
+          >
+            Download Dataset
+          </Button>
+          <Button 
+            variant="outlined"
+            startIcon={<BookmarkIcon />}
+          >
+            Save to Workspace
+          </Button>
+          <Button 
+            variant="outlined"
+            startIcon={<ShareIcon />}
+          >
+            Share
+          </Button>
         </Stack>
       </Stack>
     </Paper>

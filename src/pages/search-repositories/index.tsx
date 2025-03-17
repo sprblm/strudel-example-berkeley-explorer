@@ -1,9 +1,10 @@
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Divider } from '@mui/material';
 import React, { useState } from 'react';
 import { PageHeader } from '../../components/PageHeader';
 import { DataListPanel } from './_components/DataListPanel';
 import { FiltersPanel } from './_components/FiltersPanel';
 import { PreviewPanel } from './_components/PreviewPanel';
+import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
 import { taskflow } from './_config/taskflow.config';
 import { FilterContext } from '../../components/FilterContext';
 
@@ -58,8 +59,15 @@ const DatasetExplorer: React.FC = () => {
                 flex: 1,
                 minHeight: '600px',
                 minWidth: 0,
+                padding: 2,
               }}
             >
+              {/* Search History Panel */}
+              <SearchHistoryPanel />
+              
+              <Divider sx={{ my: 2 }} />
+              
+              {/* Data List Panel */}
               <DataListPanel
                 onToggleFiltersPanel={handleToggleFilters}
                 previewItem={previewItem}

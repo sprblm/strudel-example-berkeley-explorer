@@ -2,7 +2,16 @@ import { FilterComponent } from '../../../components/FilterField';
 import { FilterOperator } from '../../../types/filters.types';
 
 /**
- * Type definitions for the Compare Data Task Flow config object
+ * Repository definition
+ */
+export interface Repository {
+  id: string;
+  name: string;
+  enabled: boolean;
+}
+
+/**
+ * Type definitions for the Search Data Repositories Task Flow config object
  */
 export interface SearchDataRepositoriesConfig {
   /** Attributes that are used across the Task Flow */
@@ -20,14 +29,15 @@ export interface SearchDataRepositoriesConfig {
       idField: string;
       queryMode: 'client' | 'server';
     };
+    repositories?: Repository[];
     [key: string]: {
       source: string;
       staticParams?: Record<string, string> | null;
       idField: string;
       queryMode: 'client' | 'server';
-    };
+    } | Repository[] | any;
   };
-  /** Cool pages */
+  /** Pages configuration */
   pages: {
     index: {
       title: string;
@@ -36,6 +46,16 @@ export interface SearchDataRepositoriesConfig {
         title: string;
         content: string;
         tags: string;
+        source?: string;
+        quality?: string;
+        resolution?: string;
+        temporal_coverage?: string;
+        spatial_coverage?: string;
+        variables?: string;
+        thumbnail?: string;
+        citation?: string;
+        download_url?: string;
+        [key: string]: string | undefined;
       };
       cardFilters: {
         field: string;
@@ -44,6 +64,20 @@ export interface SearchDataRepositoriesConfig {
         filterComponent: FilterComponent;
         filterProps?: object;
       }[];
+      mapSearch?: {
+        enabled: boolean;
+        defaultCenter: [number, number];
+        defaultZoom: number;
+        maxBounds: [[number, number], [number, number]];
+      };
+      searchHistory?: {
+        enabled: boolean;
+        maxEntries: number;
+      };
+      savedSearches?: {
+        enabled: boolean;
+        maxSavedSearches: number;
+      };
     };
   };
 }
