@@ -20,18 +20,18 @@ export class NOAAAdapter implements DataSourceAdapter {
   public description = 'NOAA\'s Climate Data Online (CDO) provides free access to NCDC\'s archive of historical weather and climate data in addition to station history information.';
 
   private client: HttpClient;
-  private apiKey: string;
+  private apiKey: string | null;
 
   constructor(params: ApiParams) {
     this.client = new HttpClient({
       baseUrl: params.baseUrl || 'https://www.ncdc.noaa.gov/cdo-web/api/v2',
       headers: {
         'Content-Type': 'application/json',
-        'token': process.env.NOAA_API_KEY, // Read API key from environment variable
+        'token': process.env.VITE_NOAA_API_KEY, // Read API key from environment variable
       },
       timeout: params.timeout,
     });
-    this.apiKey = process.env.NOAA_API_KEY || '';
+    this.apiKey = process.env.VITE_NOAA_API_KEY ?? null;
   }
 
   /**
