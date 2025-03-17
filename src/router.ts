@@ -3,9 +3,33 @@
 
 import { components, hooks, utils } from '@generouted/react-router/client';
 
-export type Path = `/` | `/playground`;
+export type Path =
+  | `/`
+  | `/compare-data`
+  | `/compare-data/compare`
+  | `/compare-data/new`
+  | `/explore-data`
+  | `/explore-data/:id`
+  | `/monitor-activities`
+  | `/monitor-activities/calendar`
+  | `/monitor-activities/detail`
+  | `/playground`
+  | `/run-computation`
+  | `/run-computation/:id/data-inputs`
+  | `/run-computation/:id/results`
+  | `/run-computation/:id/running`
+  | `/run-computation/:id/settings`
+  | `/search-repositories`
+  | `/search-repositories/:id`;
 
-export type Params = {};
+export type Params = {
+  '/explore-data/:id': { id: string };
+  '/run-computation/:id/data-inputs': { id: string };
+  '/run-computation/:id/results': { id: string };
+  '/run-computation/:id/running': { id: string };
+  '/run-computation/:id/settings': { id: string };
+  '/search-repositories/:id': { id: string };
+};
 
 export type ModalPath = never;
 
