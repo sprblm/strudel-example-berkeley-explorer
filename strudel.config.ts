@@ -1,25 +1,57 @@
 /**
- * Configure global options and content for your app.
+ * Configures global options and content.
  */
 export const config = {
-  title: 'STRUDEL + React + MUI',
+  title: 'Climate Data Analysis Platform',
   navbar: {
-    title: 'My Project',
+    title: 'Climate Data Platform',
     logo: 'strudel-logo-icon.png',
     items: [
       {
-        label: 'Playground',
-        path: '/playground',
+        label: 'Search Repositories',
+        path: '/search-repositories',
+      },
+      {
+        label: 'Explore Data',
+        path: '/explore-data',
+      },
+      {
+        label: 'Compare Scenarios',
+        path: '/compare-data',
+      },
+      {
+        label: 'Run Models',
+        path: '/run-computation',
+      },
+      {
+        label: 'Monitor Activities',
+        path: '/monitor-activities',
       },
     ],
   },
   footer: {
-    info: 'Describe your project, place a copyright statement, or credit your funding organizations.',
+    info: 'Climate Data Analysis Platform - A comprehensive tool for climate researchers to search, explore, compare, and analyze climate data.',
     image: 'strudel-logo-header.png',
     links: [
       {
-        label: 'Playground',
-        path: '/playground',
+        label: 'Search Repositories',
+        path: '/search-repositories',
+      },
+      {
+        label: 'Explore Data',
+        path: '/explore-data',
+      },
+      {
+        label: 'Compare Scenarios',
+        path: '/compare-data',
+      },
+      {
+        label: 'Run Models',
+        path: '/run-computation',
+      },
+      {
+        label: 'Monitor Activities',
+        path: '/monitor-activities',
       },
     ],
   },
