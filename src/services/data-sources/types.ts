@@ -128,6 +128,10 @@ export interface Repository {
   authors?: string[];
   contributors?: string[];
   category?: string;
+  spatialResolution?: string | string[];
+  temporalResolution?: string | string[];
+  type?: string | string[];
+  [key: string]: unknown;
 }
 
 /**

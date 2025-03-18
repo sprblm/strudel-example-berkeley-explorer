@@ -7,6 +7,8 @@ import {
   SourceMetadata,
   HttpClientConfig
 } from './types';
+import { filterByDataFilters, filterBySearchText } from '../../utils/filters.utils';
+import { DataFilter, FilterConfig } from '../../types/filters.types';
 
 /**
  * WorldClim API adapter
@@ -39,9 +41,74 @@ export class WorldClimAdapter implements DataSourceAdapter {
       // Use client in a simulated API call
       console.log('Using client to search WorldClim datasets:', options);
       
+      // Make a client request to show usage
+      this.client.get('datasets/search', { 
+        query: options.query,
+        variables: options.variables?.join(',')
+      });
+      
       // For demonstration, we'll simulate an API response
       const datasets = this.getMockDatasets();
-      const filteredDatasets = this.filterDatasets(datasets, options);
+      
+      // Convert search options to filters
+      const filters: DataFilter[] = [];
+      
+      // Add query filter if present
+      if (options.query) {
+        filters.push({
+          field: 'name',
+          value: options.query
+        });
+      }
+      
+      // Add variables filter if present
+      if (options.variables && options.variables.length > 0) {
+        filters.push({
+          field: 'variables',
+          value: options.variables
+        });
+      }
+      
+      // Add temporal coverage filter if present
+      if (typeof options.temporal_coverage === 'object' && options.temporal_coverage) {
+        filters.push({
+          field: 'temporalCoverage',
+          value: [options.temporal_coverage.startDate, options.temporal_coverage.endDate]
+        });
+      }
+
+      // Define filter configurations for different fields
+      const filterConfigs: FilterConfig[] = [
+        {
+          field: 'name',
+          label: 'Name',
+          operator: 'contains',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'variables',
+          label: 'Variables',
+          operator: 'contains-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'temporalCoverage',
+          label: 'Time Period',
+          operator: 'between-dates-inclusive',
+          filterComponent: 'DateRangePicker'
+        }
+      ];
+      
+      // Use the utility functions for filtering
+      let filteredDatasets = datasets;
+      
+      // Apply text search if query is present
+      if (options.query) {
+        filteredDatasets = filterBySearchText<Repository>(filteredDatasets, options.query);
+      }
+      
+      // Apply other filters using the utility function
+      filteredDatasets = filterByDataFilters<Repository>(filteredDatasets, filters, filterConfigs);
       
       // Apply pagination
       const limit = options.limit || 25;
@@ -72,6 +139,7 @@ export class WorldClimAdapter implements DataSourceAdapter {
     try {
       // Use client in a simulated API call
       console.log('Using client to get WorldClim dataset details:', datasetId);
+      this.client.get(`datasets/${datasetId}`, {});
       
       // For demonstration, return the mock dataset with the matching ID
       const allDatasets = this.getMockDatasets();
@@ -128,33 +196,6 @@ export class WorldClimAdapter implements DataSourceAdapter {
       console.error('Error fetching WorldClim metadata:', error);
       throw error;
     }
-  }
-
-  /**
-   * Filter datasets based on search options
-   */
-  private filterDatasets(datasets: Repository[], options: SearchOptions): Repository[] {
-    return datasets.filter(dataset => {
-      // Filter by query text (search in name and description)
-      if (options.query) {
-        const query = options.query.toLowerCase();
-        if (!dataset.name.toLowerCase().includes(query) && 
-            !dataset.description.toLowerCase().includes(query)) {
-          return false;
-        }
-      }
-      
-      // Filter by variables
-      if (options.variables?.length && dataset.variables && !options.variables.some(v => 
-        dataset.variables.some(dv => dv.toLowerCase().includes(v.toLowerCase()))
-      )) {
-        return false;
-      }
-      
-      // Skip other filters for now as they use properties not in our Repository interface
-
-      return true;
-    });
   }
 
   /**

@@ -1,4 +1,6 @@
-import { Repository, SearchOptions, SearchResult, SourceMetadata } from './types';
+import { Repository, SearchOptions, SearchResult, SourceMetadata, HttpClientConfig } from './types';
+import { filterByDataFilters, filterBySearchText } from '../../utils/filters.utils';
+import { DataFilter, FilterConfig } from '../../types/filters.types';
 
 /**
  * Adapter for user-contributed datasets
@@ -11,9 +13,11 @@ export class UserContributedAdapter {
   public logoUrl = '/images/user-contributed-logo.png'; // Placeholder - would be a custom logo
   public description = 'Browse datasets contributed by users of the Climate Data Analysis Platform. These datasets may include research-specific climate data, regionally-focused datasets, and specialized climate indicators not available in other repositories.';
 
-  // Empty constructor with no parameters since we're not using any
-  constructor() {
+  // Constructor that accepts HttpClientConfig parameters
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(params?: HttpClientConfig) {
     // No initialization needed since we're using mock data
+    // We accept the parameters to match the interface being used in index.ts
   }
 
   /**
@@ -23,7 +27,134 @@ export class UserContributedAdapter {
     try {
       // For demonstration, we'll simulate an API response
       const datasets = this.getMockDatasets();
-      const filteredDatasets = this.filterDatasets(datasets, options);
+      
+      // Convert search options to filters
+      const filters: DataFilter[] = [];
+      
+      // Add query filter if present
+      if (options.query) {
+        filters.push({
+          field: 'name',
+          value: options.query
+        });
+      }
+      
+      // Add variables filter if present
+      if (options.variables && options.variables.length > 0) {
+        filters.push({
+          field: 'variables',
+          value: options.variables
+        });
+      }
+      
+      // Add temporal coverage filter if present
+      if (typeof options.temporal_coverage === 'object' && options.temporal_coverage) {
+        filters.push({
+          field: 'temporalCoverage',
+          value: [options.temporal_coverage.startDate, options.temporal_coverage.endDate]
+        });
+      }
+
+      // Add spatial resolution filter if present
+      if (options.spatial_resolution && options.spatial_resolution.length > 0) {
+        filters.push({
+          field: 'spatialResolution',
+          value: options.spatial_resolution
+        });
+      }
+
+      // Add temporal resolution filter if present
+      if (options.temporal_resolution && options.temporal_resolution.length > 0) {
+        filters.push({
+          field: 'temporalResolution',
+          value: options.temporal_resolution
+        });
+      }
+
+      // Add type filter if present
+      if (options.type && options.type.length > 0) {
+        filters.push({
+          field: 'type',
+          value: options.type
+        });
+      }
+
+      // Add tags filter if present
+      if (options.tags && options.tags.length > 0) {
+        filters.push({
+          field: 'keywords',
+          value: options.tags
+        });
+      }
+      
+      // Define filter configurations for different fields
+      const filterConfigs: FilterConfig[] = [
+        {
+          field: 'name',
+          label: 'Name',
+          operator: 'contains',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'variables',
+          label: 'Variables',
+          operator: 'contains-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'temporalCoverage',
+          label: 'Time Period',
+          operator: 'between-dates-inclusive',
+          filterComponent: 'DateRangePicker'
+        },
+        {
+          field: 'publisher',
+          label: 'Publisher',
+          operator: 'equals',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'license',
+          label: 'License',
+          operator: 'equals',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'keywords',
+          label: 'Keywords',
+          operator: 'contains-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'spatialResolution',
+          label: 'Spatial Resolution',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'temporalResolution',
+          label: 'Temporal Resolution',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'type',
+          label: 'Type',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
+        }
+      ];
+      
+      // Use the utility functions for filtering
+      let filteredDatasets = datasets;
+      
+      // Apply text search if query is present
+      if (options.query) {
+        filteredDatasets = filterBySearchText<Repository>(filteredDatasets, options.query);
+      }
+      
+      // Apply other filters using the utility function
+      filteredDatasets = filterByDataFilters<Repository>(filteredDatasets, filters, filterConfigs);
       
       // Apply pagination
       const limit = options.limit || 25;
@@ -110,37 +241,6 @@ export class UserContributedAdapter {
   }
 
   /**
-   * Filter datasets based on search options
-   */
-  private filterDatasets(datasets: Repository[], options: SearchOptions): Repository[] {
-    return datasets.filter(dataset => {
-      // Filter by query text (search in name and description)
-      if (options.query) {
-        const query = options.query.toLowerCase();
-        if (!dataset.name.toLowerCase().includes(query) && 
-            !dataset.description.toLowerCase().includes(query)) {
-          return false;
-        }
-      }
-      
-      // Filter by variables
-      if (options.variables?.length && dataset.variables) {
-        const hasMatchingVariables = options.variables.some(v => 
-          dataset.variables?.some(dv => dv.toLowerCase().includes(v.toLowerCase()))
-        );
-        
-        if (!hasMatchingVariables) {
-          return false;
-        }
-      }
-      
-      // Skip other filters since they may rely on properties not in our Repository interface
-      
-      return true;
-    });
-  }
-
-  /**
    * Generate mock user-contributed dataset repositories for demonstration
    */
   private getMockDatasets(): Repository[] {
@@ -159,7 +259,10 @@ export class UserContributedAdapter {
         temporalCoverage: {
           startDate: '2010-01-01',
           endDate: '2021-12-31'
-        }
+        },
+        spatialResolution: 'High (30m)',
+        temporalResolution: 'Daily',
+        type: 'Research Data'
       },
       {
         id: 'user-contrib-2',
@@ -175,7 +278,10 @@ export class UserContributedAdapter {
         temporalCoverage: {
           startDate: '1980-01-01',
           endDate: '2022-12-31'
-        }
+        },
+        spatialResolution: 'Medium (1km)',
+        temporalResolution: 'Monthly',
+        type: 'Custom Indicators'
       },
       {
         id: 'user-contrib-3',
@@ -191,7 +297,10 @@ export class UserContributedAdapter {
         temporalCoverage: {
           startDate: '2020-01-01',
           endDate: '2100-12-31'
-        }
+        },
+        spatialResolution: 'Medium (500m)',
+        temporalResolution: 'Annual',
+        type: 'Regional Analysis'
       }
     ];
   }

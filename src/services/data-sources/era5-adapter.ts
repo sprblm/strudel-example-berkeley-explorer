@@ -7,6 +7,8 @@ import {
   SearchResult, 
   SourceMetadata 
 } from './types';
+import { filterByDataFilters, filterBySearchText } from '../../utils/filters.utils';
+import { DataFilter, FilterConfig } from '../../types/filters.types';
 
 /**
  * ERA5 climate data adapter
@@ -32,59 +34,146 @@ export class ERA5Adapter implements DataSourceAdapter {
     try {
       // Use the client to avoid unused variable warning
       console.log('Using client to search ERA5 datasets with options:', options);
-      this.client.get('datasets/search', { params: options }); // Makes use of client
+      
+      // Call the client with a proper params structure that matches the expected type
+      this.client.get('datasets/search', { 
+        query: options.query,
+        variables: options.variables?.join(',')
+      });
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Mock data representing search results from ERA5
-      const repositories: Repository[] = [
+      // Get mock data
+      const repositories = this.getMockDatasets();
+      
+      // Convert search options to filters
+      const filters: DataFilter[] = [];
+      
+      // Add query filter if present
+      if (options.query) {
+        filters.push({
+          field: 'name',
+          value: options.query
+        });
+      }
+      
+      // Add variables filter if present
+      if (options.variables && options.variables.length > 0) {
+        filters.push({
+          field: 'variables',
+          value: options.variables
+        });
+      }
+      
+      // Add temporal coverage filter if present
+      if (typeof options.temporal_coverage === 'object' && options.temporal_coverage) {
+        filters.push({
+          field: 'temporalCoverage',
+          value: [options.temporal_coverage.startDate, options.temporal_coverage.endDate]
+        });
+      }
+
+      // Add spatial resolution filter if present
+      if (options.spatial_resolution && options.spatial_resolution.length > 0) {
+        filters.push({
+          field: 'spatialResolution',
+          value: options.spatial_resolution
+        });
+      }
+
+      // Add temporal resolution filter if present
+      if (options.temporal_resolution && options.temporal_resolution.length > 0) {
+        filters.push({
+          field: 'temporalResolution',
+          value: options.temporal_resolution
+        });
+      }
+
+      // Add type filter if present
+      if (options.type && options.type.length > 0) {
+        filters.push({
+          field: 'type',
+          value: options.type
+        });
+      }
+
+      // Add tags filter if present
+      if (options.tags && options.tags.length > 0) {
+        filters.push({
+          field: 'keywords',
+          value: options.tags
+        });
+      }
+      
+      // Define filter configurations for different fields
+      const filterConfigs: FilterConfig[] = [
         {
-          id: 'era5-001',
-          name: 'ERA5 Single Levels',
-          description: 'ERA5 hourly data on single levels from 1940 to present',
-          variables: ['2m_temperature', 'total_precipitation', 'sea_level_pressure'],
-          url: 'https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels',
-          citation: 'Hersbach, H., Bell, B., Berrisford, P., et al. (2020)',
-          license: 'Copernicus License',
-          publisher: 'ECMWF'
+          field: 'name',
+          label: 'Name',
+          operator: 'contains',
+          filterComponent: 'TextInput'
         },
         {
-          id: 'era5-002',
-          name: 'ERA5 Pressure Levels',
-          description: 'ERA5 hourly data on pressure levels from 1940 to present',
-          variables: ['temperature', 'geopotential', 'specific_humidity'],
-          url: 'https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-pressure-levels',
-          citation: 'Hersbach, H., Bell, B., Berrisford, P., et al. (2020)',
-          license: 'Copernicus License',
-          publisher: 'ECMWF'
+          field: 'variables',
+          label: 'Variables',
+          operator: 'contains-one-of',
+          filterComponent: 'MultiSelect'
         },
         {
-          id: 'era5-003',
-          name: 'ERA5-Land',
-          description: 'ERA5-Land hourly data from 1950 to present',
-          variables: ['soil_temperature', 'volumetric_soil_water', 'leaf_area_index'],
-          url: 'https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land',
-          citation: 'Muñoz Sabater, J. (2019)',
-          license: 'Copernicus License',
-          publisher: 'ECMWF'
+          field: 'temporalCoverage',
+          label: 'Time Period',
+          operator: 'between-dates-inclusive',
+          filterComponent: 'DateRangePicker'
+        },
+        {
+          field: 'publisher',
+          label: 'Publisher',
+          operator: 'equals',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'license',
+          label: 'License',
+          operator: 'equals',
+          filterComponent: 'TextInput'
+        },
+        {
+          field: 'keywords',
+          label: 'Keywords',
+          operator: 'contains-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'spatialResolution',
+          label: 'Spatial Resolution',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'temporalResolution',
+          label: 'Temporal Resolution',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
+        },
+        {
+          field: 'type',
+          label: 'Type',
+          operator: 'equals-one-of',
+          filterComponent: 'MultiSelect'
         }
       ];
       
-      // Filter based on search options
-      const filteredRepositories = repositories.filter(repo => {
-        // Filter by query text
-        if (options.query && !repo.name.toLowerCase().includes(options.query.toLowerCase())) {
-          return false;
-        }
-        
-        // Filter by variables
-        if (options.variables && options.variables.length > 0) {
-          return repo.variables?.some(v => options.variables?.includes(v));
-        }
-        
-        return true;
-      });
+      // Use the utility functions for filtering
+      let filteredRepositories = repositories;
+      
+      // Apply text search if query is present
+      if (options.query) {
+        filteredRepositories = filterBySearchText<Repository>(filteredRepositories, options.query);
+      }
+      
+      // Apply other filters using the utility function
+      filteredRepositories = filterByDataFilters<Repository>(filteredRepositories, filters, filterConfigs);
       
       return {
         datasets: filteredRepositories,
@@ -179,7 +268,10 @@ export class ERA5Adapter implements DataSourceAdapter {
         temporalCoverage: {
           startDate: '1940-01-01',
           endDate: '2023-12-31'
-        }
+        },
+        spatialResolution: '0.25°',
+        temporalResolution: 'Hourly',
+        type: 'Reanalysis'
       },
       {
         id: 'era5-002',
@@ -195,7 +287,10 @@ export class ERA5Adapter implements DataSourceAdapter {
         temporalCoverage: {
           startDate: '1940-01-01',
           endDate: '2023-12-31'
-        }
+        },
+        spatialResolution: '0.5°',
+        temporalResolution: 'Daily',
+        type: 'Reanalysis'
       },
       {
         id: 'era5-003',
@@ -211,7 +306,10 @@ export class ERA5Adapter implements DataSourceAdapter {
         temporalCoverage: {
           startDate: '1950-01-01',
           endDate: '2023-12-31'
-        }
+        },
+        spatialResolution: '1.0°',
+        temporalResolution: 'Monthly',
+        type: 'Reanalysis'
       }
     ];
   }
