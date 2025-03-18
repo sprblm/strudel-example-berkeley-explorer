@@ -6,6 +6,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { useFilters } from '../../../hooks/useFilters';
+import { DataFilter } from '../../../types/filters.types.tsx';
 import * as taskflow from '../../../utils/taskflow';
 import styles from './SearchHistoryPanel.module.css';
 
@@ -37,7 +38,7 @@ interface SearchItem {
   id: string;
   name: string;
   timestamp: string;
-  filters: Record<string, any>;
+  filters: DataFilter[] | Record<string, any>;
 }
 
 // Mock data for search history
@@ -106,7 +107,7 @@ export const SearchHistoryPanel: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [searchHistory, setSearchHistory] = useState<SearchItem[]>(mockSearchHistory);
   const [savedSearches, setSavedSearches] = useState<SearchItem[]>(mockSavedSearches);
-  const { updateAllFilters } = useFilters();
+  const { updateAllFilters } = useFilters([], [], []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -114,7 +115,18 @@ export const SearchHistoryPanel: React.FC = () => {
 
   const handleApplySearch = (item: SearchItem) => {
     // Apply the saved filters to the current search
-    updateAllFilters(item.filters);
+    // Convert item.filters to DataFilter[] if it's not already in that format
+    if (Array.isArray(item.filters)) {
+      updateAllFilters(item.filters as DataFilter[]);
+    } else {
+      // If filters are stored as Record<string, any>, convert to DataFilter[]
+      const filterArray = Object.entries(item.filters).map(([field, value]) => ({
+        field,
+        value,
+        operator: 'equals' // Use a default operator or determine based on value type
+      }));
+      updateAllFilters(filterArray);
+    }
   };
 
   const handleSaveSearch = (item: SearchItem) => {

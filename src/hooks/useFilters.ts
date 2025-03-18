@@ -1,9 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { filterBySearchText, filterByDataFilters } from '../utils/filters.utils';
-import { DataFilter, FilterConfig } from '../types/filters.types';
+import { DataFilter, FilterConfig } from '../types/filters.types.tsx';
 
-export const useFilters = (allData: any[], filters: DataFilter[] | null, filterConfigs: FilterConfig[] | null, searchText?: string) => {
-  const [filteredData, setFilteredData] = useState(allData);
+export const useFilters = (initialData: any[] = [], initialFilters: DataFilter[] | null = null, initialFilterConfigs: FilterConfig[] | null = null, initialSearchText: string = '') => {
+  const [allData, setAllData] = useState(initialData);
+  const [filters, setFilters] = useState<DataFilter[] | null>(initialFilters);
+  const [filterConfigs, setFilterConfigs] = useState<FilterConfig[] | null>(initialFilterConfigs);
+  const [searchText, setSearchText] = useState<string>(initialSearchText);
+  const [filteredData, setFilteredData] = useState(initialData);
+
+  const updateAllFilters = useCallback((newFilters: DataFilter[] | null) => {
+    setFilters(newFilters);
+  }, []);
+
+  const updateFilterConfigs = useCallback((newFilterConfigs: FilterConfig[] | null) => {
+    setFilterConfigs(newFilterConfigs);
+  }, []);
+
+  const updateSearchText = useCallback((newSearchText: string) => {
+    setSearchText(newSearchText);
+  }, []);
+
+  const updateData = useCallback((newData: any[]) => {
+    setAllData(newData);
+  }, []);
 
   useEffect(() => {
     let data = allData;
@@ -17,5 +37,14 @@ export const useFilters = (allData: any[], filters: DataFilter[] | null, filterC
     setFilteredData(data);
   }, [allData, filters, filterConfigs, searchText]);
 
-  return filteredData;
+  return {
+    filteredData,
+    filters,
+    filterConfigs,
+    searchText,
+    updateAllFilters,
+    updateFilterConfigs,
+    updateSearchText,
+    updateData
+  };
 };
