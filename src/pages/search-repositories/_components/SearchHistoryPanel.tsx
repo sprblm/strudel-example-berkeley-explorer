@@ -1,27 +1,13 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Tab,
-  Tabs,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Tabs, Tab, Paper, List, ListItemButton, ListItemText, ListItemIcon, IconButton, Typography, Tooltip, Divider, ListItem } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import { useFilters } from '../../../components/FilterContext';
-import { taskflow } from '../_config/taskflow.config';
+import { useFilters } from '../../../hooks/useFilters';
+import * as taskflow from '../../../utils/taskflow';
+import styles from './SearchHistoryPanel.module.css';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,9 +24,11 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       {...other}
     >
-      <Box sx={{ p: 3 }}>
-        <Typography component="div">{children}</Typography>
-      </Box>
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -154,15 +142,9 @@ export const SearchHistoryPanel: React.FC = () => {
   return (
     <Paper 
       elevation={0} 
-      sx={{ 
-        borderRadius: 1, 
-        border: '1px solid', 
-        borderColor: 'divider',
-        overflow: 'hidden',
-        mb: 2
-      }}
+      className={styles.paper}
     >
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box className={styles.tabsContainer}>
         <Tabs 
           value={tabValue} 
           onChange={handleTabChange} 
@@ -173,7 +155,7 @@ export const SearchHistoryPanel: React.FC = () => {
         </Tabs>
       </Box>
       
-      <TabPanel value={tabValue} index={0} sx={{ p: 0 }}>
+      <TabPanel value={tabValue} index={0} className={styles.tabPanel}>
         <List>
           {searchHistory.map((item) => (
             <ListItemButton key={item.id}>
@@ -206,13 +188,13 @@ export const SearchHistoryPanel: React.FC = () => {
         </List>
       </TabPanel>
       
-      <TabPanel value={tabValue} index={1}>
-        <Typography component="div" variant="body1" sx={{ p: 3 }}>
+      <TabPanel value={tabValue} index={1} className={styles.tabPanel}>
+        <Typography component="div" variant="body1" className={styles.savedSearchesHeader}>
           Saved Searches
         </Typography>
         
         {savedSearches.length === 0 ? (
-          <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+          <Typography component="div" variant="body2" color="text.secondary" className={styles.noSavedSearches}>
             No saved searches yet
           </Typography>
         ) : (
@@ -232,21 +214,21 @@ export const SearchHistoryPanel: React.FC = () => {
                   <ListItemButton 
                     dense 
                     onClick={() => handleApplySearch(item)}
-                    sx={{ pr: 8 }}
+                    className={styles.savedSearchItem}
                   >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
+                    <ListItemIcon className={styles.savedSearchIcon}>
                       <BookmarkIcon fontSize="small" color="primary" />
                     </ListItemIcon>
                     <ListItemText 
                       primary={item.name}
                       secondary={
-                        <Box sx={{ mt: 0.5 }}>
+                        <div className={styles.filterTagsWrapper}>
                           {Object.entries(item.filters).map(([key, value]) => (
-                            <Typography key={key} component="div" variant="caption" sx={{ mr: 1 }}>
+                            <span key={key} className={styles.filterTag}>
                               {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : value}</strong>
-                            </Typography>
+                            </span>
                           ))}
-                        </Box>
+                        </div>
                       }
                     />
                   </ListItemButton>
