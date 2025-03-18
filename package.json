@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://codytodonnell.github.io/strudel-kit/demo/",
+  "homepage": "",
   "scripts": {
     "start": "vite",
     "dev": "vite",
