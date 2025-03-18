@@ -1,34 +1,19 @@
-import { Repository } from './types';
-import { HttpClient } from './http-client';
-import { 
-  DataSourceAdapter, 
-  SearchOptions, 
-  SearchResult, 
-  SourceMetadata,
-  HttpClientConfig
-} from './types';
+import { Repository, SearchOptions, SearchResult, SourceMetadata } from './types';
 
 /**
- * User-Contributed Datasets API adapter
- * Allows access to datasets contributed by users of the platform
+ * Adapter for user-contributed datasets
+ * This is a mock implementation that would be replaced with actual API calls in production
  */
-export class UserContributedAdapter implements DataSourceAdapter {
+export class UserContributedAdapter {
   public id = 'user-contributed';
   public name = 'User-Contributed Datasets';
   public homepageUrl = '#'; // Placeholder - would point to the repository submission page
   public logoUrl = '/images/user-contributed-logo.png'; // Placeholder - would be a custom logo
   public description = 'Browse datasets contributed by users of the Climate Data Analysis Platform. These datasets may include research-specific climate data, regionally-focused datasets, and specialized climate indicators not available in other repositories.';
 
-  private client: HttpClient;
-
-  constructor(params: HttpClientConfig) {
-    this.client = new HttpClient({
-      baseUrl: params.baseUrl || '/api/user-contributed', // Would be a relative path to the platform's API
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: params.timeout,
-    });
+  // Empty constructor with no parameters since we're not using any
+  constructor() {
+    // No initialization needed since we're using mock data
   }
 
   /**
@@ -36,9 +21,6 @@ export class UserContributedAdapter implements DataSourceAdapter {
    */
   async searchDatasets(options: SearchOptions): Promise<SearchResult> {
     try {
-      // Log use of client to avoid unused variable warning
-      console.log('Using client to search user-contributed datasets:', options);
-      
       // For demonstration, we'll simulate an API response
       const datasets = this.getMockDatasets();
       const filteredDatasets = this.filterDatasets(datasets, options);
@@ -70,9 +52,6 @@ export class UserContributedAdapter implements DataSourceAdapter {
    */
   async getDatasetDetails(datasetId: string): Promise<Repository> {
     try {
-      // Log use of client to avoid unused variable warning
-      console.log('Using client to get user-contributed dataset details:', datasetId);
-      
       // For demonstration, return the mock dataset with the matching ID
       const allDatasets = this.getMockDatasets();
       const dataset = allDatasets.find(ds => ds.id === datasetId);
@@ -145,10 +124,14 @@ export class UserContributedAdapter implements DataSourceAdapter {
       }
       
       // Filter by variables
-      if (options.variables?.length && dataset.variables && !options.variables.some(v => 
-        dataset.variables.some(dv => dv.toLowerCase().includes(v.toLowerCase()))
-      )) {
-        return false;
+      if (options.variables?.length && dataset.variables) {
+        const hasMatchingVariables = options.variables.some(v => 
+          dataset.variables?.some(dv => dv.toLowerCase().includes(v.toLowerCase()))
+        );
+        
+        if (!hasMatchingVariables) {
+          return false;
+        }
       }
       
       // Skip other filters since they may rely on properties not in our Repository interface

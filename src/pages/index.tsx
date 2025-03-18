@@ -1,4 +1,3 @@
-import { routes } from '@generouted/react-router';
 import {
   Box,
   Chip,
@@ -21,15 +20,24 @@ import { Layout } from '../components/Layout';
  */
 const HomePage: React.FC = () => {
   /**
-   * Sort routes alphabetically by path
+   * Define routes manually instead of using generouted
    */
-  routes[0].children?.sort((a, b) => {
-    const pathA = a.path || '';
-    const pathB = b.path || '';
+  const appRoutes = [
+    { path: '/compare-data', label: 'Compare Data' },
+    { path: '/explore-data', label: 'Explore Data' },
+    { path: '/monitor-activities', label: 'Monitor Activities' },
+    { path: '/playground', label: 'Playground' },
+    { path: '/run-computation', label: 'Run Computation' },
+    { path: '/search-repositories', label: 'Search Repositories' },
+  ];
 
-    if ((pathA === 'playground' && pathB !== '/') || pathA < pathB) {
+  /**
+   * Sort routes alphabetically
+   */
+  appRoutes.sort((a, b) => {
+    if ((a.path === '/playground' && b.path !== '/') || a.path < b.path) {
       return -1;
-    } else if (pathA > pathB) {
+    } else if (a.path > b.path) {
       return 1;
     } else {
       return 0;
@@ -87,7 +95,7 @@ const HomePage: React.FC = () => {
                 >
                   <Table size="small">
                     <TableBody>
-                      {routes[0].children?.map((route) => {
+                      {appRoutes.map((route) => {
                         if (route.path === '/') {
                           return (
                             <TableRow key={route.path}>
@@ -112,7 +120,7 @@ const HomePage: React.FC = () => {
                               <TableCell>
                                 <code>
                                   <AppLink to={route.path || ''}>
-                                    /{route.path}
+                                    {route.path}
                                   </AppLink>
                                 </code>
                               </TableCell>

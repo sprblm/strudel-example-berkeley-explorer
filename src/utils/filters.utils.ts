@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { DataFilter, FilterConfig } from '../types/filters.types';
 
-export const filterBySearchText = (allData: any[], searchText?: string) => {
+export const filterBySearchText = <T extends Record<string, unknown>>(allData: T[], searchText?: string) => {
   let filteredData = allData;
   if (searchText) {
     filteredData = allData.filter((d) => {
@@ -12,8 +12,8 @@ export const filterBySearchText = (allData: any[], searchText?: string) => {
   return filteredData;
 };
 
-export const filterByDataFilters = (
-  allData: any[],
+export const filterByDataFilters = <T extends Record<string, unknown>>(
+  allData: T[],
   filters: DataFilter[] | null,
   filterConfigs: FilterConfig[] | null
 ) => {
@@ -37,7 +37,8 @@ export const filterByDataFilters = (
         if (include === true) {
           switch (filterOperatorMap[f.field]) {
             case 'contains': {
-              if (d[f.field].indexOf(f.value) > -1) {
+              const fieldValue = d[f.field as keyof typeof d];
+              if (typeof fieldValue === 'string' && typeof f.value === 'string' && fieldValue.indexOf(f.value) > -1) {
                 match = true;
               }
               break;
@@ -46,14 +47,13 @@ export const filterByDataFilters = (
               if (Array.isArray(f.value)) {
                 f.value.forEach((v) => {
                   if (!match) {
-                    if (Array.isArray(d[f.field])) {
-                      if (d[f.field].indexOf(v) > -1) {
+                    const fieldValue = d[f.field as keyof typeof d];
+                    if (Array.isArray(fieldValue)) {
+                      if (fieldValue.indexOf(v) > -1) {
                         match = true;
                       }
-                    } else {
-                      if (d[f.field] === v) {
-                        match = true;
-                      }
+                    } else if (fieldValue === v) {
+                      match = true;
                     }
                   }
                 });
@@ -64,7 +64,8 @@ export const filterByDataFilters = (
               if (Array.isArray(f.value)) {
                 f.value.forEach((v) => {
                   if (!match) {
-                    if (d[f.field] === v) {
+                    const fieldValue = d[f.field as keyof typeof d];
+                    if (fieldValue === v) {
                       match = true;
                     }
                   }
@@ -76,20 +77,23 @@ export const filterByDataFilters = (
               if (Array.isArray(f.value)) {
                 const min = f.value[0];
                 const max = f.value[1];
-                if (d[f.field] >= min && d[f.field] <= max) {
+                const fieldValue = d[f.field as keyof typeof d];
+                if (typeof fieldValue === 'number' && typeof min === 'number' && typeof max === 'number' && 
+                    fieldValue >= min && fieldValue <= max) {
                   match = true;
                 }
               }
               break;
             }
             case 'between-dates-inclusive': {
+              const fieldValue = d[f.field as keyof typeof d];
               if (
-                typeof d[f.field] === 'string' &&
+                typeof fieldValue === 'string' &&
                 Array.isArray(f.value) &&
                 f.value[0] &&
                 f.value[1]
               ) {
-                const dateValue = dayjs(d[f.field]);
+                const dateValue = dayjs(fieldValue);
                 if (
                   dateValue.isAfter(f.value[0]) &&
                   dateValue.isBefore(f.value[1])
@@ -113,8 +117,8 @@ export const filterByDataFilters = (
   return filteredData;
 };
 
-export const filterData = (
-  allData: any[],
+export const filterData = <T extends Record<string, unknown>>(
+  allData: T[],
   filters: DataFilter[],
   filterConfigs: FilterConfig[],
   searchText?: string
@@ -131,12 +135,12 @@ export const filterData = (
 export const initSliderTicks = (
   ticks: number | null,
   domain: number[],
-  scale?: any
+  scale?: { ticks: (count: number) => number[] }
 ) => {
   if (ticks === 2) {
     return domain;
   } else if (ticks !== null) {
-    return scale.ticks(ticks);
+    return scale?.ticks(ticks);
   } else {
     return;
   }
