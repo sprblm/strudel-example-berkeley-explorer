@@ -23,7 +23,7 @@ class HttpClient {
    */
   async get<T>(
     path: string,
-    params?: Record<string, any>,
+    params?: Record<string, string | number | boolean | string[] | undefined>,
     headers?: Record<string, string>
   ): Promise<T> {
     const config: AxiosRequestConfig = {
@@ -45,7 +45,7 @@ class HttpClient {
    */
   async post<T>(
     path: string,
-    data: any,
+    data: Record<string, unknown>,
     headers?: Record<string, string>
   ): Promise<T> {
     const config: AxiosRequestConfig = {

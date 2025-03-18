@@ -43,7 +43,7 @@ export class NOAAAdapter implements DataSourceAdapter {
   async searchDatasets(options: SearchOptions): Promise<SearchResult> {
     try {
       // Map our generic search options to NOAA-specific parameters
-      const params: Record<string, any> = {
+      const params: Record<string, string | number | boolean | string[] | undefined> = {
         limit: options.limit || 25,
         offset: options.page ? (options.page - 1) * (options.limit || 25) : 0,
       };
@@ -71,7 +71,7 @@ export class NOAAAdapter implements DataSourceAdapter {
       }
 
       // Make API request to NOAA CDO
-      const response = await this.client.get<any>('/datasets', params);
+      const response = await this.client.get<NOAAResponse<NOAADataset>>('/datasets', params);
       
       // Transform API response to our standard format
       const datasets = response.results.map(this.mapDatasetToRepository);
@@ -119,7 +119,7 @@ export class NOAAAdapter implements DataSourceAdapter {
         },
         spatialCoverage: {
           type: 'global',
-          coordinates: [[-180, -90], [180, 90]]
+          coordinates: [[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]]
         }
       };
       
@@ -136,23 +136,23 @@ export class NOAAAdapter implements DataSourceAdapter {
   async getSourceMetadata(): Promise<SourceMetadata> {
     try {
       // Get available data types
-      const dataTypesResponse = await this.client.get<any>('/datatypes', {
+      const dataTypesResponse = await this.client.get<NOAAResponse<NOAADataType>>('/datatypes', {
         limit: 1000,
       });
       
       // Get available locations
-      const locationsResponse = await this.client.get<any>('/locations', {
+      const locationsResponse = await this.client.get<NOAAResponse<NOAALocation>>('/locations', {
         limit: 1000,
       });
       
       // Extract unique variables from data types
       const variables: string[] = Array.from(new Set(
-        dataTypesResponse.results.map((dt: any) => dt.name as string)
+        dataTypesResponse.results.map((dt: NOAADataType) => dt.name as string)
       ));
       
       // Extract unique regions from locations
       const regions: string[] = Array.from(new Set(
-        locationsResponse.results.map((loc: any) => loc.name as string)
+        locationsResponse.results.map((loc: NOAALocation) => loc.name as string)
       ));
       
       return {
@@ -180,9 +180,9 @@ export class NOAAAdapter implements DataSourceAdapter {
   /**
    * Map NOAA dataset to our standard Repository format
    */
-  private mapDatasetToRepository(dataset: any): Repository {
+  private mapDatasetToRepository(dataset: NOAADataset): Repository {
     const variables = dataset.dataTypes 
-      ? Array.from(new Set(dataset.dataTypes.map((dt: any) => dt.name as string))) as string[]
+      ? Array.from(new Set(dataset.dataTypes.map((dt: NOAADataType) => dt.name as string))) as string[]
       : [];
     
     // Start and end dates
@@ -213,4 +213,35 @@ export class NOAAAdapter implements DataSourceAdapter {
       citation: `NOAA National Centers for Environmental Information. ${dataset.name}. Available at: ${this.homepageUrl}datasets/${dataset.id}`
     };
   }
+}
+
+interface NOAAResponse<T> {
+  results: T[];
+  metadata: {
+    resultset: {
+      count: number;
+      limit: number;
+      offset: number;
+    };
+  };
+}
+
+interface NOAADataset {
+  id: string;
+  name: string;
+  description: string;
+  mindate: string;
+  maxdate: string;
+  dataTypes: NOAADataType[];
+  version: string;
+}
+
+interface NOAADataType {
+  id: string;
+  name: string;
+}
+
+interface NOAALocation {
+  id: string;
+  name: string;
 }

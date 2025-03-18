@@ -164,3 +164,56 @@ export interface HttpClientConfig {
   headers?: Record<string, string>;
   timeout?: number;
 }
+
+/**
+ * Common API parameter types
+ */
+export interface PaginationParams {
+  limit?: number;
+  offset?: number;
+  page?: number;
+}
+
+export interface StringKeyValueParams {
+  [key: string]: string | number | boolean | string[] | undefined;
+}
+
+/**
+ * NOAA specific types
+ */
+export interface NOAADataType {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+export interface NOAALocation {
+  id: string;
+  name: string;
+  region?: string;
+  type?: string;
+}
+
+export interface NOAADataset {
+  id: string;
+  name: string;
+  description?: string;
+  mindate?: string;
+  maxdate?: string;
+  dataTypes?: NOAADataType[];
+  locations?: NOAALocation[];
+  [key: string]: unknown;
+}
+
+export interface NOAAMetadata {
+  resultset: {
+    count: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+export interface NOAAResponse<T> {
+  metadata: NOAAMetadata;
+  results: T[];
+}
