@@ -1,9 +1,9 @@
 import { Box, Stack, Divider } from '@mui/material';
 import React, { useState } from 'react';
 import { PageHeader } from '../../components/PageHeader';
+import { SharedPreviewPanel } from '../../components/SharedPreviewPanel';
 import { DataListPanel } from './_components/DataListPanel';
 import { FiltersPanel } from './_components/FiltersPanel';
-import { PreviewPanel } from './_components/PreviewPanel';
 import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
 import { taskflow } from './_config/taskflow.config';
 import { FilterContext } from '../../components/FilterContext';
@@ -81,9 +81,15 @@ const DatasetExplorer: React.FC = () => {
                   minWidth: '400px',
                 }}
               >
-                <PreviewPanel
+                <SharedPreviewPanel
                   previewItem={previewItem}
                   onClose={handleClosePreview}
+                  idField={taskflow.data.list.idField}
+                  columns={taskflow.pages.index.tableColumns}
+                  detailsConfig={{ 
+                    enabled: true, 
+                    path: '/dataset' 
+                  }}
                 />
               </Box>
             )}
