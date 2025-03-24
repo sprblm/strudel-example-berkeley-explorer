@@ -1,256 +1,157 @@
-import React, { useState } from 'react';
-import { Box, Tabs, Tab, Paper, List, ListItemButton, ListItemText, ListItemIcon, IconButton, Typography, Tooltip, Divider, ListItem } from '@mui/material';
-import HistoryIcon from '@mui/icons-material/History';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Chip, 
+  Stack, 
+  Typography, 
+  IconButton,
+  Tooltip
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
-import { useFilters } from '../../../hooks/useFilters';
-import { DataFilter } from '../../../types/filters.types.tsx';
-import * as taskflow from '../../../utils/taskflow';
-import styles from './SearchHistoryPanel.module.css';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-interface SearchItem {
-  id: string;
-  name: string;
-  timestamp: string;
-  filters: DataFilter[] | Record<string, any>;
-}
-
-// Mock data for search history
-const mockSearchHistory: SearchItem[] = [
-  {
-    id: 'search-1',
-    name: 'Arctic Temperature Data (1950-2020)',
-    timestamp: '2025-03-17T14:25:00',
-    filters: {
-      'spatial_coverage': ['Arctic'],
-      'variables': ['Temperature'],
-      'temporal_coverage': '1950-01-01 to 2020-12-31'
-    }
-  },
-  {
-    id: 'search-2',
-    name: 'Global Precipitation Patterns',
-    timestamp: '2025-03-17T13:15:00',
-    filters: {
-      'spatial_coverage': ['Global'],
-      'variables': ['Precipitation'],
-      'temporal_resolution': ['monthly']
-    }
-  },
-  {
-    id: 'search-3',
-    name: 'European Drought Conditions',
-    timestamp: '2025-03-16T09:45:00',
-    filters: {
-      'spatial_coverage': ['Europe'],
-      'variables': ['Soil Moisture', 'Precipitation'],
-      'tags': ['Drought']
-    }
-  }
-];
-
-// Mock data for saved searches
-const mockSavedSearches: SearchItem[] = [
-  {
-    id: 'saved-1',
-    name: 'California Wildfire Risk Analysis',
-    timestamp: '2025-03-10T11:30:00',
-    filters: {
-      'spatial_coverage': ['North America'],
-      'variables': ['Temperature', 'Precipitation', 'Wind Speed'],
-      'tags': ['Fires']
-    }
-  },
-  {
-    id: 'saved-2',
-    name: 'Sea Level Rise in Coastal Cities',
-    timestamp: '2025-03-05T16:20:00',
-    filters: {
-      'spatial_coverage': ['Global'],
-      'variables': ['Sea Level'],
-      'tags': ['Sea Level Rise', 'Coastal']
-    }
-  }
-];
+import HistoryIcon from '@mui/icons-material/History';
+import { useFilters } from '../../../components/FilterContext';
 
 /**
- * Panel for displaying search history and saved searches in the Search Data Repositories task flow.
- * Allows users to view, apply, save, and manage their past searches.
+ * Component that displays recent search history and allows users
+ * to quickly reapply previous search filters
  */
 export const SearchHistoryPanel: React.FC = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [searchHistory, setSearchHistory] = useState<SearchItem[]>(mockSearchHistory);
-  const [savedSearches, setSavedSearches] = useState<SearchItem[]>(mockSavedSearches);
-  const { updateAllFilters } = useFilters([], [], []);
+  const { activeFilters, setFilters, clearFilters } = useFilters();
+  const [searchHistory, setSearchHistory] = useState<Array<{id: string, filters: any, timestamp: number}>>([]);
+  const [showHistory, setShowHistory] = useState(true);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleApplySearch = (item: SearchItem) => {
-    // Apply the saved filters to the current search
-    // Convert item.filters to DataFilter[] if it's not already in that format
-    if (Array.isArray(item.filters)) {
-      updateAllFilters(item.filters as DataFilter[]);
-    } else {
-      // If filters are stored as Record<string, any>, convert to DataFilter[]
-      const filterArray = Object.entries(item.filters).map(([field, value]) => ({
-        field,
-        value,
-        operator: 'equals' // Use a default operator or determine based on value type
-      }));
-      updateAllFilters(filterArray);
+  // Load search history from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem('searchHistory');
+      if (savedHistory) {
+        setSearchHistory(JSON.parse(savedHistory));
+      }
+    } catch (error) {
+      console.error('Error loading search history:', error);
     }
+  }, []);
+
+  // Save search history to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    } catch (error) {
+      console.error('Error saving search history:', error);
+    }
+  }, [searchHistory]);
+
+  // Add current search to history when activeFilters change
+  useEffect(() => {
+    // Only save if there are active filters
+    const hasActiveFilters = Object.keys(activeFilters).length > 0;
+    if (hasActiveFilters) {
+      // Generate unique ID for this search
+      const id = `search_${Date.now()}`;
+      
+      // Add to history (avoid duplicates)
+      const isDuplicate = searchHistory.some(
+        item => JSON.stringify(item.filters) === JSON.stringify(activeFilters)
+      );
+      
+      if (!isDuplicate) {
+        setSearchHistory(prev => {
+          // Keep only the last 10 searches
+          const newHistory = [
+            { id, filters: { ...activeFilters }, timestamp: Date.now() },
+            ...prev
+          ].slice(0, 10);
+          
+          return newHistory;
+        });
+      }
+    }
+  }, [activeFilters, searchHistory]);
+
+  // Apply a saved search
+  const handleApplySearch = (filters: any) => {
+    setFilters(filters);
   };
 
-  const handleSaveSearch = (item: SearchItem) => {
-    // Check if the search is already saved
-    const isAlreadySaved = savedSearches.some(saved => saved.id === item.id);
+  // Remove a search from history
+  const handleRemoveSearch = (id: string, event: React.MouseEvent) => {
+    // Stop propagation to prevent applying the search
+    event.stopPropagation();
     
-    if (!isAlreadySaved) {
-      // Create a new saved search with a different ID
-      const newSavedSearch = {
-        ...item,
-        id: `saved-${Date.now()}`,
-      };
-      setSavedSearches([newSavedSearch, ...savedSearches]);
+    setSearchHistory(prev => prev.filter(item => item.id !== id));
+  };
+
+  // Clear all search history
+  const handleClearHistory = () => {
+    setSearchHistory([]);
+  };
+
+  // Get a readable label for the search history item
+  const getSearchLabel = (filters: any) => {
+    const filterKeys = Object.keys(filters);
+    if (filterKeys.length === 0) return 'Empty search';
+    
+    if (filterKeys.length === 1) {
+      const key = filterKeys[0];
+      return `${key}: ${filters[key]}`;
     }
+    
+    return `${filterKeys.length} filters applied`;
   };
 
-  const handleDeleteHistory = (id: string) => {
-    setSearchHistory(searchHistory.filter(item => item.id !== id));
+  // Format timestamp to readable time
+  const formatTime = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
   };
 
-  const handleDeleteSaved = (id: string) => {
-    setSavedSearches(savedSearches.filter(item => item.id !== id));
-  };
+  if (!showHistory || searchHistory.length === 0) {
+    return null;
+  }
 
   return (
-    <Paper 
-      elevation={0} 
-      className={styles.paper}
-    >
-      <Box className={styles.tabsContainer}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange} 
-          variant="fullWidth"
-        >
-          <Tab icon={<HistoryIcon />} label="HISTORY" id="search-history-tab-0" />
-          <Tab icon={<BookmarkIcon />} label="SAVED" id="search-history-tab-1" />
-        </Tabs>
-      </Box>
-      
-      <TabPanel value={tabValue} index={0} className={styles.tabPanel}>
-        <List>
-          {searchHistory.map((item) => (
-            <ListItemButton key={item.id}>
-              <ListItemText
-                primary={
-                  <Typography component="div" variant="body2">
-                    {item.name}
-                  </Typography>
-                }
-                secondary={
-                  <Typography component="div" variant="caption" color="text.secondary">
-                    {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString()}
-                  </Typography>
-                }
-              />
-              <Box>
-                <Tooltip title="Save Search">
-                  <IconButton edge="end" size="small" onClick={() => handleSaveSearch(item)}>
-                    <BookmarkBorderIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete from History">
-                  <IconButton edge="end" size="small" onClick={() => handleDeleteHistory(item.id)}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </ListItemButton>
-          ))}
-        </List>
-      </TabPanel>
-      
-      <TabPanel value={tabValue} index={1} className={styles.tabPanel}>
-        <Typography component="div" variant="body1" className={styles.savedSearchesHeader}>
-          Saved Searches
-        </Typography>
+    <Box>
+      <Stack 
+        direction="row" 
+        spacing={1} 
+        alignItems="center" 
+        sx={{ mb: 1 }}
+      >
+        <HistoryIcon fontSize="small" color="action" />
+        <Typography variant="subtitle2">Recent Searches</Typography>
         
-        {savedSearches.length === 0 ? (
-          <Typography component="div" variant="body2" color="text.secondary" className={styles.noSavedSearches}>
-            No saved searches yet
-          </Typography>
-        ) : (
-          <List disablePadding>
-            {savedSearches.map((item) => (
-              <React.Fragment key={item.id}>
-                <ListItem
-                  disablePadding
-                  secondaryAction={
-                    <Tooltip title="Delete Saved Search">
-                      <IconButton edge="end" size="small" onClick={() => handleDeleteSaved(item.id)}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  }
-                >
-                  <ListItemButton 
-                    dense 
-                    onClick={() => handleApplySearch(item)}
-                    className={styles.savedSearchItem}
-                  >
-                    <ListItemIcon className={styles.savedSearchIcon}>
-                      <BookmarkIcon fontSize="small" color="primary" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary={item.name}
-                      secondary={
-                        <div className={styles.filterTagsWrapper}>
-                          {Object.entries(item.filters).map(([key, value]) => (
-                            <span key={key} className={styles.filterTag}>
-                              {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : value}</strong>
-                            </span>
-                          ))}
-                        </div>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
-          </List>
+        {searchHistory.length > 0 && (
+          <Tooltip title="Clear all history">
+            <IconButton 
+              size="small" 
+              onClick={handleClearHistory}
+              sx={{ ml: 'auto' }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         )}
-      </TabPanel>
-    </Paper>
+      </Stack>
+      
+      <Stack 
+        direction="row" 
+        spacing={1} 
+        sx={{ flexWrap: 'wrap', gap: 1 }}
+      >
+        {searchHistory.map((item) => (
+          <Chip
+            key={item.id}
+            label={`${getSearchLabel(item.filters)} (${formatTime(item.timestamp)})`}
+            onClick={() => handleApplySearch(item.filters)}
+            onDelete={(e) => handleRemoveSearch(item.id, e)}
+            variant="outlined"
+            size="small"
+            sx={{ mb: 1 }}
+          />
+        ))}
+      </Stack>
+    </Box>
   );
 };
