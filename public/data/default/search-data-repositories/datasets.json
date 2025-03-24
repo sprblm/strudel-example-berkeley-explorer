@@ -8,6 +8,7 @@
     "citation": "Lindsey, B.D., Johnson, T.D., and Belitz, Kenneth, 2018, Data from Decadal Change in Groundwater Quality Web Site, 1988-2012: U.S. Geological Survey data release, https://doi.org/10.5066/F7PC30WD.",
     "doi": "10.5066/F7PC30WD",
     "summary": "Groundwater quality data were collected in 5,000 wells between 1988-2001 by the National Water-Quality Assessment Project. About 1,500 of these wells were sampled again between 2002-2012 to evaluate decadal changes in groundwater quality. Monitoring wells, domestic supply wells, and some public supply wells were included in this study.",
+    "source": "NOAA",
     "tags": [
       "NAWQA",
       "National Water Quality Program",
@@ -65,6 +66,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Geospatial data were developed to characterize pre-fire biomass, burn severity, and biomass consumed for the Black Dragon Fire that burned in northern China in 1987. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -120,6 +122,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Heavy rainfall occurred across Louisiana, Texas, Arkansas, and Mississippi in March 2016 as a result of a slow-moving southward dip in the jetstream , funneling tropical moisture into Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "Louisiana",
       "Mississippi",
@@ -175,6 +178,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Bathymetric survey data of the Brandon Road Dam spillway was collected on May 27 and May 28, 2015 by the US Geological Survey (USGS) using Trimble Real-Time Kinematic Global Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NASA",
     "tags": [
       "Dam",
       "GPS measurement",
@@ -230,6 +234,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "This data set presents the results of conducting Mercury Intrusion Porosimetry on core samples of the mudstone underlying the Naval Air Warfare Center, West Trenton, New Jersey Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "EPA",
     "tags": [
       "Sedimentary rock",
       "porosity",
@@ -284,6 +289,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Acetylene fermentation assays, nitrogen fixation assays, and growth studies were performed with Pelobacter sp. strain SFB93 and Pelobacter acetylenicus DSM3246. Data includes concentrations of acetylene and ethylene over time, and growth measured with OD680 and cell counts.",
+    "source": "USDA",
     "tags": [
       "Genetics",
       "Ecology",
@@ -339,6 +345,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "The spring 2017 mainland sea otter count began on April 30, and although the shore-based counts were completed by May 12, 2017, the aerial counts were not completed until July 12. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "California",
       "Sea Otters",
@@ -394,6 +401,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NASA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -449,6 +457,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "EPA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -504,6 +513,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "USDA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -559,6 +569,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -614,6 +625,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NASA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -669,6 +681,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "EPA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -724,6 +737,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "USDA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -779,6 +793,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -834,6 +849,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NASA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -889,6 +905,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "EPA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -944,6 +961,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "USDA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",
@@ -999,6 +1017,7 @@
     "citation": "Labore proident do aute et esse adipisicing veniam eiusmod culpa pariatur sunt officia.",
     "doi": "0000000000",
     "summary": "Est deserunt elit aliquip labore duis nostrud mollit sunt proident cillum. Mollit nisi sint laboris esse labore velit laboris. Ipsum id laborum et dolor laboris ut sint officia voluptate. Ipsum consectetur fugiat laboris sit Lorem duis minim fugiat.",
+    "source": "NOAA",
     "tags": [
       "Boreal forest",
       "Carbon and greenhouse gas emissions",

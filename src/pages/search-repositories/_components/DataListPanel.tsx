@@ -55,6 +55,19 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
     staticParams: taskflow.data.list.staticParams,
   });
 
+  console.log('DataListPanel: Data fetching state:', { 
+    isPending, 
+    isError, 
+    dataExists: !!data, 
+    dataSource: taskflow.data.list.source 
+  });
+  if (data) {
+    console.log('DataListPanel: Received data:', data);
+  }
+  if (error) {
+    console.error('DataListPanel: Error fetching data:', error);
+  }
+
   const filteredData = useMemo(() => {
     try {
       return filterData(data, activeFilters ?? {}, filterConfigs, searchTerm);
@@ -64,7 +77,12 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
     }
   }, [data, activeFilters, filterConfigs, searchTerm]);
 
-  const cards = queryMode === 'server' ? data.results : filteredData;
+  console.log('DataListPanel: Filtered data results:', filteredData?.length || 0);
+
+  console.log('DataListPanel: Data from query:', data);
+  const cards = Array.isArray(data) ? data : (data?.results || []);
+  console.log('DataListPanel: Cards for rendering:', cards?.length || 0);
+
   const emptyRows = new Array(pageSize).fill(null);
   const indexedRows = emptyRows.map((row, i) => i);
 
@@ -94,12 +112,16 @@ export const DataListPanel: React.FC<DataListPanelProps> = ({
   // Filter cards based on their index when the page and offset change
   // The paginatedCards list is only relevant/used for client mode apps
   useEffect(() => {
-    if (cards) {
+    if (cards && Array.isArray(cards)) {
       setPaginatedCards(
         cards.filter((_card: any, i: number) => {
           return i >= offset && i < offset + pageSize;
         })
       );
+    } else {
+      // If cards is not an array, set paginatedCards to an empty array
+      console.warn('DataListPanel: cards is not an array:', cards);
+      setPaginatedCards([]);
     }
   }, [cards, offset]);
 

@@ -1,5 +1,7 @@
 import { DataFilter, FilterConfig } from '../types/filters.types';
 import * as d3 from 'd3-fetch';
+import { createDataSource } from '../services/data-sources';
+import { SearchOptions } from '../services/data-sources/types';
 
 /**
  * Convert an array of values to a URL param by
@@ -141,12 +143,81 @@ export const createFilterParams = (
   return params;
 };
 
-export const cleanUrl = (url: string) => {
-  return url.replace(/([^:]\/)\/+/g, '$1');
+/**
+ * Cleans a URL by removing any trailing slash
+ */
+export const cleanUrl = (url: string): string => {
+  return url.endsWith('/') ? url.slice(0, -1) : url;
 };
 
-export const cleanPath = (url: string) => {
+/**
+ * Cleans a path by removing duplicate slashes
+ */
+export const cleanPath = (url: string): string => {
   return url.replace(/\/\//g, '/');
+};
+
+/**
+ * Parse an adapter URL to extract the adapter name and path
+ * Example: "worldclim://datasets" -> { adapterName: "worldclim", path: "datasets" }
+ */
+export const parseAdapterUrl = (url: string): { adapterName: string; path: string } | null => {
+  const adapterUrlPattern = /^([a-z0-9-]+):\/\/(.*)$/i;
+  const match = url.match(adapterUrlPattern);
+  
+  if (!match) {
+    return null;
+  }
+  
+  return {
+    adapterName: match[1],
+    path: match[2]
+  };
+};
+
+/**
+ * Handle a request via an adapter URL by calling the appropriate adapter's methods
+ */
+export const handleAdapterUrl = async (url: string, queryParams: URLSearchParams): Promise<any> => {
+  console.log('handleAdapterUrl: Processing adapter URL', { url, queryParams: queryParams.toString() });
+  
+  const parsedUrl = parseAdapterUrl(url);
+  if (!parsedUrl) {
+    throw new Error(`Invalid adapter URL format: ${url}`);
+  }
+  
+  const { adapterName, path } = parsedUrl;
+  console.log('handleAdapterUrl: Parsed URL', { adapterName, path });
+  
+  // Create the appropriate adapter instance
+  const adapter = createDataSource(adapterName);
+  if (!adapter) {
+    throw new Error(`Unknown adapter: ${adapterName}`);
+  }
+  
+  console.log(`handleAdapterUrl: Using ${adapterName} adapter to handle request`);
+  
+  // Convert query params to options object
+  const searchOptions: SearchOptions = {
+    query: queryParams.get('query') || '',
+    limit: parseInt(queryParams.get('limit') || '25', 10),
+    page: parseInt(queryParams.get('page') || '1', 10),
+  };
+  
+  if (queryParams.has('variables')) {
+    searchOptions.variables = queryParams.get('variables')?.split(',') || [];
+  }
+  
+  if (path === 'datasets') {
+    console.log('handleAdapterUrl: Calling searchDatasets with options', searchOptions);
+    return await adapter.searchDatasets(searchOptions);
+  } else if (path.startsWith('datasets/')) {
+    const datasetId = path.replace('datasets/', '');
+    console.log('handleAdapterUrl: Calling getDatasetDetails for', datasetId);
+    return await adapter.getDatasetDetails(datasetId);
+  } else {
+    throw new Error(`Unsupported adapter path: ${path}`);
+  }
 };
 
 /**
@@ -154,6 +225,30 @@ export const cleanPath = (url: string) => {
  * that returns JSON.
  */
 export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
+  // Check if this is an adapter URL (e.g., worldclim://datasets)
+  const isAdapter = dataSource.includes('://') && !dataSource.startsWith('http');
+  if (isAdapter) {
+    console.log('fetchData: Detected adapter URL, parsing query params');
+    // Extract query params if they exist
+    let queryParams = new URLSearchParams();
+    const queryStringIndex = dataSource.indexOf('?');
+    if (queryStringIndex !== -1) {
+      const queryString = dataSource.substring(queryStringIndex + 1);
+      queryParams = new URLSearchParams(queryString);
+      dataSource = dataSource.substring(0, queryStringIndex);
+    }
+    
+    try {
+      console.log('fetchData: Handling adapter URL', { dataSource, queryParams: queryParams.toString() });
+      const result = await handleAdapterUrl(dataSource, queryParams);
+      console.log('fetchData: Adapter returned result', result);
+      return result;
+    } catch (error) {
+      console.error('fetchData: Error handling adapter URL:', error);
+      throw error;
+    }
+  }
+
   // Get the base portion of the URL. Will be blank when running locally.
   const base = document.querySelector('base')?.getAttribute('href') ?? '';
   // Use the VITE_BASE_URL env variable to specify a path prefix that
@@ -166,6 +261,16 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
     ? cleanUrl(dataSource)
     : cleanUrl(`${basename}/${dataSource}`);
   let data: any = [];
+  
+  console.log('fetchData: Attempting to fetch data', { 
+    dataSource, 
+    fileExtension, 
+    isExternal,
+    base, 
+    basePath,
+    basename,
+    dataSourcePath 
+  });
   
   try {
     if (fileExtension === 'csv') {
@@ -186,8 +291,30 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
         data = await d3.tsv(dataSourcePath);
       }
     } else if (fileExtension === 'json' || isExternal) {
-      const response = await fetch(dataSourcePath, { signal });
-      data = await response.json();
+      console.log(`fetchData: Fetching JSON from ${dataSourcePath}`);
+      try {
+        const response = await fetch(dataSourcePath, { signal });
+        console.log('fetchData: Response status:', response.status);
+        if (!response.ok) {
+          console.error(`fetchData: Error response status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log('fetchData: Successfully loaded JSON data', result);
+        
+        // Special handling for adapter responses like WorldClim
+        if (isAdapter && result && result.datasets) {
+          console.log('fetchData: Detected adapter response with datasets property, extracting datasets');
+          data = result.datasets;
+        } else {
+          data = result;
+        }
+        
+        console.log('fetchData: Final data to return', { dataLength: Array.isArray(data) ? data.length : 'non-array' });
+      } catch (fetchError) {
+        console.error('fetchData: Error during fetch operation:', fetchError);
+        throw fetchError;
+      }
     }
     return data;
   } catch (error) {
@@ -196,6 +323,7 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
       console.log('Fetch request was cancelled');
       return null;
     }
+    console.error('fetchData: Error fetching data:', error);
     throw error;
   }
 };

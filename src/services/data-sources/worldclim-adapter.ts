@@ -39,7 +39,7 @@ export class WorldClimAdapter implements DataSourceAdapter {
   async searchDatasets(options: SearchOptions): Promise<SearchResult> {
     try {
       // Use client in a simulated API call
-      console.log('Using client to search WorldClim datasets:', options);
+      console.log('WorldClimAdapter: searchDatasets called with options:', options);
       
       // Make a client request to show usage
       this.client.get('datasets/search', { 
@@ -49,6 +49,7 @@ export class WorldClimAdapter implements DataSourceAdapter {
       
       // For demonstration, we'll simulate an API response
       const datasets = this.getMockDatasets();
+      console.log('WorldClimAdapter: mock datasets before filtering:', datasets.length);
       
       // Convert search options to filters
       const filters: DataFilter[] = [];
@@ -69,13 +70,7 @@ export class WorldClimAdapter implements DataSourceAdapter {
         });
       }
       
-      // Add temporal coverage filter if present
-      if (typeof options.temporal_coverage === 'object' && options.temporal_coverage) {
-        filters.push({
-          field: 'temporalCoverage',
-          value: [options.temporal_coverage.startDate, options.temporal_coverage.endDate]
-        });
-      }
+      console.log('WorldClimAdapter: created filters:', filters);
 
       // Define filter configurations for different fields
       const filterConfigs: FilterConfig[] = [
@@ -83,44 +78,60 @@ export class WorldClimAdapter implements DataSourceAdapter {
           field: 'name',
           label: 'Name',
           operator: 'contains',
-          filterComponent: 'TextInput'
-        },
+          filterComponent: 'TextInput',
+          transformValue: (value: string) => value.toLowerCase()
+        } as FilterConfig,
         {
           field: 'variables',
           label: 'Variables',
           operator: 'contains-one-of',
-          filterComponent: 'MultiSelect'
-        },
+          filterComponent: 'MultiSelect',
+          transformValue: (values: string[]) => values.map(v => v.toLowerCase())
+        } as FilterConfig,
         {
           field: 'temporalCoverage',
           label: 'Time Period',
           operator: 'between-dates-inclusive',
-          filterComponent: 'DateRangePicker'
-        }
+          filterComponent: 'DateRangePicker',
+          transformValue: (dates: string[]) => dates.map(d => new Date(d))
+        } as FilterConfig
       ];
       
-      // Use the utility functions for filtering
-      let filteredDatasets = datasets;
+      console.log('WorldClimAdapter: using filterConfigs:', filterConfigs);
+      
+      // Add source field to match UI filtering
+      let filteredDatasets = datasets.map(dataset => ({
+        ...dataset,
+        source: 'WorldClim'  // Add source to match UI filtering
+      })) as Repository[];
+
+      console.log('WorldClimAdapter: datasets with source field added:', filteredDatasets.length);
       
       // Apply text search if query is present
       if (options.query) {
         filteredDatasets = filterBySearchText<Repository>(filteredDatasets, options.query);
+        console.log('WorldClimAdapter: after text search:', filteredDatasets.length);
       }
       
       // Apply other filters using the utility function
       filteredDatasets = filterByDataFilters<Repository>(filteredDatasets, filters, filterConfigs);
+      console.log('WorldClimAdapter: after all filters:', filteredDatasets.length);
       
       // Apply pagination
       const limit = options.limit || 25;
       const page = options.page || 1;
       const offset = (page - 1) * limit;
       
-      return {
+      const result = {
         datasets: filteredDatasets.slice(offset, offset + limit),
         total: filteredDatasets.length,
         page: page,
         limit: limit,
       };
+      
+      console.log('WorldClimAdapter: returning result:', result);
+      
+      return result;
     } catch (error) {
       console.error('Error searching WorldClim datasets:', error);
       return {
@@ -149,7 +160,7 @@ export class WorldClimAdapter implements DataSourceAdapter {
         throw new Error(`Dataset not found: ${datasetId}`);
       }
       
-      return dataset;
+      return { ...dataset, source: 'WorldClim' };
     } catch (error) {
       console.error(`Error fetching WorldClim dataset details for ${datasetId}:`, error);
       throw error;

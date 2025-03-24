@@ -13,10 +13,11 @@ export const filterBySearchText = <T extends Record<string, unknown>>(allData: T
 };
 
 export const filterByDataFilters = <T extends Record<string, unknown>>(
-  allData: T[],
+  allData: T[] | null,
   filters: DataFilter[] | null,
   filterConfigs: FilterConfig[] | null
 ) => {
+  if (!allData) return [];
   if (!filters) return allData;
 
   let filteredData = allData;

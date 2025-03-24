@@ -102,6 +102,7 @@ export interface Repository {
   id: string;
   name: string;
   description: string;
+  source?: string;  // Added source property for filtering by data source
   title?: string;
   summary?: string;
   variables?: string[];
