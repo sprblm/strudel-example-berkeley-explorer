@@ -61,43 +61,59 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
 
   // Generate visualization data based on the preview item properties
   const generateVisualizationData = () => {
-    // Check for time-related or numeric fields to use in visualizations
-    const numericKeys = Object.keys(previewItem).filter(
-      key => typeof previewItem[key] === 'number'
-    );
-    
-    // If there are at least 2 numeric fields, create a basic visualization
-    if (numericKeys.length >= 2) {
-      const key1 = numericKeys[0];
-      const key2 = numericKeys[1];
+    try {
+      // Check for time-related or numeric fields to use in visualizations
+      const numericKeys = Object.keys(previewItem || {}).filter(
+        key => typeof previewItem[key] === 'number'
+      );
       
+      // If there are at least 2 numeric fields, create a basic visualization
+      if (numericKeys.length >= 2) {
+        const key1 = numericKeys[0];
+        const key2 = numericKeys[1];
+        
+        return {
+          timeSeriesData: {
+            x: Array.from({ length: 20 }, (_, i) => i),
+            y: Array.from({ length: 20 }, (_, i) => 
+              Math.sin(i * 0.5) * previewItem[key1] / 10 + previewItem[key1]
+            ),
+          },
+          scatterData: {
+            x: [previewItem[key1], previewItem[key1] * 1.2],
+            y: [previewItem[key2], previewItem[key2] * 0.8],
+            text: ['Current', 'Projected'],
+          }
+        };
+      }
+      
+      // Default visualization data if no suitable properties found
       return {
         timeSeriesData: {
           x: Array.from({ length: 20 }, (_, i) => i),
-          y: Array.from({ length: 20 }, (_, i) => 
-            Math.sin(i * 0.5) * previewItem[key1] / 10 + previewItem[key1]
-          ),
+          y: Array.from({ length: 20 }, (_, i) => Math.sin(i * 0.5) * 5 + 10),
         },
         scatterData: {
-          x: [previewItem[key1], previewItem[key1] * 1.2],
-          y: [previewItem[key2], previewItem[key2] * 0.8],
-          text: ['Current', 'Projected'],
+          x: [1, 2, 3, 4],
+          y: [10, 15, 13, 17],
+          text: ['A', 'B', 'C', 'D'],
+        }
+      };
+    } catch (error) {
+      console.error('Error generating visualization data:', error);
+      // Return safe default data
+      return {
+        timeSeriesData: {
+          x: [0, 1, 2, 3, 4],
+          y: [5, 10, 5, 10, 5],
+        },
+        scatterData: {
+          x: [1, 2, 3, 4],
+          y: [10, 15, 13, 17],
+          text: ['A', 'B', 'C', 'D'],
         }
       };
     }
-    
-    // Default visualization data if no suitable properties found
-    return {
-      timeSeriesData: {
-        x: Array.from({ length: 20 }, (_, i) => i),
-        y: Array.from({ length: 20 }, (_, i) => Math.sin(i * 0.5) * 5 + 10),
-      },
-      scatterData: {
-        x: [1, 2, 3, 4],
-        y: [10, 15, 13, 17],
-        text: ['A', 'B', 'C', 'D'],
-      }
-    };
   };
 
   const visualizationData = generateVisualizationData();
@@ -162,7 +178,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
         {/* Details Tab */}
         {tabValue === 0 && (
           <Stack spacing={2}>
-            <LabelValueTable data={attributes} />
+            <LabelValueTable rows={attributes} />
             
             {detailsConfig.enabled && (
               <Button 
@@ -204,6 +220,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                 }}
                 style={{width: '100%'}}
                 useResizeHandler={true}
+                onError={(error) => console.error('Error rendering Plotly chart:', error)}
               />
             </Box>
             
@@ -234,6 +251,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                 }}
                 style={{width: '100%'}}
                 useResizeHandler={true}
+                onError={(error) => console.error('Error rendering Plotly chart:', error)}
               />
             </Box>
           </Stack>

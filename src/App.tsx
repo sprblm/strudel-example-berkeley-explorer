@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { Box, Container, CssBaseline, AppBar, Toolbar, Typography, Button, Link, Paper, Stack } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link as RouterLink } from 'react-router-dom';
@@ -9,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ExploreIcon from '@mui/icons-material/Explore';
 import InfoIcon from '@mui/icons-material/Info';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /**
  * Main App component that sets up routing and global layout
@@ -61,12 +61,14 @@ function App() {
 
         {/* Main Content */}
         <Box component="main" sx={{ flexGrow: 1 }}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/search-repositories/*" element={<SearchRepositories />} />
-            <Route path="/explore-data/*" element={<DataExplorer />} />
-            <Route path="/about" element={<AboutPage />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/search-repositories/*" element={<SearchRepositories />} />
+              <Route path="/explore-data/*" element={<DataExplorer />} />
+              <Route path="/about" element={<AboutPage />} />
+            </Routes>
+          </ErrorBoundary>
         </Box>
 
         {/* Footer */}
