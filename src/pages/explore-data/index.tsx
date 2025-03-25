@@ -1,6 +1,6 @@
 import { Box, Paper, Stack } from '@mui/material';
 import React, { useState } from 'react';
-import { FilterContext } from '../../components/FilterContext';
+import { FilterContextProvider } from '../../components/FilterContext';
 import { PageHeader } from '../../components/PageHeader';
 import { SharedPreviewPanel } from '../../components/SharedPreviewPanel';
 import { DataView } from './_components/DataView';
@@ -16,9 +16,17 @@ import { CardView } from './_components/CardView';
  * This page includes the page header, filters panel,
  * main table, and the table row preview panel.
  */
+
+interface PreviewItem {
+  id: string;
+  title: string;
+  description?: string;
+  // Add other necessary fields based on your data structure
+}
+
 const DataExplorer: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [previewItem, setPreviewItem] = useState<any>();
+  const [previewItem, setPreviewItem] = useState<PreviewItem | null>(null);
   const [showFiltersPanel, setShowFiltersPanel] = useState(true);
   const [viewMode, setViewMode] = useState('table');
 
@@ -39,7 +47,7 @@ const DataExplorer: React.FC = () => {
   };
 
   return (
-    <FilterContext>
+    <FilterContextProvider>
       <Box>
         <PageHeader
           pageTitle={taskflow.pages.index.title}
@@ -127,7 +135,7 @@ const DataExplorer: React.FC = () => {
           </Stack>
         </Box>
       </Box>
-    </FilterContext>
+    </FilterContextProvider>
   );
 };
 

@@ -6,14 +6,21 @@ import { FiltersPanel } from './_components/FiltersPanel';
 import { PreviewPanel } from './_components/PreviewPanel';
 import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
 import { taskflow } from './_config/taskflow.config';
-import { FilterContext } from '../../components/FilterContext';
+import { FilterContextProvider } from '../../components/FilterContext';
 
 /**
  * The main explore page for the search-data-repositories Task Flow.
  * Displays a page header, `<FiltersPanel>`, `<DataListPanel>`, and `<PreviewPanel>`.
  */
+interface PreviewItem {
+  id: string;
+  title: string;
+  description?: string;
+  // Add other necessary fields based on your data structure
+}
+
 const DatasetExplorer: React.FC = () => {
-  const [previewItem, setPreviewItem] = useState<any>();
+  const [previewItem, setPreviewItem] = useState<PreviewItem | null>(null);
   const [showFiltersPanel, setShowFiltersPanel] = useState(true);
 
   const handleCloseFilters = () => {
@@ -32,7 +39,7 @@ const DatasetExplorer: React.FC = () => {
    * Content to render on the page for this component
    */
   return (
-    <FilterContext>
+    <FilterContextProvider>
       <Box>
         <PageHeader
           pageTitle={taskflow.pages.index.title}
@@ -64,9 +71,9 @@ const DatasetExplorer: React.FC = () => {
             >
               {/* Search History Panel */}
               <SearchHistoryPanel />
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               {/* Data List Panel */}
               <DataListPanel
                 onToggleFiltersPanel={handleToggleFilters}
@@ -90,7 +97,7 @@ const DatasetExplorer: React.FC = () => {
           </Stack>
         </Box>
       </Box>
-    </FilterContext>
+    </FilterContextProvider>
   );
 };
 
