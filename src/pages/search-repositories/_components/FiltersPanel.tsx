@@ -29,7 +29,7 @@ interface FiltersPanelProps {
  */
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
   const { activeFilters, setFilter, clearFilters } = useFilters();
-  const filterConfigs = taskflow.pages.index.tableFilters;
+  const filterConfigs = taskflow.pages.index.cardFilters;
 
   const handleClearFilters = () => {
     clearFilters();
