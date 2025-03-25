@@ -43,8 +43,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
         { value: 'asia', label: 'Asia' },
         { value: 'africa', label: 'Africa' },
         { value: 'south_america', label: 'South America' },
-        { value: 'australia', label: 'Australia' }
-      ]
+        { value: 'australia', label: 'Australia' },
+      ],
     },
     {
       field: 'data_source',
@@ -54,8 +54,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
         { value: 'noaa', label: 'NOAA' },
         { value: 'nasa', label: 'NASA' },
         { value: 'ipcc', label: 'IPCC' },
-        { value: 'world_bank', label: 'World Bank' }
-      ]
+        { value: 'world_bank', label: 'World Bank' },
+      ],
     },
     {
       field: 'climate_variable',
@@ -65,8 +65,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
         { value: 'temperature', label: 'Temperature' },
         { value: 'precipitation', label: 'Precipitation' },
         { value: 'sea_level', label: 'Sea Level' },
-        { value: 'co2', label: 'CO2 Emissions' }
-      ]
+        { value: 'co2', label: 'CO2 Emissions' },
+      ],
     },
     {
       field: 'time_period',
@@ -75,9 +75,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       options: {
         min: 1900,
         max: 2100,
-        step: 10
-      }
-    }
+        step: 10,
+      },
+    },
   ];
 
   const additionalClimateFilters = [
@@ -89,8 +89,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
         { value: 'daily', label: 'Daily' },
         { value: 'monthly', label: 'Monthly' },
         { value: 'yearly', label: 'Yearly' },
-        { value: 'decadal', label: 'Decadal' }
-      ]
+        { value: 'decadal', label: 'Decadal' },
+      ],
     },
     {
       field: 'dataset_type',
@@ -99,8 +99,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       options: [
         { value: 'observational', label: 'Observational' },
         { value: 'model', label: 'Model' },
-        { value: 'reanalysis', label: 'Reanalysis' }
-      ]
+        { value: 'reanalysis', label: 'Reanalysis' },
+      ],
     },
     {
       field: 'scenario',
@@ -109,8 +109,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       options: [
         { value: 'ssp126', label: 'SSP1-2.6' },
         { value: 'ssp245', label: 'SSP2-4.5' },
-        { value: 'ssp585', label: 'SSP5-8.5' }
-      ]
+        { value: 'ssp585', label: 'SSP5-8.5' },
+      ],
     },
     {
       field: 'license',
@@ -119,12 +119,16 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       options: [
         { value: 'cc_by', label: 'CC BY' },
         { value: 'cc_by_sa', label: 'CC BY-SA' },
-        { value: 'public_domain', label: 'Public Domain' }
-      ]
-    }
+        { value: 'public_domain', label: 'Public Domain' },
+      ],
+    },
   ];
 
-  const allFilters = [...filterConfigs, ...climateFilterConfigs, ...additionalClimateFilters];
+  const allFilters = [
+    ...filterConfigs,
+    ...climateFilterConfigs,
+    ...additionalClimateFilters,
+  ];
 
   const handleClearFilters = () => {
     clearFilters();
@@ -144,35 +148,46 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
 
   return (
     <Paper elevation={0} sx={{ height: '100%', p: 2 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={2}
+      >
         <Typography variant="h6">Filters</Typography>
         <IconButton onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
         </IconButton>
       </Stack>
-      
-      <Button 
-        variant="outlined" 
-        fullWidth 
+
+      <Button
+        variant="outlined"
+        fullWidth
         onClick={handleClearFilters}
         sx={{ mb: 3 }}
       >
         Clear All Filters
       </Button>
-      
+
       <Stack spacing={3}>
         {allFilters.map((filter) => {
           const { field, label, type, options } = filter;
-          
+
           // Range filter (for numeric values)
-          if (type === 'range' && options?.min !== undefined && options?.max !== undefined) {
+          if (
+            type === 'range' &&
+            options?.min !== undefined &&
+            options?.max !== undefined
+          ) {
             const value = activeFilters[field] || [options.min, options.max];
             return (
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
                 <Slider
-                  value={value}
-                  onChange={(_, newValue) => handleRangeFilterChange(field, newValue as number[])}
+                  value={Number(value?.value) || options.min}
+                  onChange={(_, newValue) =>
+                    handleRangeFilterChange(field, newValue as number[])
+                  }
                   valueLabelDisplay="auto"
                   min={options.min}
                   max={options.max}
@@ -191,7 +206,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           // Select filter (dropdown)
           if (type === 'select' && Array.isArray(options)) {
             return (
@@ -199,8 +214,14 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
                 <Typography gutterBottom>{label}</Typography>
                 <FormControl fullWidth size="small">
                   <Select
-                    value={activeFilters[field] || ''}
-                    onChange={(e) => handleSelectFilterChange(field, e.target.value)}
+                    value={
+                      typeof activeFilters[field] === 'string'
+                        ? activeFilters[field]
+                        : ''
+                    }
+                    onChange={(e) =>
+                      handleSelectFilterChange(field, e.target.value)
+                    }
                     displayEmpty
                   >
                     <MenuItem value="">
@@ -217,7 +238,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           // Toggle filter (checkbox/switch)
           if (type === 'toggle') {
             return (
@@ -227,7 +248,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
                     control={
                       <Switch
                         checked={!!activeFilters[field]}
-                        onChange={(e) => handleToggleFilterChange(field, e.target.checked)}
+                        onChange={(e) =>
+                          handleToggleFilterChange(field, e.target.checked)
+                        }
                       />
                     }
                     label={label}
@@ -237,7 +260,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           return null;
         })}
       </Stack>

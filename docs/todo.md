@@ -1,6 +1,7 @@
 # Climate Data Analysis Platform Development
 
 ## Development Tasks
+
 - [x] Set up development environment
 - [x] Initialize STRUDEL Kit project
 - [ ] Implement Search Data Repositories flow
@@ -13,6 +14,7 @@
 - [ ] Deploy and demonstrate application
 
 ## Implementation Notes
+
 - Focus on implementing the primary task flows first
 - Use STRUDEL Kit components and design patterns
 - Ensure cohesive integration between different task flows

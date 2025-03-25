@@ -1,30 +1,22 @@
-import React, {
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react';
-import { FilterOperator } from './FilterField';
+import React, { PropsWithChildren, useContext, useReducer } from 'react';
+import { DataFilter, FilterOperator } from '../context/filterTypes';
 
-export interface DataFilter {
-  field: string;
-  value: string | any[] | null;
-  operator: FilterOperator;
-}
-
-export interface FilterState {
+interface FilterState {
   activeFilters: DataFilter[];
   expandedGroup: string | number | boolean;
 }
 
-const FilterContextAPI = React.createContext<
-  | {
-      activeFilters: FilterState['activeFilters'];
-      expandedGroup: FilterState['expandedGroup'];
-      dispatch: React.Dispatch<FilterAction>;
-    }
-  | undefined
->(undefined);
+interface FilterContextType {
+  activeFilters: DataFilter[];
+  expandedGroup: string | number | boolean;
+  dispatch: React.Dispatch<FilterAction>;
+  setFilter: (field: string, value: unknown) => void;
+  clearFilters: () => void;
+}
+
+const FilterContextAPI = React.createContext<FilterContextType | undefined>(
+  undefined
+);
 
 const initialState: FilterState = {
   activeFilters: [],
@@ -34,7 +26,11 @@ const initialState: FilterState = {
 export type FilterAction =
   | {
       type: 'SET_FILTER';
-      payload: { field: string; value: any; operator: FilterOperator };
+      payload: {
+        field: string;
+        value: unknown;
+        operator: FilterOperator; // Explicitly use FilterOperator
+      };
     }
   | { type: 'SET_ACTIVE_FILTERS'; payload: FilterState['activeFilters'] }
   | { type: 'SET_EXPANDED_GROUP'; payload: FilterState['expandedGroup'] };
@@ -46,65 +42,62 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
       const existingIndex = state.activeFilters.findIndex(
         (f) => f.field === filter.field
       );
-      const activeFilters = [...state.activeFilters];
-      if (existingIndex > -1) {
-        if (filter.value) {
-          activeFilters[existingIndex] = filter;
-        } else {
-          activeFilters.splice(existingIndex, 1);
-        }
-      } else if (filter.value) {
-        activeFilters.push(filter);
+      if (existingIndex >= 0) {
+        const updatedFilters = [...state.activeFilters];
+        updatedFilters[existingIndex] = {
+          field: filter.field,
+          value: filter.value,
+          operator: filter.operator,
+        };
+        return { ...state, activeFilters: updatedFilters };
       }
       return {
         ...state,
-        activeFilters,
+        activeFilters: [
+          ...state.activeFilters,
+          {
+            field: filter.field,
+            value: filter.value,
+            operator: filter.operator,
+          },
+        ],
       };
     }
-    case 'SET_ACTIVE_FILTERS': {
-      return {
-        ...state,
-        activeFilters: action.payload,
-      };
-    }
-    case 'SET_EXPANDED_GROUP': {
-      return {
-        ...state,
-        expandedGroup: action.payload,
-      };
-    }
-    default: {
-      throw new Error(`Unhandled action type`);
-    }
+    case 'SET_ACTIVE_FILTERS':
+      return { ...state, activeFilters: action.payload };
+    case 'SET_EXPANDED_GROUP':
+      return { ...state, expandedGroup: action.payload };
+    default:
+      return state;
   }
 }
 
-interface FilterContextProps extends PropsWithChildren {
-  activeFilters?: FilterState['activeFilters'];
-  onChange?: (filters: FilterState['activeFilters']) => void;
-}
-
-export const FilterContext: React.FC<FilterContextProps> = ({
-  activeFilters = [],
-  onChange = () => null,
+export const FilterContextProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(filterReducer, {
-    ...initialState,
-    activeFilters,
+  const [state, dispatch] = useReducer(filterReducer, initialState);
+
+const setFilter = (field: string, value: unknown) => {
+  dispatch({
+    type: 'SET_FILTER',
+    payload: {
+      field,
+      value: Array.isArray(value) ? value : [value],
+      operator: FilterOperator.EQUALS,
+    },
   });
+};
+  const clearFilters = () => {
+    dispatch({ type: 'SET_ACTIVE_FILTERS', payload: [] });
+  };
+
   const value = {
     activeFilters: state.activeFilters,
     expandedGroup: state.expandedGroup,
     dispatch,
+    setFilter,
+    clearFilters,
   };
-
-  /**
-   * Emit a change event when state.activeFilters changes
-   */
-  useEffect(() => {
-    if (onChange) onChange(state.activeFilters);
-  }, [JSON.stringify(state.activeFilters)]);
 
   return (
     <FilterContextAPI.Provider value={value}>
