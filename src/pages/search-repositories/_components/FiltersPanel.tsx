@@ -31,6 +31,101 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
   const { activeFilters, setFilter, clearFilters } = useFilters();
   const filterConfigs = taskflow.pages.index.cardFilters;
 
+  const climateFilterConfigs = [
+    {
+      field: 'region',
+      label: 'Geographic Region',
+      type: 'select',
+      options: [
+        { value: 'global', label: 'Global' },
+        { value: 'north_america', label: 'North America' },
+        { value: 'europe', label: 'Europe' },
+        { value: 'asia', label: 'Asia' },
+        { value: 'africa', label: 'Africa' },
+        { value: 'south_america', label: 'South America' },
+        { value: 'australia', label: 'Australia' }
+      ]
+    },
+    {
+      field: 'data_source',
+      label: 'Data Source',
+      type: 'select',
+      options: [
+        { value: 'noaa', label: 'NOAA' },
+        { value: 'nasa', label: 'NASA' },
+        { value: 'ipcc', label: 'IPCC' },
+        { value: 'world_bank', label: 'World Bank' }
+      ]
+    },
+    {
+      field: 'climate_variable',
+      label: 'Climate Variable',
+      type: 'select',
+      options: [
+        { value: 'temperature', label: 'Temperature' },
+        { value: 'precipitation', label: 'Precipitation' },
+        { value: 'sea_level', label: 'Sea Level' },
+        { value: 'co2', label: 'CO2 Emissions' }
+      ]
+    },
+    {
+      field: 'time_period',
+      label: 'Time Period',
+      type: 'range',
+      options: {
+        min: 1900,
+        max: 2100,
+        step: 10
+      }
+    }
+  ];
+
+  const additionalClimateFilters = [
+    {
+      field: 'resolution',
+      label: 'Resolution',
+      type: 'select',
+      options: [
+        { value: 'daily', label: 'Daily' },
+        { value: 'monthly', label: 'Monthly' },
+        { value: 'yearly', label: 'Yearly' },
+        { value: 'decadal', label: 'Decadal' }
+      ]
+    },
+    {
+      field: 'dataset_type',
+      label: 'Dataset Type',
+      type: 'select',
+      options: [
+        { value: 'observational', label: 'Observational' },
+        { value: 'model', label: 'Model' },
+        { value: 'reanalysis', label: 'Reanalysis' }
+      ]
+    },
+    {
+      field: 'scenario',
+      label: 'Scenario',
+      type: 'select',
+      options: [
+        { value: 'ssp126', label: 'SSP1-2.6' },
+        { value: 'ssp245', label: 'SSP2-4.5' },
+        { value: 'ssp585', label: 'SSP5-8.5' }
+      ]
+    },
+    {
+      field: 'license',
+      label: 'License Type',
+      type: 'select',
+      options: [
+        { value: 'cc_by', label: 'CC BY' },
+        { value: 'cc_by_sa', label: 'CC BY-SA' },
+        { value: 'public_domain', label: 'Public Domain' }
+      ]
+    }
+  ];
+
+  const allFilters = [...filterConfigs, ...climateFilterConfigs, ...additionalClimateFilters];
+
   const handleClearFilters = () => {
     clearFilters();
   };
@@ -66,7 +161,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       </Button>
       
       <Stack spacing={3}>
-        {filterConfigs.map((filter) => {
+        {allFilters.map((filter) => {
           const { field, label, type, options } = filter;
           
           // Range filter (for numeric values)
