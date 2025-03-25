@@ -2,120 +2,151 @@ import { createTheme } from '@mui/material';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 /**
- * MUI Theme object for setting app-wide and component-wide styles.
- * Specify colors, spacing, fonts, and more.
- * Learn more about theme options: https://mui.com/material-ui/customization/theming/
+ * MUI Theme object with glass neumorphic iridescent styling
+ * Featuring subtle gradients, glass effects, and soft shadows
  */
 export const theme = createTheme({
-  // Color palette to use throughout the app
+  // Color palette with iridescent tones
   palette: {
     mode: 'light',
     background: {
-      default: '#F5F5F6',
-      paper: '#fff',
+      default: 'rgba(240, 245, 255, 0.8)', // Subtle blue-tinted background
+      paper: 'rgba(255, 255, 255, 0.6)', // Translucent white for glass effect
     },
     primary: {
-      main: '#1976d2',
-      // Exclude light, dark, or contrastText to have them
-      // calculated automatically based on the main color.
-      light: '#42a5f5',
-      dark: '#1565c0',
-      contrastText: '#fff',
+      main: '#5b8af9', // Iridescent blue
+      light: '#89b6ff',
+      dark: '#3d5fc6',
+      contrastText: '#ffffff',
     },
     secondary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
-      contrastText: '#fff',
+      main: '#9c69e2', // Iridescent purple
+      light: '#c89df8',
+      dark: '#7344b0',
+      contrastText: '#ffffff',
     },
     info: {
-      main: '#0288d1',
-      light: '#03a9f4',
-      dark: '#01579b',
-      contrastText: '#fff',
+      main: '#49caff', // Bright cyan for accents
+      light: '#83e0ff',
+      dark: '#0097cc',
+      contrastText: '#ffffff',
     },
     success: {
-      main: '#2e7d32',
-      light: '#4caf50',
-      dark: '#1b5e20',
-      contrastText: '#fff',
+      main: '#57c893', // Soft green
+      light: '#8df8bf',
+      dark: '#2a9568',
+      contrastText: '#ffffff',
     },
     warning: {
-      main: '#ed6c02',
-      light: '#ff9800',
-      dark: '#e65100',
-      contrastText: '#fff',
+      main: '#ffb64d', // Soft amber
+      light: '#ffda82',
+      dark: '#cf8600',
+      contrastText: '#ffffff',
     },
     error: {
-      main: '#d32f2f',
-      light: '#ef5350',
-      dark: '#c62828',
-      contrastText: '#fff',
+      main: '#ff6b8e', // Soft pink-red
+      light: '#ff9fb7',
+      dark: '#c93762',
+      contrastText: '#ffffff',
     },
     neutral: {
-      main: '#DADADA',
-      light: '#e0e0e0',
-      dark: '#828282',
+      main: '#d0d8e8',
+      light: '#e8eef7',
+      dark: '#a3b0c9',
     },
     common: {
-      black: '#000',
-      white: '#fff',
+      black: '#2d3748',
+      white: '#ffffff',
     },
     grey: {
-      50: '#ddd',
-      500: '#999',
-      900: '#444',
+      50: '#f7faff',
+      500: '#a4b0c3',
+      900: '#4a5568',
     },
   },
-  // Control the default border radius
+  // Rounded corners for neumorphic style
   shape: {
-    borderRadius: 4,
+    borderRadius: 16, // More pronounced rounded corners
   },
-  // Control the font, size, and font weights
+  // Modern, clean typography
   typography: {
     htmlFontSize: 16,
-    fontFamily: `"Helvetica", "Verdana", "Arial", sans-serif`,
+    fontFamily: `"Inter", "Roboto", "Helvetica", sans-serif`,
     fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
-    fontWeightBold: 700,
+    fontWeightBold: 600, // Slightly less bold for softer appearance
   },
-  // Default options for MUI components used throughout the app
+  // Component customizations for neumorphic glass style
   components: {
-    /**
-     * Example component customization.
-     * Learn more at https://mui.com/material-ui/customization/theme-components/
-     * 
-        MuiComponentName: {
-          defaultProps: {
-            // Put prop names and values here
-          },
-          styleOverrides: {
-            root: {
-              // Put styles here
-            }
-          },
-          // Create new custom variants of certain components
-          variants: [
-            {
-              props: { variant: '' },
-              style: {
-                // Put styles here
-              },
-            },
-          ],
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
+          backdropFilter: 'blur(10px)',
+          boxShadow: 'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
         },
-     *
-     */
+        elevation1: {
+          boxShadow: 'rgba(255, 255, 255, 0.5) -3px -3px 6px, rgba(0, 0, 0, 0.1) 3px 3px 8px',
+        },
+        elevation2: {
+          boxShadow: 'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+        },
+        elevation3: {
+          boxShadow: 'rgba(255, 255, 255, 0.5) -7px -7px 14px, rgba(0, 0, 0, 0.1) 7px 7px 20px',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(10px)',
+          background: 'rgba(255, 255, 255, 0.6)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+          transition: 'transform 0.3s, box-shadow 0.3s',
+          '&:hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: 'rgba(255, 255, 255, 0.6) -8px -8px 16px, rgba(0, 0, 0, 0.15) 8px 8px 20px',
+          },
+        },
+      },
+    },
     MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          textTransform: 'none',
+          boxShadow: 'rgba(255, 255, 255, 0.4) -2px -2px 5px, rgba(0, 0, 0, 0.1) 2px 2px 5px',
+          backdropFilter: 'blur(5px)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            boxShadow: 'rgba(255, 255, 255, 0.4) -1px -1px 3px, rgba(0, 0, 0, 0.1) 1px 1px 3px',
+            transform: 'translateY(-2px)',
+          },
+          '&:active': {
+            boxShadow: 'inset rgba(0, 0, 0, 0.1) 2px 2px 5px, inset rgba(255, 255, 255, 0.4) -2px -2px 5px',
+            transform: 'translateY(0)',
+          },
+        },
+        contained: {
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
+        },
+        outlined: {
+          borderWidth: '1px',
+          borderColor: 'rgba(255, 255, 255, 0.5)',
+        },
+      },
       variants: [
         {
           props: { color: 'neutral' },
           style: {
-            backgroundColor: 'white',
-            borderColor: '#bdbdbd',
-            color: '#757575',
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+            color: '#5a6a8a',
           },
         },
       ],
@@ -124,6 +155,30 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           textDecoration: 'none',
+          position: 'relative',
+          '&:after': {
+            content: '""',
+            position: 'absolute',
+            width: '0%',
+            height: '2px',
+            bottom: '-2px',
+            left: '0',
+            background: 'linear-gradient(90deg, rgba(91,138,249,0.8), rgba(156,105,226,0.8))',
+            transition: 'width 0.3s ease',
+          },
+          '&:hover:after': {
+            width: '100%',
+          },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: 'rgba(0, 0, 0, 0.05) 0 1px 5px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.8)',
         },
       },
     },
@@ -136,6 +191,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           border: 0,
+          backdropFilter: 'blur(8px)',
+          background: 'rgba(255, 255, 255, 0.4)',
           '& .MuiDataGrid-cell:focus-within': {
             outline: 'none',
           },
@@ -143,7 +200,7 @@ export const theme = createTheme({
             minHeight: '4rem',
           },
           '& .MuiDataGrid-columnHeaderTitle': {
-            color: 'grey.900',
+            color: '#4a5568',
             fontSize: '0.85rem',
             fontWeight: 'bold',
             textTransform: 'uppercase',
