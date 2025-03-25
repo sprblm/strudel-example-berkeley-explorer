@@ -1,11 +1,15 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": true
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "allowImportingTsExtensions": true,
+    "noEmit": false,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "scripts/**/*"
+  ]
 }
