@@ -1,8 +1,11 @@
-import { AppBar, IconButton, Toolbar, Typography, Stack } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Stack, IconButton } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
+import SearchIcon from '@mui/icons-material/Search';
+import ExploreIcon from '@mui/icons-material/Explore';
+import InfoIcon from '@mui/icons-material/Info';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import React from 'react';
-import { AppLink } from './AppLink';
 import { config } from '../../strudel.config';
 import { ImageWrapper } from './ImageWrapper';
 import { cleanPath } from '../utils/queryParams.utils';
@@ -12,16 +15,10 @@ import { cleanPath } from '../utils/queryParams.utils';
  */
 export const TopBar: React.FC = () => {
   return (
-    <AppBar color="default" position="static">
+    <AppBar position="static" color="primary">
       <Toolbar>
-        <Stack
-          direction="row"
-          sx={{
-            alignItems: 'center',
-            flexGrow: 1,
-          }}
-        >
-          <AppLink to="/">
+        <Stack direction="row" sx={{ alignItems: 'center', flexGrow: 1 }}>
+          <RouterLink to="/">
             {!config.navbar.logo && (
               <IconButton
                 size="large"
@@ -38,24 +35,52 @@ export const TopBar: React.FC = () => {
                   src={cleanPath(
                     `${import.meta.env.BASE_URL}/${config.navbar.logo}`
                   )}
+                  alt={config.navbar.title || "Application logo"}
                 />
               </ImageWrapper>
             )}
-          </AppLink>
-          <AppLink to="/">
-            <Typography variant="h6" component="div">
-              {config.navbar.title}
-            </Typography>
-          </AppLink>
-          {config.navbar.items.map((item, i) => (
-            <AppLink key={`${item.path}-${i}`} to={item.path}>
-              {item.label}
-            </AppLink>
-          ))}
+          </RouterLink>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Climate Data Analysis Platform
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/"
+              startIcon={<HomeIcon />}
+            >
+              Home
+            </Button>
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/search-repositories"
+              startIcon={<SearchIcon />}
+            >
+              Search Data
+            </Button>
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/explore-data"
+              startIcon={<ExploreIcon />}
+            >
+              Explore Data
+            </Button>
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/about"
+              startIcon={<InfoIcon />}
+            >
+              About
+            </Button>
+            <IconButton color="inherit">
+              <AccountCircleIcon />
+            </IconButton>
+          </Stack>
         </Stack>
-        <IconButton size="large" edge="start" color="inherit">
-          <AccountCircleIcon />
-        </IconButton>
       </Toolbar>
     </AppBar>
   );
