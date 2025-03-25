@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, CardActionArea, IconButton, Stack } from '@mui/material';
+import { Box, Card, IconButton, Stack } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 interface DataListCardProps {
@@ -38,16 +38,16 @@ export const DataListCard: React.FC<DataListCardProps> = ({
         },
       }}
     >
-      <CardActionArea onClick={handleClick}>
+      <Box onClick={handleClick} sx={{ cursor: 'pointer' }}>
         <Box sx={{ p: 2 }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ flex: 1 }}>{children}</Box>
-            <IconButton edge="end" aria-label="view details">
+            <IconButton edge="end" aria-label="view details" onClick={handleClick}>
               <KeyboardArrowRightIcon />
             </IconButton>
           </Stack>
         </Box>
-      </CardActionArea>
+      </Box>
     </Card>
   );
 };
