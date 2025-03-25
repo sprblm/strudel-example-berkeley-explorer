@@ -5,15 +5,16 @@ import { components, hooks, utils } from '@generouted/react-router/client';
 
 export type Path =
   | `/`
+  | `/about`
   | `/compare-data`
   | `/compare-data/compare`
   | `/compare-data/new`
   | `/explore-data`
   | `/explore-data/:id`
+  | `/home`
   | `/monitor-activities`
   | `/monitor-activities/calendar`
   | `/monitor-activities/detail`
-  | `/playground`
   | `/run-computation`
   | `/run-computation/:id/data-inputs`
   | `/run-computation/:id/results`
