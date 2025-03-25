@@ -9,7 +9,7 @@ export const taskflow: SearchDataRepositoriesConfig = {
       /**
        * Source of the data for the initial list of items on the main page.
        */
-      source: '/api/worldclim',
+      source: 'worldclim://datasets',
       /**
        * Key-value object of params that should always be included in the query URL
        */
