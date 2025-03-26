@@ -1,4 +1,4 @@
-import { ListConfig, CardFields, TaskflowConfig } from './taskflow.types';
+import { TaskflowConfig } from './taskflow.types';
 
 export const taskflow: TaskflowConfig = {
   data: {
