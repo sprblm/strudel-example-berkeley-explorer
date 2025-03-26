@@ -8,6 +8,7 @@ export interface ListConfig {
   source: string;
   idField: string;
   queryMode: 'server' | 'client';
+  staticParams?: Record<string, unknown>;
 }
 
 export interface CardFields {
