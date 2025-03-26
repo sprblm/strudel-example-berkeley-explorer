@@ -1,7 +1,8 @@
 import { CircularProgress } from '@mui/material';
+import './LoadingSpinner.css';
 
 export const LoadingSpinner = () => (
-  <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+  <div className="loading-spinner-container">
     <CircularProgress />
   </div>
 );
