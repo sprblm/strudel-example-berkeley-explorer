@@ -8,7 +8,6 @@ import {
   FormGroup,
   IconButton,
   MenuItem,
-  Paper,
   Select,
   Slider,
   Stack,
@@ -22,9 +21,31 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFilters } from '../../../components/FilterContext';
 import { taskflow } from '../_config/taskflow.config';
+import { MapSelector } from './MapSelector';
 
 interface FiltersPanelProps {
   onClose: () => void;
+}
+
+// Add proper type for filter parameter
+interface FilterFieldProps {
+  filter: {
+    field: string;
+    label: string;
+    type: string;
+    options?:
+      | {
+          min?: number;
+          max?: number;
+          step?: number;
+          value?: string;
+          label?: string;
+        }
+      | {
+          value: string;
+          label: string;
+        }[];
+  };
 }
 
 /**
@@ -33,7 +54,7 @@ interface FiltersPanelProps {
  */
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
   const [expandedMap, setExpandedMap] = useState(false);
-  const { activeFilters, setFilter, clearFilters } = useFilters();
+  const { activeFilters, clearFilters, setFilter } = useFilters();
 
   const toggleMapExpand = () => {
     setExpandedMap(!expandedMap);
@@ -44,32 +65,36 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
   };
 
   const handleRangeFilterChange = (field: string, value: number[]) => {
-    setFilter(field, value);
+    useFilters().setFilter(field, value as [number, number]);
   };
 
   const handleSelectFilterChange = (field: string, value: string) => {
-    setFilter(field, value);
+    useFilters().setFilter(field, value);
   };
 
   const handleToggleFilterChange = (field: string, checked: boolean) => {
-    setFilter(field, checked);
+    useFilters().setFilter(field, checked);
   };
-
   // Group filters by category
   const filterCategories = {
-    source: taskflow.pages.index.cardFilters.filter((f) => f.field === 'source'),
-    variables: taskflow.pages.index.cardFilters.filter((f) => f.field === 'variables'),
-    temporal: taskflow.pages.index.cardFilters.filter((f) =>
-      f.field === 'temporal_coverage' || f.field === 'temporal_resolution'
+    source: taskflow.pages.index.cardFilters.filter(
+      (f) => f.field === 'source'
     ),
-    spatial: taskflow.pages.index.cardFilters.filter((f) =>
-      f.field === 'spatial_resolution' || f.field === 'spatial_coverage'
+    variables: taskflow.pages.index.cardFilters.filter(
+      (f) => f.field === 'variables'
     ),
-    type: taskflow.pages.index.cardFilters.filter((f) =>
-      f.field === 'type' || f.field === 'quality'
+    temporal: taskflow.pages.index.cardFilters.filter(
+      (f) =>
+        f.field === 'temporal_coverage' || f.field === 'temporal_resolution'
     ),
-    tags: taskflow.pages.index.cardFilters.filter((f) =>
-      f.field === 'category' || f.field === 'tags'
+    spatial: taskflow.pages.index.cardFilters.filter(
+      (f) => f.field === 'spatial_resolution' || f.field === 'spatial_coverage'
+    ),
+    type: taskflow.pages.index.cardFilters.filter(
+      (f) => f.field === 'type' || f.field === 'quality'
+    ),
+    tags: taskflow.pages.index.cardFilters.filter(
+      (f) => f.field === 'category' || f.field === 'tags'
     ),
   };
 
@@ -177,9 +202,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
     ...additionalClimateFilters,
   ];
 
-  const FilterField = ({ filter }) => {
-    const { field, label, type, options } = filter;
-
+  const FilterField: React.FC<FilterFieldProps> = ({ filter }) => {
+    const { activeFilters, setFilter } = useFilters();
+    const { field, label, type, options = [] } = filter;
     // Range filter (for numeric values)
     if (
       type === 'range' &&
@@ -226,9 +251,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
                   ? activeFilters[field]
                   : ''
               }
-              onChange={(e) =>
-                handleSelectFilterChange(field, e.target.value)
-              }
+              onChange={(e) => handleSelectFilterChange(field, e.target.value)}
               displayEmpty
             >
               <MenuItem value="">
@@ -273,6 +296,14 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
 
   return (
     <Box sx={{ border: 'none', overflowY: 'auto', maxHeight: '100vh', p: 2 }}>
+      {/* Map for geographic selection */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          Geographic Region
+        </Typography>
+        <MapSelector expanded={expandedMap} onToggleExpand={toggleMapExpand} />
+      </Box>
+
       <Stack
         direction="row"
         alignItems="center"
@@ -391,7 +422,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       {/* Additional Climate Filters Section */}
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="medium">Additional Climate Filters</Typography>
+          <Typography fontWeight="medium">
+            Additional Climate Filters
+          </Typography>
         </AccordionSummary>
         <AccordionDetails>
           {additionalClimateFilters.map((filter) => (
