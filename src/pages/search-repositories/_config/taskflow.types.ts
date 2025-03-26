@@ -97,3 +97,13 @@ export interface SearchDataRepositoriesConfig {
     };
   };
 }
+
+export interface TaskflowConfig {
+  data: {
+    list: ListConfig;
+    detail: Record<string, unknown>;
+    repositories: Record<string, unknown>[];
+  };
+  cards: CardFields;
+  pages?: Record<string, unknown>;
+}

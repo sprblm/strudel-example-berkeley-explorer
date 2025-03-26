@@ -1,13 +1,6 @@
-import { ListConfig, CardFields } from './taskflow.types';
+import { ListConfig, CardFields, TaskflowConfig } from './taskflow.types';
 
-export const taskflow: { 
-  data: { 
-    list: ListConfig; 
-    detail: Record<string, unknown>; 
-    repositories: Record<string, unknown>[] 
-  }; 
-  cards: CardFields 
-} = {
+export const taskflow: TaskflowConfig = {
   data: {
     /**
      * Data definition for the initial items list
