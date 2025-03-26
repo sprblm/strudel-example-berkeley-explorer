@@ -1,28 +1,27 @@
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SortIcon from '@mui/icons-material/Sort';
 import {
-  Alert,
   Box,
   Button,
   Pagination,
   Paper,
-  Skeleton,
   Stack,
-  TextField,
   Typography,
   ListItemText,
 } from '@mui/material';
 import React, { useEffect, useState, useMemo } from 'react';
 import { DataListCard } from './DataListCard';
-import { taskflow } from '../_config/taskflow.config';
-import { useFilters } from '../../../components/FilterContext';
-import { filterData } from '../../../utils/filters.utils';
+import { getListConfig, getCardFields } from '../_config/taskflow.config';
 import { useListQuery } from '../../../utils/useListQuery';
+import { LoadingSpinner } from '../../../components/LoadingSpinner';
+import { ErrorAlert } from '../../../components/ErrorAlert';
 
 interface DataListPanelProps {
-  onToggleFiltersPanel: () => any;
-  previewItem: any;
-  setPreviewItem: React.Dispatch<React.SetStateAction<any>>;
+  onToggleFiltersPanel: () => void;
+  previewItem: Record<string, unknown> | null;
+  setPreviewItem: React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>;
+  listConfig?: ReturnType<typeof getListConfig>;
+  cardFields?: ReturnType<typeof getCardFields>;
 }
 
 /**
@@ -30,228 +29,110 @@ interface DataListPanelProps {
  * Cards are filterable by the inputs in `<FiltersPanel>` and clicking a card will
  * display the `<PreviewPanel>`.
  */
-export const DataListPanel: React.FC<DataListPanelProps> = ({
+export const DataListPanel = ({
   onToggleFiltersPanel,
   previewItem,
   setPreviewItem,
-}) => {
-  const { activeFilters } = useFilters();
-  const [searchTerm, setSearchTerm] = useState('');
+  listConfig = getListConfig(),
+  cardFields = getCardFields(),
+}: DataListPanelProps) => {
+  const { idField, title, content } = cardFields;
+  const { source: dataSource } = listConfig;
+  const [cards, setCards] = useState<Record<string, unknown>[]>([]);
   const [page, setPage] = useState(1);
-  const pageSize = 10;
-  const [offset, setOffest] = useState((page - 1) * pageSize);
-  const [total, setTotal] = useState(1);
-  const [paginatedCards, setPaginatedCards] = useState<any[]>([]);
-  const filterConfigs = taskflow.pages.index.cardFilters;
-  const queryMode = taskflow.data.list.queryMode;
-  const { isPending, isError, data, error } = useListQuery({
-    activeFilters,
-    dataSource: taskflow.data.list.source,
-    filterConfigs,
-    offset,
-    page,
-    pageSize,
-    queryMode,
-    staticParams: taskflow.data.list.staticParams,
-  });
+  const [sortBy, setSortBy] = useState<'name' | 'date'>('name');
 
-  console.log('DataListPanel: Data fetching state:', { 
-    isPending, 
-    isError, 
-    dataExists: !!data, 
-    dataSource: taskflow.data.list.source 
-  });
-  if (data) {
-    console.log('DataListPanel: Received data:', data);
-  }
-  if (error) {
-    console.error('DataListPanel: Error fetching data:', error);
-  }
+  const { data: response, isPending, isError, error } = useListQuery(dataSource);
+  const data = response?.data || [];
 
-  const filteredData = useMemo(() => {
-    try {
-      return filterData(data, activeFilters ?? {}, filterConfigs, searchTerm);
-    } catch (error) {
-      console.error('Filter error:', error);
-      return [];
+  useEffect(() => {
+    if (data.length > 0) {
+      setCards(data);
     }
-  }, [data, activeFilters, filterConfigs, searchTerm]);
+  }, [data]);
 
-  console.log('DataListPanel: Filtered data results:', filteredData?.length || 0);
-
-  console.log('DataListPanel: Data from query:', data);
-  const cards = Array.isArray(data) ? data : (data?.results || []);
-  console.log('DataListPanel: Cards for rendering:', cards?.length || 0);
-
-  const emptyRows = new Array(pageSize).fill(null);
-  const indexedRows = emptyRows.map((row, i) => i);
-
-  const handleSearch: React.ChangeEventHandler<HTMLInputElement> = (evt) => {
-    setSearchTerm(evt.target.value);
-  };
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
-    setPage(value);
-  };
-
-  // Set total count after cards is populated from query
-  useEffect(() => {
-    if (cards) {
-      setTotal(queryMode === 'server' ? data.total : cards.length);
+  const renderCards = useMemo(() => {
+    if (isPending) {
+      return <LoadingSpinner />;
     }
-  }, [cards]);
-
-  // Modify the item offset when the page changes
-  useEffect(() => {
-    setOffest((page - 1) * pageSize);
-  }, [page]);
-
-  // Filter cards based on their index when the page and offset change
-  // The paginatedCards list is only relevant/used for client mode apps
-  useEffect(() => {
-    if (cards && Array.isArray(cards)) {
-      setPaginatedCards(
-        cards.filter((_card: any, i: number) => {
-          return i >= offset && i < offset + pageSize;
-        })
+    if (isError) {
+      return <ErrorAlert message={error?.message ?? 'Error fetching data'} />;
+    }
+    return cards.map((card, index) => {
+      const cardId = String(card[idField as keyof typeof card] || index);
+      const cardTitle = card[title as keyof typeof card] as string;
+      const cardContent = card[content as keyof typeof card] as string;
+      
+      return (
+        <DataListCard key={cardId} item={card} previewItem={previewItem} setPreviewItem={setPreviewItem}>
+          <ListItemText
+            primary={<Typography>{cardTitle}</Typography>}
+            secondary={<Typography>{cardContent}</Typography>}
+          />
+        </DataListCard>
       );
-    } else {
-      // If cards is not an array, set paginatedCards to an empty array
-      console.warn('DataListPanel: cards is not an array:', cards);
-      setPaginatedCards([]);
-    }
-  }, [cards, offset]);
+    });
+  }, [cards, isPending, isError, error, idField, title, content, previewItem, setPreviewItem]);
 
   // Content to render on the page for this component
   return (
     <Paper elevation={0}>
-      <Stack
-        direction="row"
-        spacing={2}
-        alignItems="center"
+      <Box
         sx={{
-          padding: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
         }}
       >
-        <Button startIcon={<FilterAltIcon />} onClick={onToggleFiltersPanel}>
-          Filters
-        </Button>
-        <Button startIcon={<SortIcon />}>Sort</Button>
-        <Box flex={1}>
-          <TextField
-            variant="outlined"
-            label="Search"
-            size="small"
-            value={searchTerm}
-            fullWidth
-            onChange={handleSearch}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 2,
+          }}
+        >
+          <Button
+            startIcon={<FilterAltIcon />}
+            onClick={onToggleFiltersPanel}
+          >
+            Filters
+          </Button>
+          <Button
+            startIcon={<SortIcon />}
+            onClick={() => setSortBy(sortBy === 'name' ? 'date' : 'name')}
+          >
+            Sort by {sortBy === 'name' ? 'Date' : 'Name'}
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            padding: 2,
+          }}
+        >
+          {renderCards}
+          {cards && cards.length === 0 && (
+            <Stack flex={1}>
+              <Typography>No data matches your search</Typography>
+            </Stack>
+          )}
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            padding: 2,
+          }}
+        >
+          <Pagination
+            count={Math.ceil((response?.total || 0) / 10)}
+            page={page}
+            onChange={(_, value) => setPage(value)}
           />
         </Box>
-      </Stack>
-      <Stack
-        direction="row"
-        sx={{
-          padding: 2,
-        }}
-      >
-        {isPending && (
-          <Box
-            flex={1}
-            sx={{
-              padding: 2,
-            }}
-          >
-            {indexedRows.map((row) => (
-              <Skeleton key={row} height={100} />
-            ))}
-          </Box>
-        )}
-        {isError && (
-          <Stack flex={1}>
-            <Alert severity="error">{error.message}</Alert>
-          </Stack>
-        )}
-        {queryMode == 'client' && cards && cards.length > 0 && (
-          <Stack flex={1}>
-            {paginatedCards?.map((item: any) => (
-              <DataListCard
-                key={item[taskflow.data.list.idField]}
-                item={item}
-                previewItem={previewItem}
-                setPreviewItem={setPreviewItem}
-              >
-                <ListItemText
-                  primary={
-                    <Typography component="div" variant="body2">
-                      {item.name}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography component="div" variant="caption" color="text.secondary">
-                      {item.description}
-                    </Typography>
-                  }
-                />
-              </DataListCard>
-            ))}
-          </Stack>
-        )}
-        {queryMode == 'server' && cards && cards.length > 0 && (
-          <Stack flex={1}>
-            {cards?.map((item: any) => (
-              <DataListCard
-                key={item[taskflow.data.list.idField]}
-                item={item}
-                previewItem={previewItem}
-                setPreviewItem={setPreviewItem}
-              >
-                <ListItemText
-                  primary={
-                    <Typography component="div" variant="body2">
-                      {item.name}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography component="div" variant="caption" color="text.secondary">
-                      {item.description}
-                    </Typography>
-                  }
-                />
-              </DataListCard>
-            ))}
-          </Stack>
-        )}
-        {cards && cards.length === 0 && (
-          <Stack flex={1}>
-            <Typography>No data matches your search</Typography>
-          </Stack>
-        )}
-        {!previewItem && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: 'neutral.dark',
-              height: 700,
-              width: 400,
-            }}
-          >
-            <Typography>{'<Map>'}</Typography>
-          </Box>
-        )}
-      </Stack>
-      <Pagination
-        count={Math.ceil(total / pageSize)}
-        page={page}
-        onChange={handlePageChange}
-        sx={{
-          padding: 2,
-        }}
-      />
+      </Box>
     </Paper>
   );
 };

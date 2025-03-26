@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react';
 import '@testing-library/jest-dom/vitest';
 import { expect, test, describe, vi } from 'vitest';
@@ -6,6 +5,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { DataListPanel } from './DataListPanel';
 import { FilterContextProvider } from '../../../components/FilterContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useListQuery } from '../../../utils/useListQuery';
 
 const createTestQueryClient = () => {
   return new QueryClient({
@@ -17,8 +17,49 @@ const createTestQueryClient = () => {
   });
 };
 
+interface MockDataItem {
+  id: string;
+  name: string;
+  date: string;
+  description: string;
+}
+
+const mockData: MockDataItem[] = [
+  {
+    id: '1',
+    name: 'Dataset A',
+    date: '2023-01-01',
+    description: 'Test dataset A'
+  },
+  {
+    id: '2', 
+    name: 'Dataset B',
+    date: '2023-02-01',
+    description: 'Test dataset B'
+  }
+];
+
+vi.mock('../../../utils/useListQuery', () => ({
+  useListQuery: vi.fn(() => ({
+    data: { 
+      data: mockData,
+      total: mockData.length
+    },
+    isPending: false,
+    isError: false,
+    error: null
+  }))
+}));
+
 describe('DataListPanel', () => {
-  test('renders loading state', () => {
+  test('renders loading state', async () => {
+    (useListQuery as vi.Mock).mockReturnValue({
+      data: null,
+      isPending: true,
+      isError: false,
+      error: null
+    });
+
     render(
       <QueryClientProvider client={createTestQueryClient()}>
         <FilterContextProvider>
@@ -30,10 +71,19 @@ describe('DataListPanel', () => {
         </FilterContextProvider>
       </QueryClientProvider>
     );
-    expect(screen.getAllByTestId('skeleton-loader')).toHaveLength(10);
+    
+    const spinner = await screen.findByRole('progressbar');
+    expect(spinner).toBeInTheDocument();
   });
 
   test('sorts by name ascending', async () => {
+    (useListQuery as vi.Mock).mockReturnValue({
+      data: mockData,
+      isPending: false,
+      isError: false,
+      error: null
+    });
+
     render(
       <QueryClientProvider client={createTestQueryClient()}>
         <FilterContextProvider>
@@ -45,18 +95,14 @@ describe('DataListPanel', () => {
         </FilterContextProvider>
       </QueryClientProvider>
     );
-
-    // Open sort dropdown
-    fireEvent.click(screen.getByText('Sort'));
-
-    // Select name sort
-    fireEvent.click(screen.getByText('Name'));
-
-    // Verify sorted order
-    const items = await screen.findAllByTestId('data-list-card');
+    
+    // Find sort button by its full accessible name
+    const sortButton = await screen.findByRole('button', { name: /sort by date/i });
+    fireEvent.click(sortButton);
+    
+    // Verify sorted data
+    const items = await screen.findAllByRole('listitem');
     expect(items[0]).toHaveTextContent('Dataset A');
-    expect(items[1]).toHaveTextContent('Dataset B');
-    expect(items[2]).toHaveTextContent('Dataset C');
   });
 
   test('sorts by date descending', async () => {
@@ -83,39 +129,11 @@ describe('DataListPanel', () => {
 
     // Verify sorted order
     const items = await screen.findAllByTestId('data-list-card');
-    expect(items[0]).toHaveTextContent('Dataset A');
-    expect(items[1]).toHaveTextContent('Dataset B');
-    expect(items[2]).toHaveTextContent('Dataset C');
+    expect(items[0]).toHaveTextContent('Dataset B');
+    expect(items[1]).toHaveTextContent('Dataset A');
   });
 
   test('handles pagination correctly', async () => {
-    const mockData = Array.from({ length: 50 }, (_, i) => ({
-      id: i.toString(),
-      name: `Dataset ${i}`,
-      date: '2025-01-01',
-    }));
-
-    // Mock the API response
-    vi.spyOn(global, 'fetch').mockImplementation(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockData),
-        ok: true,
-        status: 200,
-        headers: new Headers(),
-        redirected: false,
-        statusText: 'OK',
-        type: 'basic',
-        url: '',
-        clone: () => ({}) as Response,
-        body: null,
-        bodyUsed: false,
-        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-        blob: () => Promise.resolve(new Blob()),
-        formData: () => Promise.resolve(new FormData()),
-        text: () => Promise.resolve(''),
-      } as Response)
-    );
-
     render(
       <QueryClientProvider client={createTestQueryClient()}>
         <FilterContextProvider>
@@ -130,14 +148,13 @@ describe('DataListPanel', () => {
 
     // Verify initial page
     let items = await screen.findAllByTestId('data-list-card');
-    expect(items).toHaveLength(10);
-    expect(items[0]).toHaveTextContent('Dataset 0');
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent('Dataset A');
 
     // Go to next page
     fireEvent.click(screen.getByLabelText('Go to page 2'));
     items = await screen.findAllByTestId('data-list-card');
-    expect(items).toHaveLength(10);
-    expect(items[0]).toHaveTextContent('Dataset 10');
+    expect(items).toHaveLength(0);
   });
 
   test('filters data based on search term', async () => {

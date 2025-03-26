@@ -406,32 +406,6 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
           ))}
         </AccordionDetails>
       </Accordion>
-
-      {/* Climate Filters Section */}
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="medium">Climate Filters</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {climateFilterConfigs.map((filter) => (
-            <FilterField key={filter.field} filter={filter} />
-          ))}
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Additional Climate Filters Section */}
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="medium">
-            Additional Climate Filters
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {additionalClimateFilters.map((filter) => (
-            <FilterField key={filter.field} filter={filter} />
-          ))}
-        </AccordionDetails>
-      </Accordion>
     </Box>
   );
 };

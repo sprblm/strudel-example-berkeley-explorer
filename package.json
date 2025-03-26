@@ -17,7 +17,8 @@
     "prettier:fix": "prettier . --write '**/*.{js,jsx,ts,tsx}'",
     "prepare": "cd ../ && husky ./strudel-taskflows/.husky",
     "type-check": "tsc --noEmit",
-    "check": "npm run type-check && npm run lint"
+    "check": "npm run type-check && npm run lint",
+    "test": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -44,7 +45,11 @@
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/d3-fetch": "^3.0.7",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^20.12.12",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
@@ -66,12 +71,14 @@
     "gh-pages": "^6.1.1",
     "http-proxy-middleware": "^3.0.3",
     "husky": "^9.1.6",
+    "jsdom": "^26.0.0",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2",
-    "vite": "^5.4.14"
+    "vite": "^5.4.14",
+    "vitest": "^3.0.9"
   },
   "engines": {
     "node": "^18.18.0 || >=20.0.0"

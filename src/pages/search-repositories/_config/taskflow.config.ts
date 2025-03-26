@@ -1,6 +1,13 @@
-import { SearchDataRepositoriesConfig } from './taskflow.types';
+import { ListConfig, CardFields } from './taskflow.types';
 
-export const taskflow: SearchDataRepositoriesConfig = {
+export const taskflow: { 
+  data: { 
+    list: ListConfig; 
+    detail: Record<string, unknown>; 
+    repositories: Record<string, unknown>[] 
+  }; 
+  cards: CardFields 
+} = {
   data: {
     /**
      * Data definition for the initial items list
@@ -9,11 +16,14 @@ export const taskflow: SearchDataRepositoriesConfig = {
       /**
        * Source of the data for the initial list of items on the main page.
        */
-      source: '/api/worldclim',
+      source: '/api/datasets',
       /**
        * Key-value object of params that should always be included in the query URL
        */
-      staticParams: null,
+      staticParams: {
+        limit: 10,
+        offset: 0,
+      },
       /**
        * Field name for the unique ID in the data source.
        */
@@ -21,13 +31,13 @@ export const taskflow: SearchDataRepositoriesConfig = {
       /**
        * Method by which data should be filtered, either client or server.
        */
-      queryMode: 'client',
+      queryMode: 'server',
     },
     /**
      * Data definition for the item detail page
      */
     detail: {
-      source: 'data/default/search-data-repositories/datasets.json',
+      source: '/api/dataset',
       staticParams: null,
       idField: 'id',
       queryMode: 'client',
@@ -44,6 +54,16 @@ export const taskflow: SearchDataRepositoriesConfig = {
       { id: 'user', name: 'User-contributed datasets', enabled: true },
     ],
   },
+  cards: {
+    /**
+     * Field name for the title in the data source.
+     */
+    titleField: 'name',
+    /**
+     * Field name for the content in the data source.
+     */
+    contentField: 'description',
+  },
   pages: {
     index: {
       /**
@@ -53,15 +73,16 @@ export const taskflow: SearchDataRepositoriesConfig = {
       /**
        * Text to appear underneath the title at the top of the main page.
        */
-      description: 'Search across multiple climate data repositories to find relevant datasets for your research',
+      description:
+        'Search across multiple climate data repositories to find relevant datasets for your research',
       /**
        * Map of card sections to property names in the data source.
        * This determines the content of the cards on the main page.
        */
       cardFields: {
-        title: 'title',
-        content: 'summary',
-        tags: 'tags',
+        title: 'name',
+        content: 'description',
+        tags: 'keywords',
         source: 'source',
         quality: 'quality',
         resolution: 'resolution',
@@ -87,12 +108,8 @@ export const taskflow: SearchDataRepositoriesConfig = {
           filterComponent: 'CheckboxList',
           filterProps: {
             options: [
-              { label: 'NOAA Climate Data Online', value: 'NOAA' },
-              { label: 'NASA Earth Observations', value: 'NASA' },
-              { label: 'WorldClim', value: 'WorldClim' },
-              { label: 'CMIP6 Climate Model Outputs', value: 'CMIP6' },
-              { label: 'ERA5 Reanalysis Data', value: 'ERA5' },
-              { label: 'User-contributed datasets', value: 'User' },
+              { label: 'NOAA', value: 'noaa' },
+              { label: 'NASA', value: 'nasa' },
             ],
           },
         },
@@ -114,7 +131,10 @@ export const taskflow: SearchDataRepositoriesConfig = {
               { label: 'Solar Radiation', value: 'Solar Radiation' },
               { label: 'Cloud Cover', value: 'Cloud Cover' },
               { label: 'Sea Level', value: 'Sea Level' },
-              { label: 'Sea Surface Temperature', value: 'Sea Surface Temperature' },
+              {
+                label: 'Sea Surface Temperature',
+                value: 'Sea Surface Temperature',
+              },
               { label: 'Snow Cover', value: 'Snow Cover' },
               { label: 'Soil Moisture', value: 'Soil Moisture' },
             ],
@@ -272,7 +292,10 @@ export const taskflow: SearchDataRepositoriesConfig = {
           filterProps: {
             options: [
               { label: 'Boreal forest', value: 'Boreal forest' },
-              { label: 'Carbon and greenhouse gas emissions', value: 'Carbon and greenhouse gas emissions' },
+              {
+                label: 'Carbon and greenhouse gas emissions',
+                value: 'Carbon and greenhouse gas emissions',
+              },
               { label: 'Ecology', value: 'Ecology' },
               { label: 'Climate Change', value: 'Climate Change' },
               { label: 'Global Warming', value: 'Global Warming' },
@@ -292,7 +315,10 @@ export const taskflow: SearchDataRepositoriesConfig = {
         enabled: true,
         defaultCenter: [0, 0],
         defaultZoom: 1,
-        maxBounds: [[-90, -180], [90, 180]],
+        maxBounds: [
+          [-90, -180],
+          [90, 180],
+        ],
       },
       /**
        * Settings for search history tracking
@@ -311,3 +337,6 @@ export const taskflow: SearchDataRepositoriesConfig = {
     },
   },
 };
+
+export const getListConfig = () => taskflow.data.list;
+export const getCardFields = () => taskflow.cards;
