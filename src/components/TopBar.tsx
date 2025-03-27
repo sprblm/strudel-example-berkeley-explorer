@@ -1,85 +1,39 @@
-import { AppBar, Toolbar, Typography, Button, Stack, IconButton } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
+import { AppBar, Toolbar, InputBase, IconButton, Stack } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import ExploreIcon from '@mui/icons-material/Explore';
-import InfoIcon from '@mui/icons-material/Info';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import React from 'react';
-import { config } from '../../strudel.config';
-import { ImageWrapper } from './ImageWrapper';
-import { cleanPath } from '../utils/queryParams.utils';
+import { SideSheet } from './SideSheet';
+import { useLocation } from 'react-router-dom';
 
 /**
- * Top navigation bar component
+ * Top navigation bar with search input and sidesheet menu
  */
 export const TopBar: React.FC = () => {
+  const location = useLocation();
+  const showSearch = location.pathname !== '/';
+
   return (
     <AppBar position="static" color="primary">
       <Toolbar>
         <Stack direction="row" sx={{ alignItems: 'center', flexGrow: 1 }}>
-          <RouterLink to="/">
-            {!config.navbar.logo && (
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-              >
-                <HomeIcon />
-              </IconButton>
-            )}
-            {config.navbar.logo && (
-              <ImageWrapper height={30}>
-                <img
-                  src={cleanPath(
-                    `${import.meta.env.BASE_URL}/${config.navbar.logo}`
-                  )}
-                  alt={config.navbar.title || "Application logo"}
-                />
-              </ImageWrapper>
-            )}
-          </RouterLink>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Climate Data Analysis Platform
-          </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/"
-              startIcon={<HomeIcon />}
-            >
-              Home
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/search-repositories"
-              startIcon={<SearchIcon />}
-            >
-              Search Data
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/explore-data"
-              startIcon={<ExploreIcon />}
-            >
-              Explore Data
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/about"
-              startIcon={<InfoIcon />}
-            >
-              About
-            </Button>
-            <IconButton color="inherit">
-              <AccountCircleIcon />
-            </IconButton>
-          </Stack>
+          <SideSheet />
+          {showSearch && (
+            <InputBase
+              placeholder="Search..."
+              sx={{ 
+                ml: 2,
+                flexGrow: 1,
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                borderRadius: 1,
+                px: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                },
+              }}
+              startAdornment={
+                <SearchIcon sx={{ color: 'inherit', mr: 1 }} />
+              }
+            />
+          )}
         </Stack>
       </Toolbar>
     </AppBar>

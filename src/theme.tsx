@@ -71,7 +71,7 @@ export const theme = createTheme({
   // Modern, clean typography
   typography: {
     htmlFontSize: 16,
-    fontFamily: `"Inter", "Roboto", "Helvetica", sans-serif`,
+    fontFamily: `'Public Sans', sans-serif`,
     fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
@@ -84,7 +84,6 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
-          backdropFilter: 'blur(10px)',
           boxShadow: 'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
           border: '1px solid rgba(255, 255, 255, 0.18)',
         },
@@ -102,7 +101,6 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backdropFilter: 'blur(10px)',
           background: 'rgba(255, 255, 255, 0.6)',
           borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
           borderTop: '1px solid rgba(255, 255, 255, 0.8)',
@@ -120,8 +118,6 @@ export const theme = createTheme({
           borderRadius: 12,
           textTransform: 'none',
           boxShadow: 'rgba(255, 255, 255, 0.4) -2px -2px 5px, rgba(0, 0, 0, 0.1) 2px 2px 5px',
-          backdropFilter: 'blur(5px)',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))',
           transition: 'all 0.3s ease',
           '&:hover': {
             boxShadow: 'rgba(255, 255, 255, 0.4) -1px -1px 3px, rgba(0, 0, 0, 0.1) 1px 1px 3px',
@@ -133,7 +129,11 @@ export const theme = createTheme({
           },
         },
         contained: {
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
+          backgroundColor: '#5b8af9',
+          color: '#ffffff',
+          '&:hover': {
+            backgroundColor: '#3d5fc6',
+          },
         },
         outlined: {
           borderWidth: '1px',
@@ -176,7 +176,6 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           background: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(10px)',
           boxShadow: 'rgba(0, 0, 0, 0.05) 0 1px 5px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.8)',
         },
@@ -191,7 +190,6 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           border: 0,
-          backdropFilter: 'blur(8px)',
           background: 'rgba(255, 255, 255, 0.4)',
           '& .MuiDataGrid-cell:focus-within': {
             outline: 'none',
