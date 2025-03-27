@@ -5,7 +5,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["node", "cypress", "vitest"],
+    "types": ["node", "cypress"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsxdev", // Changed from "react-jsx" to "react-jsxdev"
+    "jsx": "react-jsxdev",
 
     /* Linting */
     "strict": true,
@@ -30,7 +30,6 @@
     "cypress.config.ts"
   ],
   "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.vite.json" }
+    { "path": "./tsconfig.node.json" }
   ]
 }
