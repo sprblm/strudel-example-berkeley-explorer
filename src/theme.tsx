@@ -14,15 +14,15 @@ export const theme = createTheme({
       paper: 'rgba(255, 255, 255, 0.6)', // Translucent white for glass effect
     },
     primary: {
-      main: '#5b8af9', // Iridescent blue
-      light: '#89b6ff',
-      dark: '#3d5fc6',
+      main: '#0b4fc5', // Iridescent blue
+      light: '#5b8af9',
+      dark: '#003892',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#9c69e2', // Iridescent purple
-      light: '#c89df8',
-      dark: '#7344b0',
+      main: '#112bd6', // Iridescent purple
+      light: '#6a5af9',
+      dark: '#0a1c9e',
       contrastText: '#ffffff',
     },
     info: {
@@ -83,18 +83,27 @@ export const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
-          boxShadow: 'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+          backgroundImage:
+            'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
+          boxShadow:
+            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
           border: '1px solid rgba(255, 255, 255, 0.18)',
+          '&:hover': {
+            backgroundImage:
+              'linear-gradient(135deg, rgba(218,220,227,0.1), rgba(82,176,214,0.1))',
+          },
         },
         elevation1: {
-          boxShadow: 'rgba(255, 255, 255, 0.5) -3px -3px 6px, rgba(0, 0, 0, 0.1) 3px 3px 8px',
+          boxShadow:
+            'rgba(255, 255, 255, 0.5) -3px -3px 6px, rgba(0, 0, 0, 0.1) 3px 3px 8px',
         },
         elevation2: {
-          boxShadow: 'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+          boxShadow:
+            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
         },
         elevation3: {
-          boxShadow: 'rgba(255, 255, 255, 0.5) -7px -7px 14px, rgba(0, 0, 0, 0.1) 7px 7px 20px',
+          boxShadow:
+            'rgba(255, 255, 255, 0.5) -7px -7px 14px, rgba(0, 0, 0, 0.1) 7px 7px 20px',
         },
       },
     },
@@ -107,7 +116,8 @@ export const theme = createTheme({
           transition: 'transform 0.3s, box-shadow 0.3s',
           '&:hover': {
             transform: 'translateY(-5px)',
-            boxShadow: 'rgba(255, 255, 255, 0.6) -8px -8px 16px, rgba(0, 0, 0, 0.15) 8px 8px 20px',
+            boxShadow:
+              'rgba(255, 255, 255, 0.6) -8px -8px 16px, rgba(0, 0, 0, 0.15) 8px 8px 20px',
           },
         },
       },
@@ -117,14 +127,19 @@ export const theme = createTheme({
         root: {
           borderRadius: 12,
           textTransform: 'none',
-          boxShadow: 'rgba(255, 255, 255, 0.4) -2px -2px 5px, rgba(0, 0, 0, 0.1) 2px 2px 5px',
+          boxShadow:
+            'rgba(255, 255, 255, 0.4) -2px -2px 5px, rgba(0, 0, 0, 0.1) 2px 2px 5px',
           transition: 'all 0.3s ease',
           '&:hover': {
-            boxShadow: 'rgba(255, 255, 255, 0.4) -1px -1px 3px, rgba(0, 0, 0, 0.1) 1px 1px 3px',
+            backgroundImage:
+              'linear-gradient(135deg, rgba(218,220,227,0.1), rgba(82,176,214,0.1))',
+            boxShadow:
+              'rgba(255, 255, 255, 0.4) -1px -1px 3px, rgba(0, 0, 0, 0.1) 1px 1px 3px',
             transform: 'translateY(-2px)',
           },
           '&:active': {
-            boxShadow: 'inset rgba(0, 0, 0, 0.1) 2px 2px 5px, inset rgba(255, 255, 255, 0.4) -2px -2px 5px',
+            boxShadow:
+              'inset rgba(0, 0, 0, 0.1) 2px 2px 5px, inset rgba(255, 255, 255, 0.4) -2px -2px 5px',
             transform: 'translateY(0)',
           },
         },
@@ -163,7 +178,8 @@ export const theme = createTheme({
             height: '2px',
             bottom: '-2px',
             left: '0',
-            background: 'linear-gradient(90deg, rgba(91,138,249,0.8), rgba(156,105,226,0.8))',
+            background:
+              'linear-gradient(90deg, rgba(91,138,249,0.8), rgba(156,105,226,0.8))',
             transition: 'width 0.3s ease',
           },
           '&:hover:after': {
@@ -203,6 +219,20 @@ export const theme = createTheme({
             fontWeight: 'bold',
             textTransform: 'uppercase',
           },
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundImage:
+            'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
+          boxShadow:
+            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
+          color: 'inherit',
+          fontFamily: 'inherit',
+          fontSize: 'inherit',
         },
       },
     },
