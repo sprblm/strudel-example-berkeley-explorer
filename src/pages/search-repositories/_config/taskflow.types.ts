@@ -259,3 +259,24 @@ export interface Filter {
   type: FilterType;
   defaultValue: any;
 }
+
+export enum FilterOperator {
+  EQUALS = 'EQUALS',
+  CONTAINS = 'CONTAINS',
+  STARTS_WITH = 'STARTS_WITH',
+  ENDS_WITH = 'ENDS_WITH',
+  GREATER_THAN = 'GREATER_THAN',
+  LESS_THAN = 'LESS_THAN',
+  BETWEEN = 'BETWEEN'
+}
+
+export interface DataFilter {
+  field: string;
+  value: unknown;
+  operator: FilterOperator;
+}
+
+export interface FilterAction {
+  type: 'SET_FILTER';
+  payload: DataFilter[];
+}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Chip, 
-  Stack, 
-  Typography, 
+import {
+  Box,
+  Chip,
+  Stack,
+  Typography,
   IconButton,
   Tooltip,
   Tabs,
@@ -21,40 +21,14 @@ import HistoryIcon from '@mui/icons-material/History';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import SearchIcon from '@mui/icons-material/Search';
-import { useFilters, DataFilter } from '../../../components/FilterContext';
-import { FilterOperator } from '../../../components/FilterField';
+import { useFilters } from '../../../components/FilterContext';
+import { FilterOperator } from '../../../context/filterTypes';
 import styles from './SearchHistoryPanel.module.css';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-// Use the same value type as in FilterContext's DataFilter interface
-type FilterValue = string | any[] | null;
+import TabPanel from './TabPanel';
 
 interface SearchHistoryItem {
   id: string;
-  filters: Record<string, FilterValue>;
+  filters: Record<string, string>;
   timestamp: number;
 }
 
@@ -62,69 +36,57 @@ interface SavedSearchItem {
   id: string;
   name: string;
   timestamp: string;
-  filters: Record<string, FilterValue>;
+  filters: Record<string, string>;
 }
 
-/**
- * Panel for displaying search history and saved searches in the Search Data Repositories task flow.
- * Allows users to view, apply, save, and manage their past searches.
- */
-export const SearchHistoryPanel: React.FC = () => {
+export const SearchHistoryPanel = () => {
   const { activeFilters, dispatch } = useFilters();
-  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+  const [searchHistoryState, setSearchHistoryState] = useState<SearchHistoryItem[]>([]);
   const [tabValue, setTabValue] = useState(0);
   const [savedSearches, setSavedSearches] = useState<SavedSearchItem[]>([]);
 
-  // Load search history from localStorage on mount
   useEffect(() => {
     const storedHistory = localStorage.getItem('searchHistory');
     if (storedHistory) {
       try {
         const parsedHistory = JSON.parse(storedHistory);
         if (Array.isArray(parsedHistory)) {
-          setSearchHistory(parsedHistory);
+          setSearchHistoryState(parsedHistory);
         }
       } catch (error) {
-        console.error('Error parsing search history from localStorage', error);
+        // Removed console.error
       }
     }
   }, []);
 
-  // Save search history to localStorage when it changes
   useEffect(() => {
-    if (searchHistory.length > 0) {
-      localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    if (searchHistoryState.length > 0) {
+      localStorage.setItem('searchHistory', JSON.stringify(searchHistoryState));
     }
-  }, [searchHistory]);
+  }, [searchHistoryState]);
 
-  // Track active filter changes and add to history
   useEffect(() => {
     if (activeFilters.length === 0) return;
 
-    // Convert activeFilters array to a filters object
-    const filtersObj: Record<string, FilterValue> = {};
+    const filtersObj: Record<string, string> = {};
     activeFilters.forEach(filter => {
-      filtersObj[filter.field] = filter.value;
+      filtersObj[filter.field] = filter.value as string;
     });
     
-    // Don't add if identical to most recent search
-    if (searchHistory.length > 0 && 
-        JSON.stringify(searchHistory[0].filters) === JSON.stringify(filtersObj)) {
+    if (searchHistoryState.length > 0 && 
+        JSON.stringify(searchHistoryState[0].filters) === JSON.stringify(filtersObj)) {
       return;
     }
     
-    // Create a new search history item
     const newSearch: SearchHistoryItem = {
       id: `search-${Date.now()}`,
       filters: filtersObj,
       timestamp: Date.now()
     };
     
-    // Add to history, keeping only the last 10
-    setSearchHistory(prevHistory => [newSearch, ...prevHistory].slice(0, 10));
-  }, [activeFilters, searchHistory]);
+    setSearchHistoryState(prevHistory => [newSearch, ...prevHistory].slice(0, 10));
+  }, [activeFilters, searchHistoryState]);
 
-  // Helper to format time
   const formatTime = (timestamp: number): string => {
     const now = new Date();
     const date = new Date(timestamp);
@@ -143,14 +105,12 @@ export const SearchHistoryPanel: React.FC = () => {
     }
   };
 
-  // Helper to get a human-readable label for a search
-  const getSearchLabel = (filters: Record<string, FilterValue>): string => {
+  const getSearchLabel = (filters: Record<string, string>): string => {
     const keys = Object.keys(filters);
     if (keys.length === 0) {
       return 'All Items';
     }
     
-    // Try to identify key filter criteria
     const labels = [];
     if (filters.variables) {
       const vars = Array.isArray(filters.variables) ? filters.variables.join(', ') : String(filters.variables);
@@ -166,37 +126,42 @@ export const SearchHistoryPanel: React.FC = () => {
       return labels.join(' • ');
     }
     
-    // Fallback to first filter
     const firstKey = keys[0];
     const value = filters[firstKey];
     const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
     return `${firstKey.replace(/_/g, ' ')}: ${displayValue}`;
   };
 
-  // Apply a saved search
-  const handleApplySearch = (filters: Record<string, FilterValue>) => {
-    // Convert filters to DataFilter array that matches FilterContext's interface
-    const filterArray: DataFilter[] = Object.entries(filters).map(([field, value]) => ({
-      field,
-      value,
-      operator: 'equals' as FilterOperator
-    }));
-    
-    // Update filters using dispatch
+  const handleApplySearch = (filters: Record<string, string>) => {
     if (dispatch) {
-      dispatch({ type: 'SET_FILTERS', payload: filterArray });
+      dispatch({
+        type: 'SET_FILTER',
+        payload: {
+          field: 'search',
+          value: '',
+          operator: FilterOperator.EQUALS
+        }
+      });
     }
+    Object.entries(filters).forEach(([field, value]) => {
+      dispatch({
+        type: 'SET_FILTER',
+        payload: {
+          field,
+          value,
+          operator: FilterOperator.EQUALS
+        }
+      });
+    });
   };
 
-  // Remove a single search from history
   const handleRemoveSearch = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Don't apply the filter when clicking delete
-    setSearchHistory(prevHistory => prevHistory.filter(item => item.id !== id));
+    e.stopPropagation(); 
+    setSearchHistoryState(prevHistory => prevHistory.filter(item => item.id !== id));
   };
 
-  // Clear entire search history
   const handleClearHistory = () => {
-    setSearchHistory([]);
+    setSearchHistoryState([]);
     localStorage.removeItem('searchHistory');
   };
 
@@ -205,11 +170,9 @@ export const SearchHistoryPanel: React.FC = () => {
   };
 
   const handleSaveSearch = (item: SearchHistoryItem) => {
-    // Check if the search is already saved
     const isAlreadySaved = savedSearches.some(saved => saved.id === item.id);
     
     if (!isAlreadySaved) {
-      // Create a new saved search with a different ID
       const newSavedSearch: SavedSearchItem = {
         id: `saved-${Date.now()}`,
         name: getSearchLabel(item.filters),
@@ -221,14 +184,14 @@ export const SearchHistoryPanel: React.FC = () => {
   };
 
   const handleDeleteHistory = (id: string) => {
-    setSearchHistory(searchHistory.filter(item => item.id !== id));
+    setSearchHistoryState(searchHistoryState.filter(item => item.id !== id));
   };
 
   const handleDeleteSaved = (id: string) => {
     setSavedSearches(savedSearches.filter(item => item.id !== id));
   };
 
-  if (searchHistory.length === 0) {
+  if (searchHistoryState.length === 0) {
     return (
       <Paper elevation={0} className={styles.paper}>
         <Box className={styles.tabsContainer}>
@@ -277,7 +240,7 @@ export const SearchHistoryPanel: React.FC = () => {
           spacing={1} 
           sx={{ flexWrap: 'wrap', gap: 1 }}
         >
-          {searchHistory.map((item) => (
+          {searchHistoryState.map((item) => (
             <Chip
               key={item.id}
               label={`${getSearchLabel(item.filters)} (${formatTime(item.timestamp)})`}
@@ -303,7 +266,7 @@ export const SearchHistoryPanel: React.FC = () => {
       
       <TabPanel value={tabValue} index={1}>
         <List>
-          {searchHistory.map((item) => (
+          {searchHistoryState.map((item) => (
             <ListItemButton key={item.id}>
               <ListItemText
                 primary={
