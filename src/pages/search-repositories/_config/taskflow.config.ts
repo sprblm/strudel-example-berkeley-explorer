@@ -49,13 +49,25 @@ export const taskflow: TaskflowConfig = {
   },
   cards: {
     /**
+     * Field name for the unique ID in the data source.
+     */
+    idField: 'id',
+    /**
      * Field name for the title in the data source.
      */
-    titleField: 'name',
+    titleField: 'title',
     /**
      * Field name for the content in the data source.
      */
-    contentField: 'description',
+    contentField: 'summary',
+    /**
+     * Field name for the date in the data source.
+     */
+    dateField: 'publication_date',
+    /**
+     * Field name for the category in the data source.
+     */
+    categoryField: 'category'
   },
   pages: {
     index: {
@@ -73,18 +85,11 @@ export const taskflow: TaskflowConfig = {
        * This determines the content of the cards on the main page.
        */
       cardFields: {
-        title: 'name',
-        content: 'description',
-        tags: 'keywords',
-        source: 'source',
-        quality: 'quality',
-        resolution: 'resolution',
-        temporal_coverage: 'temporal_coverage',
-        spatial_coverage: 'spatial_coverage',
-        variables: 'variables',
-        thumbnail: 'thumbnail_url',
-        citation: 'citation',
-        download_url: 'download_url',
+        idField: 'id',
+        titleField: 'title',
+        contentField: 'summary',
+        dateField: 'publication_date',
+        categoryField: 'category'
       },
       /**
        * List of filters to display on the main page and use to filter the main data cards.

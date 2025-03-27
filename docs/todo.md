@@ -16,6 +16,7 @@
 ### Search Repositories Page
 
 #### Phase 1: Core Search Interface
+
 1. **Search Interface Foundation**
    - [ ] Create basic search form component
    - [ ] Implement text search input with auto-suggest
@@ -32,34 +33,37 @@
    - [ ] Implement pagination controls
 
 #### Phase 2: Advanced Features
-4. **Dataset Details**
+
+1. **Dataset Details**
    - [ ] Create dataset preview cards
    - [ ] Add metadata display (source, variables, coverage)
    - [ ] Implement quality indicators and citations
 
-5. **Data Access**
+2. **Data Access**
    - [ ] Add download/import options
    - [ ] Implement API connections to repositories
    - [ ] Set up data caching layer
 
 #### Phase 3: User Features
-6. **Search History**
+
+1. **Search History**
    - [ ] Implement search history persistence
    - [ ] Add search history display component
    - [ ] Create API endpoints for history storage/retrieval
 
-7. **Saved Datasets**
+2. **Saved Datasets**
    - [ ] Add dataset saving functionality
    - [ ] Implement dataset management UI
    - [ ] Create API endpoints for dataset storage
 
 #### Phase 4: Performance & Offline
-8. **Optimization**
+
+1. **Optimization**
    - [ ] Optimize search query processing
    - [ ] Implement data caching for performance
    - [ ] Add localStorage integration
 
-9. **Offline Support**
+2. **Offline Support**
    - [ ] Implement service worker
    - [ ] Add offline search capabilities
    - [ ] Implement offline data access

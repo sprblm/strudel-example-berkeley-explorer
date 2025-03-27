@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, IconButton, Tooltip } from '@mui/material';
-import { MapContainer, TileLayer, Rectangle, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Rectangle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { taskflow } from '../_config/taskflow.config';
@@ -8,7 +8,6 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useFilters } from '../../../components/FilterContext';
-import { setFilter } from '../components/FilterContext';
 
 // Fix for default marker icons in Leaflet with webpack
 // @ts-expect-error - Leaflet typings issue with imagePath
@@ -36,6 +35,19 @@ const predefinedRegions = [
   { name: 'Arctic', bounds: [[66.5, -180.0], [90.0, 180.0]] },
   { name: 'Antarctic', bounds: [[-90.0, -180.0], [-60.0, 180.0]] },
 ];
+
+interface TaskflowPages {
+  index: {
+    mapSearch?: {
+      enabled: boolean;
+      defaultCenter: [number, number];
+      defaultZoom: number;
+      maxBounds: [[number, number], [number, number]];
+    };
+  };
+}
+
+const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
 
 // Reset map view control
 const ResetMapView = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
@@ -74,7 +86,7 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ expanded = false, onTo
   const [customBounds, setCustomBounds] = useState<[[number, number], [number, number]] | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(expanded);
   
-  const mapConfig = taskflow.pages.index.mapSearch || {
+  const mapConfig = pageConfig?.mapSearch || {
     enabled: true,
     defaultCenter: [0, 0],
     defaultZoom: 1,
@@ -94,7 +106,6 @@ export const MapSelector: React.FC<MapSelectorProps> = ({ expanded = false, onTo
     setSelectedRegion(regionName);
     setCustomBounds(bounds);
 
-    // Update filter with selected region
     // Update filter with selected region
     setFilter('spatial_coverage', {
       operator: 'contains-one-of',

@@ -1,38 +1,33 @@
 import React from 'react';
-import { Box, Card, IconButton, Stack } from '@mui/material';
+import { Box, Card, Stack, Typography, IconButton } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import type { CardData } from '../_config/taskflow.types';
-import { taskflow } from '../_config/taskflow.config';
-
-interface DataListCardProps {
-  item: CardData;
-  previewItem: CardData | null;
-  setPreviewItem: (item: CardData | null) => void;
-  children: React.ReactNode;
-}
 
 /**
  * Card component that displays data in the DataListPanel
  * Clicking the card selects it for preview in the PreviewPanel
  */
 const cardStyles = {
-  marginBottom: taskflow.pages.index.cardSpacing || 2,
-  borderColor: taskflow.pages.index.theme?.primaryColor || 'primary.main'
+  marginBottom: 2,
+  borderColor: 'primary.main'
 };
 
-export const DataListCard: React.FC<DataListCardProps> = ({
-  item,
-  previewItem,
-  setPreviewItem,
-  children
+interface Dataset {
+  title: string;
+  summary: string;
+  attached_files?: { file_id: number; file_name: string; file_size: string; description: string }[];
+}
+
+interface DataListCardProps {
+  dataset: Dataset;
+  onClick: () => void;
+  isSelected: boolean;
+}
+
+const DataListCard: React.FC<DataListCardProps> = ({
+  dataset,
+  onClick,
+  isSelected
 }) => {
-  const handleClick = () => {
-    setPreviewItem(item);
-  };
-
-  // Check if this card is the selected one
-  const isSelected = previewItem?.id === item.id;
-
   return (
     <Card sx={{
       ...cardStyles,
@@ -40,11 +35,23 @@ export const DataListCard: React.FC<DataListCardProps> = ({
       transition: 'all 0.2s',
       ':hover': { boxShadow: 3 }
     }}>
-      <Box onClick={handleClick} sx={{ cursor: 'pointer' }}>
+      <Box onClick={onClick} sx={{ cursor: 'pointer' }}>
         <Box sx={{ p: 2 }}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Box sx={{ flex: 1 }}>{children}</Box>
-            <IconButton edge="end" aria-label="view details" onClick={handleClick}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6">{dataset.title}</Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {dataset.summary}
+              </Typography>
+              {dataset.attached_files?.map((file) => (
+                <div key={file.file_id}>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    {file.file_name}
+                  </Typography>
+                </div>
+              ))}
+            </Box>
+            <IconButton edge="end" aria-label="view details" onClick={onClick}>
               <KeyboardArrowRightIcon />
             </IconButton>
           </Stack>
@@ -53,3 +60,5 @@ export const DataListCard: React.FC<DataListCardProps> = ({
     </Card>
   );
 };
+
+export default DataListCard;

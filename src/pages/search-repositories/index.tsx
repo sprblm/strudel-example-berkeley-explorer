@@ -1,34 +1,43 @@
 import { Box, Stack, Divider } from '@mui/material';
 import React, { useState } from 'react';
 import { PageHeader } from '../../components/PageHeader';
-import { DataListPanel } from './_components/DataListPanel';
-import { FiltersPanel } from './_components/FiltersPanel';
+import DataListPanel from './_components/DataListPanel';
+import FiltersPanel from './_components/FiltersPanel'; 
 import { PreviewPanel } from './_components/PreviewPanel';
 import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
+import SearchInput from './_components/SearchInput';
 import { taskflow } from './_config/taskflow.config';
+import type { Dataset } from './_config/taskflow.types';
 import { FilterContextProvider } from '../../components/FilterContext';
+import { searchHelper } from '../../utils/searchHelper';
 
 /**
  * The main explore page for the search-data-repositories Task Flow.
  * Displays a page header, `<FiltersPanel>`, `<DataListPanel>`, and `<PreviewPanel>`.
  */
-interface PreviewItem {
-  id: string;
-  title: string;
-  description?: string;
-  // Add other necessary fields based on your data structure
+
+interface TaskflowPages {
+  index: {
+    title: string;
+    description: string;
+  };
 }
 
 const DatasetExplorer: React.FC = () => {
-  const [previewItem, setPreviewItem] = useState<PreviewItem | null>(null);
-  const [showFiltersPanel, setShowFiltersPanel] = useState(true);
+  const [previewItem, setPreviewItem] = useState<Dataset | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<Dataset[]>([]);
+  const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
 
-  const handleCloseFilters = () => {
-    setShowFiltersPanel(false);
+  const handleSearch = async (searchText: string) => {
+    const datasets: Dataset[] = []; // TODO: Get actual datasets
+    const results = await searchHelper.searchDatasets(searchText, datasets);
+    setSearchResults(results);
   };
 
-  const handleToggleFilters = () => {
-    setShowFiltersPanel(!showFiltersPanel);
+  const fetchSuggestions = async () => {
+    const suggestions = await searchHelper.getSuggestions();
+    setSuggestions(suggestions);
   };
 
   const handleClosePreview = () => {
@@ -42,24 +51,28 @@ const DatasetExplorer: React.FC = () => {
     <FilterContextProvider>
       <Box>
         <PageHeader
-          pageTitle={taskflow.pages.index.title}
-          description={taskflow.pages.index.description}
+          pageTitle={pageConfig?.title || 'Search Climate Datasets'}
+          description={pageConfig?.description || ''}
           sx={{
             marginBottom: 1,
             padding: 2,
           }}
-        />
+        >
+          <SearchInput
+            onSearch={handleSearch}
+            suggestions={suggestions}
+            onInputChange={fetchSuggestions}
+          />
+        </PageHeader>
         <Box>
           <Stack direction="row">
-            {showFiltersPanel && (
-              <Box
-                sx={{
-                  width: '350px',
-                }}
-              >
-                <FiltersPanel onClose={handleCloseFilters} />
-              </Box>
-            )}
+            <Box
+              sx={{
+                width: '350px',
+              }}
+            >
+              <FiltersPanel />
+            </Box>
             <Box
               sx={{
                 border: 'none',
@@ -76,9 +89,9 @@ const DatasetExplorer: React.FC = () => {
 
               {/* Data List Panel */}
               <DataListPanel
-                onToggleFiltersPanel={handleToggleFilters}
                 previewItem={previewItem}
-                setPreviewItem={setPreviewItem}
+                setPreviewItem={(item: Dataset | null) => setPreviewItem(item)}
+                searchResults={searchResults}
               />
             </Box>
             {previewItem && (
