@@ -1,18 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Stack, StackProps, Typography } from '@mui/material';
 import React from 'react';
-
-enum FilterType {
-  CHECKBOX_LIST = 'CHECKBOX_LIST',
-  RANGE_SLIDER = 'RANGE_SLIDER',
-}
-
-interface Filter {
-  label: string;
-  field: string;
-  type: FilterType;
-  defaultValue: any;
-}
+import { Filter, FilterType } from '../pages/search-repositories/_config/taskflow.types';
 
 interface FiltersProps extends StackProps {
   filters?: Filter[];

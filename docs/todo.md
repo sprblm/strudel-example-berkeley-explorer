@@ -1,6 +1,6 @@
 # Climate Data Analysis Platform Development
 
-## Development Tasks
+## Overall Development Tasks
 
 - [x] Set up development environment
 - [x] Initialize STRUDEL Kit project
@@ -18,7 +18,7 @@
 #### Phase 1: Core Search Interface
 
 1. **Search Interface Foundation**
-   - [ ] Create basic search form component
+   - [x] Create basic search form component
    - [ ] Implement text search input with auto-suggest
    - [ ] Add basic filter sections (variables, time period, region)
 
@@ -28,16 +28,16 @@
    - [ ] Implement map controls (zoom, pan, reset)
 
 3. **Search Results Display**
-   - [ ] Create results list component
-   - [ ] Add basic sorting (relevance, date)
+   - [x] Create results list component
+   - [x] Add basic sorting (relevance, date)
    - [ ] Implement pagination controls
 
 #### Phase 2: Advanced Features
 
 1. **Dataset Details**
-   - [ ] Create dataset preview cards
-   - [ ] Add metadata display (source, variables, coverage)
-   - [ ] Implement quality indicators and citations
+   - [x] Create dataset preview cards
+   - [x] Add metadata display (source, variables, coverage)
+   - [x] Implement quality indicators and citations
 
 2. **Data Access**
    - [ ] Add download/import options

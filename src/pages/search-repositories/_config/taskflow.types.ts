@@ -210,6 +210,34 @@ export interface TaskflowConfig {
   pages?: Record<string, unknown>;
 }
 
+export interface TaskflowPages {
+  index: {
+    filters?: {
+      fields: Array<{
+        field: string;
+        label: string;
+        type: string;
+        options?: Array<{ value: string; label: string }>;
+        min?: number;
+        max?: number;
+        step?: number;
+      }>;
+    };
+  };
+}
+
+export interface FilterFieldProps {
+  filter: {
+    field: string;
+    label: string;
+    type: string;
+    options?: Array<{ value: string; label: string }>;
+    min?: number;
+    max?: number;
+    step?: number;
+  };
+}
+
 /**
  * Props for the DataListPanel component
  * Defines the data structure for the main list panel component
@@ -218,4 +246,16 @@ export interface DataListPanelProps {
   searchResults: Dataset[];
   previewItem: Dataset | null;
   setPreviewItem: (item: Dataset | null) => void;
+}
+
+export enum FilterType {
+  CHECKBOX_LIST = 'CHECKBOX_LIST',
+  RANGE_SLIDER = 'RANGE_SLIDER',
+}
+
+export interface Filter {
+  label: string;
+  field: string;
+  type: FilterType;
+  defaultValue: any;
 }
