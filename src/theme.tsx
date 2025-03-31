@@ -2,122 +2,147 @@ import { createTheme } from '@mui/material';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 /**
- * MUI Theme object with glass neumorphic iridescent styling
- * Featuring subtle gradients, glass effects, and soft shadows
+ * MUI Theme object with modern aesthetic inspired by bolt-version-cdac
+ * Featuring clean design, subtle shadows, and smooth transitions
  */
 export const theme = createTheme({
-  // Color palette with iridescent tones
+  // Updated color palette with modern tones
   palette: {
     mode: 'light',
     background: {
-      default: 'rgba(240, 245, 255, 0.8)', // Subtle blue-tinted background
-      paper: 'rgba(255, 255, 255, 0.6)', // Translucent white for glass effect
+      default: '#f9fafb', // Light gray background similar to tailwind bg-gray-50
+      paper: '#ffffff', // Clean white for cards and content areas
     },
     primary: {
-      main: '#0b4fc5', // Iridescent blue
-      light: '#5b8af9',
-      dark: '#003892',
+      main: '#1d4ed8', // Modern blue similar to tailwind blue-700
+      light: '#3b82f6', // tailwind blue-500
+      dark: '#1e40af', // tailwind blue-800
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#112bd6', // Iridescent purple
-      light: '#6a5af9',
-      dark: '#0a1c9e',
+      main: '#4f46e5', // Modern indigo similar to tailwind indigo-600
+      light: '#6366f1', // tailwind indigo-500
+      dark: '#4338ca', // tailwind indigo-700
       contrastText: '#ffffff',
     },
     info: {
-      main: '#49caff', // Bright cyan for accents
-      light: '#83e0ff',
-      dark: '#0097cc',
+      main: '#0ea5e9', // Bright sky blue similar to tailwind sky-500
+      light: '#38bdf8', // tailwind sky-400
+      dark: '#0284c7', // tailwind sky-600
       contrastText: '#ffffff',
     },
     success: {
-      main: '#57c893', // Soft green
-      light: '#8df8bf',
-      dark: '#2a9568',
+      main: '#10b981', // Clean green similar to tailwind emerald-500
+      light: '#34d399', // tailwind emerald-400
+      dark: '#059669', // tailwind emerald-600
       contrastText: '#ffffff',
     },
     warning: {
-      main: '#ffb64d', // Soft amber
-      light: '#ffda82',
-      dark: '#cf8600',
+      main: '#f59e0b', // Warm amber similar to tailwind amber-500
+      light: '#fbbf24', // tailwind amber-400
+      dark: '#d97706', // tailwind amber-600
       contrastText: '#ffffff',
     },
     error: {
-      main: '#ff6b8e', // Soft pink-red
-      light: '#ff9fb7',
-      dark: '#c93762',
+      main: '#ef4444', // Modern red similar to tailwind red-500
+      light: '#f87171', // tailwind red-400
+      dark: '#dc2626', // tailwind red-600
       contrastText: '#ffffff',
     },
     neutral: {
-      main: '#d0d8e8',
-      light: '#e8eef7',
-      dark: '#a3b0c9',
+      main: '#9ca3af', // tailwind gray-400
+      light: '#e5e7eb', // tailwind gray-200
+      dark: '#6b7280', // tailwind gray-500
     },
     common: {
-      black: '#2d3748',
+      black: '#111827', // tailwind gray-900
       white: '#ffffff',
     },
     grey: {
-      50: '#f7faff',
-      500: '#a4b0c3',
-      900: '#4a5568',
+      50: '#f9fafb',
+      100: '#f3f4f6',
+      200: '#e5e7eb',
+      300: '#d1d5db',
+      400: '#9ca3af',
+      500: '#6b7280',
+      600: '#4b5563',
+      700: '#374151',
+      800: '#1f2937',
+      900: '#111827',
     },
   },
-  // Rounded corners for neumorphic style
+  // Modern rounded corners
   shape: {
-    borderRadius: 16, // More pronounced rounded corners
+    borderRadius: 12, // Slightly reduced but still modern
   },
-  // Modern, clean typography
+  // Clean, modern typography
   typography: {
     htmlFontSize: 16,
-    fontFamily: `'Public Sans', sans-serif`,
+    fontFamily: `'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`,
     fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
-    fontWeightBold: 600, // Slightly less bold for softer appearance
+    fontWeightBold: 600,
+    h1: {
+      fontWeight: 700,
+      fontSize: '2.5rem',
+    },
+    h2: {
+      fontWeight: 600,
+      fontSize: '2rem',
+    },
+    h3: {
+      fontWeight: 600,
+      fontSize: '1.5rem',
+    },
+    h4: {
+      fontWeight: 600,
+      fontSize: '1.25rem',
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: '1.125rem',
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: '1rem',
+    },
   },
-  // Component customizations for neumorphic glass style
+  // Component customizations for modern style
   components: {
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundImage:
-            'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
-          boxShadow:
-            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
+          backgroundImage: 'none',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          transition: 'box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out',
           '&:hover': {
-            backgroundImage:
-              'linear-gradient(135deg, rgba(218,220,227,0.1), rgba(82,176,214,0.1))',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           },
         },
         elevation1: {
-          boxShadow:
-            'rgba(255, 255, 255, 0.5) -3px -3px 6px, rgba(0, 0, 0, 0.1) 3px 3px 8px',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         },
         elevation2: {
-          boxShadow:
-            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         },
         elevation3: {
-          boxShadow:
-            'rgba(255, 255, 255, 0.5) -7px -7px 14px, rgba(0, 0, 0, 0.1) 7px 7px 20px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.6)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.8)',
-          transition: 'transform 0.3s, box-shadow 0.3s',
+          backgroundColor: '#ffffff',
+          borderRadius: 12,
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
           '&:hover': {
-            transform: 'translateY(-5px)',
-            boxShadow:
-              'rgba(255, 255, 255, 0.6) -8px -8px 16px, rgba(0, 0, 0, 0.15) 8px 8px 20px',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           },
         },
       },
@@ -125,43 +150,43 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 8,
           textTransform: 'none',
-          boxShadow:
-            'rgba(255, 255, 255, 0.4) -2px -2px 5px, rgba(0, 0, 0, 0.1) 2px 2px 5px',
-          transition: 'all 0.3s ease',
+          fontWeight: 500,
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          transition: 'all 0.2s ease-in-out',
           '&:hover': {
-            backgroundImage:
-              'linear-gradient(135deg, rgba(218,220,227,0.1), rgba(82,176,214,0.1))',
-            boxShadow:
-              'rgba(255, 255, 255, 0.4) -1px -1px 3px, rgba(0, 0, 0, 0.1) 1px 1px 3px',
-            transform: 'translateY(-2px)',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           },
           '&:active': {
-            boxShadow:
-              'inset rgba(0, 0, 0, 0.1) 2px 2px 5px, inset rgba(255, 255, 255, 0.4) -2px -2px 5px',
             transform: 'translateY(0)',
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           },
         },
         contained: {
-          backgroundColor: '#5b8af9',
+          backgroundColor: '#3b82f6', // tailwind blue-500
           color: '#ffffff',
           '&:hover': {
-            backgroundColor: '#3d5fc6',
+            backgroundColor: '#2563eb', // tailwind blue-600
           },
         },
         outlined: {
           borderWidth: '1px',
-          borderColor: 'rgba(255, 255, 255, 0.5)',
+          '&:hover': {
+            backgroundColor: 'rgba(59, 130, 246, 0.04)', // Very light blue on hover
+          },
         },
       },
       variants: [
         {
           props: { color: 'neutral' },
           style: {
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-            borderColor: 'rgba(255, 255, 255, 0.6)',
-            color: '#5a6a8a',
+            backgroundColor: '#f3f4f6', // tailwind gray-100
+            color: '#4b5563', // tailwind gray-600
+            '&:hover': {
+              backgroundColor: '#e5e7eb', // tailwind gray-200
+            },
           },
         },
       ],
@@ -170,7 +195,13 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           textDecoration: 'none',
+          color: '#2563eb', // tailwind blue-600
+          fontWeight: 500,
           position: 'relative',
+          transition: 'color 0.2s ease-in-out',
+          '&:hover': {
+            color: '#1d4ed8', // tailwind blue-700
+          },
           '&:after': {
             content: '""',
             position: 'absolute',
@@ -178,9 +209,8 @@ export const theme = createTheme({
             height: '2px',
             bottom: '-2px',
             left: '0',
-            background:
-              'linear-gradient(90deg, rgba(91,138,249,0.8), rgba(156,105,226,0.8))',
-            transition: 'width 0.3s ease',
+            backgroundColor: '#2563eb', // tailwind blue-600
+            transition: 'width 0.2s ease-in-out',
           },
           '&:hover:after': {
             width: '100%',
@@ -191,9 +221,52 @@ export const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.7)',
-          boxShadow: 'rgba(0, 0, 0, 0.05) 0 1px 5px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.8)',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          color: '#111827', // tailwind gray-900
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+            transition: 'box-shadow 0.2s ease-in-out',
+            '&:hover': {
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6', // tailwind blue-500
+              },
+            },
+            '&.Mui-focused': {
+              boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)', // Light blue focus ring
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6', // tailwind blue-500
+                borderWidth: '1px',
+              },
+            },
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          borderRadius: 4,
+          padding: 8,
+          '&.Mui-checked': {
+            color: '#3b82f6', // tailwind blue-500
+          },
+        },
+      },
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          padding: 8,
+          '&.Mui-checked': {
+            color: '#3b82f6', // tailwind blue-500
+          },
         },
       },
     },
@@ -202,37 +275,57 @@ export const theme = createTheme({
         spacing: 2,
       },
     },
-    MuiDataGrid: {
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          backgroundColor: '#3b82f6', // tailwind blue-500
+          height: 3,
+          borderRadius: '3px 3px 0 0',
+        },
+      },
+    },
+    MuiTab: {
       styleOverrides: {
         root: {
-          border: 0,
-          background: 'rgba(255, 255, 255, 0.4)',
-          '& .MuiDataGrid-cell:focus-within': {
-            outline: 'none',
-          },
-          '& .MuiDataGrid-overlayWrapper': {
-            minHeight: '4rem',
-          },
-          '& .MuiDataGrid-columnHeaderTitle': {
-            color: '#4a5568',
-            fontSize: '0.85rem',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
+          textTransform: 'none',
+          fontWeight: 500,
+          minHeight: 48,
+          minWidth: 120,
+          '&.Mui-selected': {
+            color: '#3b82f6', // tailwind blue-500
           },
         },
       },
     },
-    MuiDrawer: {
+    MuiChip: {
       styleOverrides: {
-        paper: {
-          backgroundImage:
-            'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0))',
-          boxShadow:
-            'rgba(255, 255, 255, 0.5) -5px -5px 10px, rgba(0, 0, 0, 0.1) 5px 5px 15px',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-          color: 'inherit',
-          fontFamily: 'inherit',
-          fontSize: 'inherit',
+        root: {
+          borderRadius: 8,
+          fontWeight: 500,
+          '&.MuiChip-colorPrimary': {
+            backgroundColor: '#e0f2fe', // Light blue background
+            color: '#0284c7', // tailwind sky-600
+          },
+          '&.MuiChip-colorSecondary': {
+            backgroundColor: '#e0e7ff', // Light indigo background
+            color: '#4f46e5', // tailwind indigo-600
+          },
+          '&.MuiChip-colorSuccess': {
+            backgroundColor: '#d1fae5', // Light green background
+            color: '#059669', // tailwind emerald-600
+          },
+          '&.MuiChip-colorError': {
+            backgroundColor: '#fee2e2', // Light red background
+            color: '#dc2626', // tailwind red-600
+          },
+          '&.MuiChip-colorWarning': {
+            backgroundColor: '#fef3c7', // Light amber background
+            color: '#d97706', // tailwind amber-600
+          },
+          '&.MuiChip-colorInfo': {
+            backgroundColor: '#e0f2fe', // Light sky background
+            color: '#0284c7', // tailwind sky-600
+          },
         },
       },
     },
