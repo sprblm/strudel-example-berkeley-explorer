@@ -1,149 +1,251 @@
-import { Box, Typography, Slider, Select, MenuItem, FormControlLabel, Switch } from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import { TaskflowPages, FilterFieldProps } from '../_config/taskflow.types';
-import { taskflow } from '../_config/taskflow.config';
+import { Box, Typography, FormGroup, FormControlLabel, Checkbox, Paper, Divider } from '@mui/material';
+import { useState } from 'react';
+import { FilterIcon, SortAscIcon } from '../../../components/Icons';
+import { useFilters } from '../../../components/FilterContext';
+import { FilterOperator } from '../../../context/filterTypes';
 
-const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
-
-interface FilterCategories {
-  metadata: FilterFieldProps['filter'][];
-  temporal: FilterFieldProps['filter'][];
-  spatial: FilterFieldProps['filter'][];
-  source: FilterFieldProps['filter'][];
-  content: FilterFieldProps['filter'][];
-  quality: FilterFieldProps['filter'][];
-}
-
-const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value: any) => void }> = ({ filter, onChange }) => {
-  const { field, label, type, options = [] } = filter;
-
-  if (type === 'range' && filter.min !== undefined && filter.max !== undefined) {
-    return (
-      <Box key={field}>
-        <Typography>{label}</Typography>
-        <Slider
-          min={filter.min}
-          max={filter.max}
-          step={filter.step}
-          valueLabelDisplay="auto"
-        />
-      </Box>
-    );
-  }
-
-  if (type === 'select') {
-    return (
-      <Box key={field}>
-        <Typography>{label}</Typography>
-        <Select onChange={(e) => onChange(field, e.target.value)}>
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-    );
-  }
-
-  if (type === 'toggle') {
-    return (
-      <Box key={field}>
-        <FormControlLabel
-          control={<Switch />}
-          label={label}
-        />
-      </Box>
-    );
-  }
-
-  return null;
-};
-
+/**
+ * Filters panel component with modern styling
+ * Includes data sources, formats, and sort options
+ */
 const FiltersPanel = () => {
-  const [filterValues, setFilterValues] = useState({});
+  const { dispatch } = useFilters();
+  const [sortBy, setSortBy] = useState('relevance');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/datasets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(filterValues),
-        });
+  // Data sources for filter
+  const dataSources = [
+    { id: 'noaa', name: 'NOAA', checked: false },
+    { id: 'nasa', name: 'NASA', checked: false },
+    { id: 'ecmwf', name: 'ECMWF', checked: false },
+    { id: 'worldclim', name: 'WorldClim', checked: false },
+  ];
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
+  // Data formats for filter
+  const dataFormats = [
+    { id: 'netcdf', name: 'NetCDF', checked: false },
+    { id: 'csv', name: 'CSV', checked: false },
+    { id: 'hdf5', name: 'HDF5', checked: false },
+    { id: 'geotiff', name: 'GeoTIFF', checked: false },
+  ];
+
+  const handleDataSourceChange = (sourceId: string, _checked: boolean) => {
+    // Update the source selection
+    if (dispatch) {
+      dispatch({
+        type: 'SET_FILTER',
+        payload: {
+          field: 'source',
+          value: sourceId,
+          operator: FilterOperator.CONTAINS
         }
-      } catch (err) {
-        // Implement proper error handling
-        if (err instanceof Error) {
-          alert('An error occurred while fetching data: ' + err.message);
-        } else {
-          alert('An unexpected error occurred');
-        }
-      }
-    };
-
-    fetchData();
-  }, [filterValues]);
-
-  const handleFilterChange = (field: string, value: any) => {
-    setFilterValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
+      });
+    }
   };
 
-  // Group filters by category based on Dataset interface
-  const filterCategories: FilterCategories = {
-    metadata: pageConfig.filters?.fields.filter(f => 
-      f.field === 'title' ||
-      f.field === 'summary' ||
-      f.field === 'citation' ||
-      f.field === 'doi'
-    ) || [],
-    temporal: pageConfig.filters?.fields.filter(f =>
-      f.field === 'publication_date' ||
-      f.field === 'start_date' ||
-      f.field === 'end_date'
-    ) || [],
-    spatial: pageConfig.filters?.fields.filter(f =>
-      f.field === 'spatial_coverage' ||
-      f.field === 'spatial_resolution'
-    ) || [],
-    source: pageConfig.filters?.fields.filter(f =>
-      f.field === 'source' ||
-      f.field === 'publisher' ||
-      f.field === 'distributor'
-    ) || [],
-    content: pageConfig.filters?.fields.filter(f =>
-      f.field === 'variables' ||
-      f.field === 'category' ||
-      f.field === 'tags'
-    ) || [],
-    quality: pageConfig.filters?.fields.filter(f =>
-      f.field === 'quality' ||
-      f.field === 'type'
-    ) || []
+  const handleDataFormatChange = (formatId: string, _checked: boolean) => {
+    // Update the format selection
+    if (dispatch) {
+      dispatch({
+        type: 'SET_FILTER',
+        payload: {
+          field: 'format',
+          value: formatId,
+          operator: FilterOperator.CONTAINS
+        }
+      });
+    }
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
+    // Apply sorting logic here
   };
 
   return (
-    <Box>
-      {(Object.keys(filterCategories) as (keyof FilterCategories)[]).map((category) => (
-        <Box key={category}>
-          {filterCategories[category].map((filter: FilterFieldProps['filter']) => (
-            <FilterField 
-              key={filter.field} 
-              filter={filter}
-              onChange={handleFilterChange}
+    <Paper 
+      elevation={0} 
+      sx={{ 
+        p: 0, 
+        borderRadius: 2, 
+        border: '1px solid',
+        borderColor: 'grey.200',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Filters header */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'grey.200',
+        backgroundColor: 'grey.50'
+      }}>
+        <FilterIcon size={18} />
+        <Typography 
+          variant="subtitle1" 
+          component="h2" 
+          sx={{ fontWeight: 600, ml: 1 }}
+        >
+          Filters
+        </Typography>
+      </Box>
+
+      {/* Data Sources */}
+      <Box sx={{ p: 2 }}>
+        <Typography 
+          variant="subtitle2" 
+          component="h3" 
+          sx={{ fontWeight: 600, mb: 1.5 }}
+        >
+          Data Sources
+        </Typography>
+        <FormGroup>
+          {dataSources.map((source) => (
+            <FormControlLabel
+              key={source.id}
+              control={
+                <Checkbox 
+                  size="small"
+                  checked={source.checked}
+                  onChange={(e) => handleDataSourceChange(source.id, e.target.checked)}
+                  sx={{ 
+                    color: 'grey.500',
+                    '&.Mui-checked': {
+                      color: 'primary.main',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ color: 'grey.700' }}>
+                  {source.name}
+                </Typography>
+              }
+              sx={{ mb: 0.5 }}
             />
           ))}
+        </FormGroup>
+      </Box>
+
+      <Divider />
+
+      {/* Data Formats */}
+      <Box sx={{ p: 2 }}>
+        <Typography 
+          variant="subtitle2" 
+          component="h3" 
+          sx={{ fontWeight: 600, mb: 1.5 }}
+        >
+          Data Formats
+        </Typography>
+        <FormGroup>
+          {dataFormats.map((format) => (
+            <FormControlLabel
+              key={format.id}
+              control={
+                <Checkbox 
+                  size="small"
+                  checked={format.checked}
+                  onChange={(e) => handleDataFormatChange(format.id, e.target.checked)}
+                  sx={{ 
+                    color: 'grey.500',
+                    '&.Mui-checked': {
+                      color: 'primary.main',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ color: 'grey.700' }}>
+                  {format.name}
+                </Typography>
+              }
+              sx={{ mb: 0.5 }}
+            />
+          ))}
+        </FormGroup>
+      </Box>
+
+      <Divider />
+
+      {/* Sort By */}
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+          <SortAscIcon size={16} />
+          <Typography 
+            variant="subtitle2" 
+            component="h3" 
+            sx={{ fontWeight: 600, ml: 1 }}
+          >
+            Sort By
+          </Typography>
         </Box>
-      ))}
-    </Box>
+
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox 
+                size="small"
+                checked={sortBy === 'relevance'}
+                onChange={() => handleSortChange('relevance')}
+                sx={{ 
+                  color: 'grey.500',
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ color: 'grey.700' }}>
+                Relevance
+              </Typography>
+            }
+          />
+          <FormControlLabel
+            control={
+              <Checkbox 
+                size="small"
+                checked={sortBy === 'date'}
+                onChange={() => handleSortChange('date')}
+                sx={{ 
+                  color: 'grey.500',
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ color: 'grey.700' }}>
+                Last Updated
+              </Typography>
+            }
+          />
+          <FormControlLabel
+            control={
+              <Checkbox 
+                size="small"
+                checked={sortBy === 'downloads'}
+                onChange={() => handleSortChange('downloads')}
+                sx={{ 
+                  color: 'grey.500',
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ color: 'grey.700' }}>
+                Downloads
+              </Typography>
+            }
+          />
+        </FormGroup>
+      </Box>
+    </Paper>
   );
 };
 
