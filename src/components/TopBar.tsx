@@ -55,10 +55,13 @@ export const TopBar: React.FC = () => {
             to="/search-repositories"
             startIcon={<SearchIcon size={18} />}
             sx={{ 
-              color: 'text.primary',
+              color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+              '&:hover': { 
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                color: 'text.primary'
+              }
             }}
           >
             Search Data
@@ -69,10 +72,13 @@ export const TopBar: React.FC = () => {
             to="/explore-data"
             startIcon={<GlobeIcon size={18} />}
             sx={{ 
-              color: 'text.primary',
+              color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+              '&:hover': { 
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                color: 'text.primary'
+              }
             }}
           >
             Explore Data
@@ -83,10 +89,13 @@ export const TopBar: React.FC = () => {
             to="/compare-data"
             startIcon={<BarChartIcon size={18} />}
             sx={{ 
-              color: 'text.primary',
+              color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+              '&:hover': { 
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                color: 'text.primary'
+              }
             }}
           >
             Compare Data
@@ -97,10 +106,13 @@ export const TopBar: React.FC = () => {
             to="/run-computation"
             startIcon={<PlayCircle size={18} />}
             sx={{ 
-              color: 'text.primary',
+              color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+              '&:hover': { 
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                color: 'text.primary'
+              }
             }}
           >
             Run Computation
@@ -111,25 +123,25 @@ export const TopBar: React.FC = () => {
             to="/monitor"
             startIcon={<MonitorIcon size={18} />}
             sx={{ 
-              color: 'text.primary',
+              color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+              '&:hover': { 
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                color: 'text.primary'
+              }
             }}
           >
             Monitor
           </Button>
-        </Box>
-
-        {/* Right side buttons */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          
           <Button
             component={Link}
             to="/contribute"
             startIcon={<UploadIcon size={18} />}
             sx={{
               color: 'primary.main',
-              mr: 2,
+              mr: 1.5,
               fontSize: '0.875rem',
               border: '1px solid',
               borderColor: 'primary.main',
@@ -138,7 +150,10 @@ export const TopBar: React.FC = () => {
           >
             Contribute
           </Button>
+        </Box>
 
+        {/* Right side buttons */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title="Help">
             <IconButton 
               size="small"
