@@ -60,7 +60,8 @@ import {
   Play,
   PlayCircle as PlayCircleLucide,
   Server as ServerLucide,
-  Monitor
+  Monitor,
+  AlertTriangle
 } from 'lucide-react';
 
 /**
@@ -159,3 +160,5 @@ export const PlayCircle = createIcon(PlayCircleLucide);
 export const Server = createIcon(ServerLucide);
 // Add Monitor icon for monitoring section
 export const MonitorIcon = createIcon(Monitor);
+// Add AlertTriangle icon for warning states
+export const AlertTriangleIcon = createIcon(AlertTriangle);
