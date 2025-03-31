@@ -59,7 +59,8 @@ import {
   Star,
   Play,
   PlayCircle as PlayCircleLucide,
-  Server as ServerLucide
+  Server as ServerLucide,
+  Monitor
 } from 'lucide-react';
 
 /**
@@ -76,7 +77,14 @@ interface IconProps {
 
 // Helper function to create styled icons
 const createIcon = (Icon: React.FC<any>) => {
-  return ({ size = 24, strokeWidth = 1.5, className = '', onClick, color, style }: IconProps) => (
+  return ({
+    size = 24,
+    strokeWidth = 2,
+    className,
+    onClick,
+    color,
+    style,
+  }: IconProps) => (
     <Icon
       size={size}
       strokeWidth={strokeWidth}
@@ -149,3 +157,5 @@ export const StarIcon = createIcon(Star);
 export const PlayIcon = createIcon(Play);
 export const PlayCircle = createIcon(PlayCircleLucide);
 export const Server = createIcon(ServerLucide);
+// Add Monitor icon for monitoring section
+export const MonitorIcon = createIcon(Monitor);

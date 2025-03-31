@@ -1,23 +1,24 @@
-import { AppBar, Toolbar, InputBase, Box, Button, Tooltip, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Box, Button, Tooltip, IconButton } from '@mui/material';
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
-  SearchIcon, 
   GlobeIcon, 
   HelpCircleIcon, 
   SettingsIcon,
   HomeIcon,
   UploadIcon,
-  PlayCircle
+  PlayCircle,
+  SearchIcon,
+  MonitorIcon,
+  BarChartIcon
 } from './Icons';
 
 /**
- * Top navigation bar with search input and navigation options
+ * Top navigation bar with navigation options
  * Updated with modern aesthetic and Lucide icons
  */
 export const TopBar: React.FC = () => {
   const location = useLocation();
-  const showSearch = location.pathname !== '/';
 
   return (
     <AppBar 
@@ -45,50 +46,20 @@ export const TopBar: React.FC = () => {
           >
             CDAP
           </Button>
-          
-          {showSearch && (
-            <Box sx={{ position: 'relative', ml: 1 }}>
-              <InputBase
-                placeholder="Search datasets..."
-                sx={{ 
-                  width: 300,
-                  pl: 4.5,
-                  pr: 2,
-                  py: 0.75,
-                  backgroundColor: 'grey.100',
-                  borderRadius: 2,
-                  fontSize: '0.875rem',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    backgroundColor: 'grey.200',
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: 'grey.200',
-                    boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
-                  }
-                }}
-              />
-              <Box
-                sx={{ 
-                  position: 'absolute',
-                  left: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'rgba(107, 114, 128, 0.8)'
-                }}
-              >
-                <SearchIcon size={18} />
-              </Box>
-            </Box>
-          )}
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Navigation Links */}
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, ml: 2 }}>
           <Button
             component={Link}
             to="/search-repositories"
-            size="small"
-            sx={{ color: 'text.secondary' }}
+            startIcon={<SearchIcon size={18} />}
+            sx={{ 
+              color: 'text.primary',
+              mr: 1.5,
+              fontSize: '0.875rem',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+            }}
           >
             Search Data
           </Button>
@@ -96,8 +67,13 @@ export const TopBar: React.FC = () => {
           <Button
             component={Link}
             to="/explore-data"
-            size="small"
-            sx={{ color: 'text.secondary' }}
+            startIcon={<GlobeIcon size={18} />}
+            sx={{ 
+              color: 'text.primary',
+              mr: 1.5,
+              fontSize: '0.875rem',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+            }}
           >
             Explore Data
           </Button>
@@ -105,8 +81,13 @@ export const TopBar: React.FC = () => {
           <Button
             component={Link}
             to="/compare-data"
-            size="small"
-            sx={{ color: 'text.secondary' }}
+            startIcon={<BarChartIcon size={18} />}
+            sx={{ 
+              color: 'text.primary',
+              mr: 1.5,
+              fontSize: '0.875rem',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+            }}
           >
             Compare Data
           </Button>
@@ -114,58 +95,67 @@ export const TopBar: React.FC = () => {
           <Button
             component={Link}
             to="/run-computation"
-            size="small"
-            startIcon={<PlayCircle size={16} />}
-            sx={{ color: 'text.secondary' }}
+            startIcon={<PlayCircle size={18} />}
+            sx={{ 
+              color: 'text.primary',
+              mr: 1.5,
+              fontSize: '0.875rem',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+            }}
           >
             Run Computation
           </Button>
           
           <Button
             component={Link}
-            to="/contribute"
-            size="small"
-            startIcon={<UploadIcon size={16} />}
+            to="/monitor"
+            startIcon={<MonitorIcon size={18} />}
             sx={{ 
-              ml: 1, 
-              color: 'primary.main', 
+              color: 'text.primary',
+              mr: 1.5,
+              fontSize: '0.875rem',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+            }}
+          >
+            Monitor
+          </Button>
+        </Box>
+
+        {/* Right side buttons */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+            component={Link}
+            to="/contribute"
+            startIcon={<UploadIcon size={18} />}
+            sx={{
+              color: 'primary.main',
+              mr: 2,
+              fontSize: '0.875rem',
+              border: '1px solid',
               borderColor: 'primary.main',
-              borderRadius: 1,
-              borderWidth: 1,
-              borderStyle: 'solid',
-              px: 2
+              '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' }
             }}
           >
             Contribute
           </Button>
 
-          <Box sx={{ ml: 1, display: 'flex', gap: 0.5 }}>
-            <Tooltip title="Help & Documentation">
-              <IconButton 
-                color="inherit" 
-                size="small"
-                sx={{ 
-                  color: 'grey.700',
-                  '&:hover': { backgroundColor: 'grey.100' } 
-                }}
-              >
-                <HelpCircleIcon size={20} />
-              </IconButton>
-            </Tooltip>
-            
-            <Tooltip title="Settings">
-              <IconButton 
-                color="inherit" 
-                size="small"
-                sx={{ 
-                  color: 'grey.700',
-                  '&:hover': { backgroundColor: 'grey.100' } 
-                }}
-              >
-                <SettingsIcon size={20} />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          <Tooltip title="Help">
+            <IconButton 
+              size="small"
+              sx={{ mr: 1 }}
+            >
+              <HelpCircleIcon size={20} />
+            </IconButton>
+          </Tooltip>
+          
+          <Tooltip title="Settings">
+            <IconButton 
+              size="small"
+              sx={{ mr: 1 }}
+            >
+              <SettingsIcon size={20} />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Toolbar>
     </AppBar>
