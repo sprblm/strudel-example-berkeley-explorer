@@ -52,11 +52,13 @@ To create the leading open-source platform that accelerates climate research by 
 Enables users to search across multiple climate data repositories to find relevant datasets based on various criteria.
 
 #### User Stories
+
 - As a climate researcher, I want to search for temperature datasets covering the Arctic region from 1950-2020 so I can analyze long-term warming trends.
 - As an environmental scientist, I want to filter precipitation data by geographic region and time period so I can study rainfall patterns in drought-prone areas.
 - As a data scientist, I want to discover datasets with specific variables (temperature, humidity, wind speed) so I can build comprehensive climate models.
 
 #### Requirements
+
 1. Interface for searching across multiple climate data repositories (NOAA, NASA, WorldClim, etc.)
 2. Advanced filtering options:
    - Climate variables (temperature, precipitation, humidity, etc.)
@@ -73,6 +75,7 @@ Enables users to search across multiple climate data repositories to find releva
 5. Search history tracking
 
 #### UI Components
+
 - Search form with multiple filter sections
 - Interactive map for geographic selection
 - Results list with sorting options
@@ -85,11 +88,13 @@ Enables users to search across multiple climate data repositories to find releva
 Enables users to visually explore and interact with climate datasets through various visualization types and data views.
 
 #### User Stories
+
 - As a climate scientist, I want to visualize temperature anomalies on a global map so I can identify regions with significant warming.
 - As a researcher, I want to generate time series plots of sea level rise data so I can analyze trends and seasonal patterns.
 - As an analyst, I want to explore correlations between different climate variables so I can understand their relationships.
 
 #### Requirements
+
 1. Interactive data visualization dashboard with:
    - Geographic map views with layer controls
    - Time series plots with zoom/pan capabilities
@@ -104,6 +109,7 @@ Enables users to visually explore and interact with climate datasets through var
 5. Shareable visualization states via URLs
 
 #### UI Components
+
 - Visualization dashboard with configurable layout
 - Visualization type selector
 - Control panels for each visualization type
@@ -114,14 +120,17 @@ Enables users to visually explore and interact with climate datasets through var
 ### 3.3 Compare Data
 
 #### Description
+
 Enables users to compare multiple climate datasets, models, or scenarios side-by-side to identify differences and similarities.
 
 #### User Stories
+
 - As a climate scientist, I want to compare observed temperature data with model projections so I can evaluate model accuracy.
 - As a researcher, I want to view side-by-side comparisons of different climate scenarios so I can understand potential future outcomes.
 - As an analyst, I want to calculate and visualize differences between datasets so I can quantify changes over time.
 
 #### Requirements
+
 1. Side-by-side comparison views for:
    - Maps (synchronized or independent navigation)
    - Time series (overlaid or separated)
@@ -138,6 +147,7 @@ Enables users to compare multiple climate datasets, models, or scenarios side-by
 5. Customizable comparison layouts (2-up, 4-up, etc.)
 
 #### UI Components
+
 - Comparison workspace with configurable panels
 - Dataset selector for each comparison slot
 - Synchronization controls
@@ -151,11 +161,13 @@ Enables users to compare multiple climate datasets, models, or scenarios side-by
 Enables users to configure and execute climate data analyses, from simple statistical calculations to complex climate models.
 
 #### User Stories
+
 - As a climate scientist, I want to run trend analyses on temperature data so I can quantify warming rates.
 - As a researcher, I want to execute downscaling algorithms on global climate models so I can obtain regional projections.
 - As a data scientist, I want to apply machine learning models to climate data so I can identify patterns and make predictions.
 
 #### Requirements
+
 1. Workflow builder interface for:
    - Selecting input datasets
    - Configuring processing steps
@@ -175,6 +187,7 @@ Enables users to configure and execute climate data analyses, from simple statis
 6. Reproducibility features (workflow versioning, parameter tracking)
 
 #### UI Components
+
 - Workflow canvas with drag-and-drop components
 - Component configuration panels
 - Input/output connection visualization
@@ -185,14 +198,17 @@ Enables users to configure and execute climate data analyses, from simple statis
 ### 3.5 Monitor Activities
 
 #### Description
+
 Enables users to track the progress of long-running climate analyses, data processing tasks, and model runs.
 
 #### User Stories
+
 - As a climate modeler, I want to monitor the progress of my climate simulation so I can estimate completion time.
 - As a researcher, I want to receive notifications when my data processing tasks complete so I can proceed with analysis.
 - As a team leader, I want to view the status of all team computation tasks so I can manage resources effectively.
 
 #### Requirements
+
 1. Activity dashboard showing:
    - Running tasks with progress indicators
    - Completed tasks with results links
@@ -208,6 +224,7 @@ Enables users to track the progress of long-running climate analyses, data proce
 5. Historical activity records and statistics
 
 #### UI Components
+
 - Activity dashboard with task cards
 - Progress bars and status indicators
 - Task detail panel with logs and metrics
@@ -218,14 +235,17 @@ Enables users to track the progress of long-running climate analyses, data proce
 ### 3.6 Contribute Data
 
 #### Description
+
 Enables users to upload processed datasets, analysis results, or model outputs to share with the scientific community.
 
 #### User Stories
+
 - As a climate researcher, I want to upload my processed climate dataset so others can build upon my work.
 - As a modeler, I want to share my climate model outputs so they can be compared with other models.
 - As a scientist, I want to publish my analysis results with proper metadata so they can be properly cited.
 
 #### Requirements
+
 1. Data upload interface supporting:
    - Multiple file formats (NetCDF, CSV, GeoTIFF, etc.)
    - Batch uploads
@@ -245,6 +265,7 @@ Enables users to upload processed datasets, analysis results, or model outputs t
 6. DOI assignment for published datasets
 
 #### UI Components
+
 - Upload form with drag-and-drop area
 - Metadata input forms
 - Validation status indicators
@@ -259,9 +280,11 @@ Enables users to upload processed datasets, analysis results, or model outputs t
 ### 4.1 User Account Management
 
 #### Description
+
 Basic account functionality for saving searches, analyses, and managing permissions.
 
 #### Requirements
+
 1. User registration and authentication
 2. Profile management
 3. Saved items (searches, visualizations, analyses)
@@ -272,9 +295,11 @@ Basic account functionality for saving searches, analyses, and managing permissi
 ### 4.2 Data Cart and Workspace
 
 #### Description
+
 Temporary storage for selected datasets and analysis results during a session.
 
 #### Requirements
+
 1. Add/remove datasets to cart
 2. Organize datasets into collections
 3. Batch operations on cart items
@@ -284,9 +309,11 @@ Temporary storage for selected datasets and analysis results during a session.
 ### 4.3 Help and Documentation
 
 #### Description
+
 Integrated help system and documentation for platform features and climate data concepts.
 
 #### Requirements
+
 1. Contextual help for each interface section
 2. Tutorial walkthroughs for common tasks
 3. Glossary of climate science terms
@@ -300,6 +327,7 @@ Integrated help system and documentation for platform features and climate data 
 ### 5.1 STRUDEL Kit Implementation
 
 #### Task Flow Components
+
 1. Implement all primary STRUDEL task flows:
    - Search Data Repositories
    - Explore Data
@@ -313,6 +341,7 @@ Integrated help system and documentation for platform features and climate data 
    - Track State
 
 #### Design System Adherence
+
 1. Follow STRUDEL design patterns and guidelines
 2. Use STRUDEL UI components and templates
 3. Maintain consistent interaction patterns across all task flows
@@ -321,6 +350,7 @@ Integrated help system and documentation for platform features and climate data 
 ### 5.2 Data Integration
 
 #### Data Sources
+
 1. NOAA Climate Data Online
 2. NASA Earth Observations
 3. WorldClim
@@ -329,6 +359,7 @@ Integrated help system and documentation for platform features and climate data 
 6. User-contributed datasets
 
 #### Data Formats
+
 1. NetCDF
 2. GeoTIFF
 3. CSV/TSV
