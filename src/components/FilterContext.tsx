@@ -113,3 +113,5 @@ export const useFilters = () => {
   }
   return context;
 };
+
+export type { DataFilter } from '../context/filterTypes';
