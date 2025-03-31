@@ -1,0 +1,110 @@
+[
+  {
+    "id": "nasa-001",
+    "title": "MODIS Land Surface Temperature",
+    "publication_date": "2023-02-10",
+    "start_date": "2000-02-24",
+    "end_date": "2023-01-31",
+    "citation": "NASA Earth Observations (2023)",
+    "doi": "10.5067/MODIS/MOD11C3.061",
+    "summary": "Monthly global land surface temperature measurements from the MODIS instrument",
+    "source": "nasa",
+    "tags": ["Temperature", "Land Surface", "Satellite"],
+    "category": "Satellite",
+    "purpose": "Climate monitoring and land cover studies",
+    "point_of_contact": "eosdis@eos.nasa.gov",
+    "originator": "NASA Earth Observing System",
+    "metadata_contact": "eosdis@eos.nasa.gov",
+    "publisher": "NASA",
+    "distributor": "NASA Earth Observations",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Earth Science Community", "url": "https://earthdata.nasa.gov/" },
+      { "title": "Remote Sensing", "url": "https://www.nasa.gov/earth" }
+    ],
+    "associated_projects": [
+      { "title": "MODIS Science Team", "url": "https://modis.gsfc.nasa.gov/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 4001,
+        "file_name": "modis-lst-user-guide.pdf",
+        "file_size": "3.5 MB",
+        "description": "User guide for MODIS Land Surface Temperature products"
+      }
+    ],
+    "variables": ["Temperature", "Land Surface Temperature"]
+  },
+  {
+    "id": "nasa-002",
+    "title": "Global Precipitation Measurement (GPM)",
+    "publication_date": "2022-09-15",
+    "start_date": "2014-03-01",
+    "end_date": "2022-08-31",
+    "citation": "NASA/JAXA (2022)",
+    "doi": "10.5067/GPM/IMERG/3B-MONTH/06",
+    "summary": "Global precipitation estimates from the GPM satellite constellation",
+    "source": "nasa",
+    "tags": ["Precipitation", "Rainfall", "Satellite"],
+    "category": "Satellite",
+    "purpose": "Global precipitation monitoring",
+    "point_of_contact": "gpm-science@lists.nasa.gov",
+    "originator": "NASA/JAXA",
+    "metadata_contact": "gpm-science@lists.nasa.gov",
+    "publisher": "NASA",
+    "distributor": "NASA Earth Observations",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Precipitation Science Team", "url": "https://gpm.nasa.gov/science" },
+      { "title": "Hydrology", "url": "https://water.nasa.gov/" }
+    ],
+    "associated_projects": [
+      { "title": "Global Precipitation Measurement Mission", "url": "https://gpm.nasa.gov/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 5001,
+        "file_name": "gpm-imerg-algorithm.pdf",
+        "file_size": "2.8 MB",
+        "description": "IMERG algorithm theoretical basis document"
+      }
+    ],
+    "variables": ["Precipitation", "Rainfall"]
+  },
+  {
+    "id": "nasa-003",
+    "title": "GRACE Terrestrial Water Storage",
+    "publication_date": "2021-12-01",
+    "start_date": "2002-04-01",
+    "end_date": "2021-10-31",
+    "citation": "NASA JPL (2021)",
+    "doi": "10.5067/TELND-3AC63",
+    "summary": "Global measurements of changes in terrestrial water storage from GRACE satellites",
+    "source": "nasa",
+    "tags": ["Water Storage", "Groundwater", "Satellite"],
+    "category": "Satellite",
+    "purpose": "Water resource monitoring",
+    "point_of_contact": "grace@jpl.nasa.gov",
+    "originator": "NASA JPL",
+    "metadata_contact": "grace@jpl.nasa.gov",
+    "publisher": "NASA",
+    "distributor": "NASA Earth Observations",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Hydrology", "url": "https://water.nasa.gov/" },
+      { "title": "Gravity Science", "url": "https://grace.jpl.nasa.gov/" }
+    ],
+    "associated_projects": [
+      { "title": "GRACE Follow-On", "url": "https://gracefo.jpl.nasa.gov/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 6001,
+        "file_name": "grace-data-users-handbook.pdf",
+        "file_size": "4.2 MB",
+        "description": "GRACE data users handbook"
+      }
+    ],
+    "variables": ["Water Storage", "Groundwater"]
+  }
+]

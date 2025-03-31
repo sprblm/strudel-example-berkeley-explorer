@@ -6,6 +6,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import { theme } from './theme';
 import './index.css';
+import { initMocks } from './mocks';
+
+// Initialize mock data system if enabled via environment variables
+initMocks();
 
 // Create a QueryClient instance to manage server state and caching
 // This is the central hub for all React Query operations

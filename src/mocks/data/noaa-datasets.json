@@ -1,0 +1,113 @@
+[
+  {
+    "id": "noaa-001",
+    "title": "Global Historical Climatology Network",
+    "publication_date": "2023-05-15",
+    "start_date": "1950-01-01",
+    "end_date": "2023-01-01",
+    "citation": "NOAA National Centers for Environmental Information (2023)",
+    "doi": "10.1234/noaa-ghcn-2023",
+    "summary": "Daily temperature and precipitation data from weather stations worldwide",
+    "source": "noaa",
+    "tags": ["Temperature", "Precipitation", "Historical"],
+    "category": "Observational",
+    "purpose": "Long-term climate monitoring",
+    "point_of_contact": "data@noaa.gov",
+    "originator": "NOAA",
+    "metadata_contact": "metadata@noaa.gov",
+    "publisher": "NOAA",
+    "distributor": "NOAA Climate Data Online",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Climate Research", "url": "https://www.climate.gov/research" },
+      { "title": "Weather Forecasting", "url": "https://www.weather.gov" }
+    ],
+    "associated_projects": [
+      { "title": "Global Climate Monitoring", "url": "https://www.ncei.noaa.gov/monitoring-references" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 1001,
+        "file_name": "ghcn-daily-readme.txt",
+        "file_size": "45 KB",
+        "description": "Documentation for the GHCN-Daily dataset"
+      },
+      {
+        "file_id": 1002,
+        "file_name": "ghcn-daily-inventory.csv",
+        "file_size": "2.3 MB",
+        "description": "Inventory of stations and available data"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation"]
+  },
+  {
+    "id": "noaa-002",
+    "title": "Extended Reconstructed Sea Surface Temperature (ERSST)",
+    "publication_date": "2022-11-30",
+    "start_date": "1854-01-01",
+    "end_date": "2022-10-31",
+    "citation": "Huang, B. et al. (2022)",
+    "doi": "10.7289/V5KD1VVF",
+    "summary": "Global monthly sea surface temperature analysis derived from ICOADS data",
+    "source": "noaa",
+    "tags": ["Sea Surface Temperature", "Ocean", "Historical"],
+    "category": "Reanalysis",
+    "purpose": "Climate monitoring and research",
+    "point_of_contact": "ncei.info@noaa.gov",
+    "originator": "NOAA NCEI",
+    "metadata_contact": "ncei.info@noaa.gov",
+    "publisher": "NOAA",
+    "distributor": "NOAA Climate Data Online",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Ocean Climate", "url": "https://www.ncei.noaa.gov/products/ocean-climate" },
+      { "title": "Climate Monitoring", "url": "https://www.ncei.noaa.gov/monitoring-references" }
+    ],
+    "associated_projects": [
+      { "title": "International Comprehensive Ocean-Atmosphere Data Set", "url": "https://icoads.noaa.gov/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 2001,
+        "file_name": "ersst-v5-documentation.pdf",
+        "file_size": "1.2 MB",
+        "description": "Technical documentation for ERSSTv5"
+      }
+    ],
+    "variables": ["Sea Surface Temperature"]
+  },
+  {
+    "id": "noaa-003",
+    "title": "Climate Normals Dataset",
+    "publication_date": "2021-05-04",
+    "start_date": "1991-01-01",
+    "end_date": "2020-12-31",
+    "citation": "NOAA National Centers for Environmental Information (2021)",
+    "doi": "10.7289/V5PN93JP",
+    "summary": "30-year averages of climatological variables for the United States",
+    "source": "noaa",
+    "tags": ["Temperature", "Precipitation", "Climate Normals"],
+    "category": "Derived",
+    "purpose": "Climate reference and planning",
+    "point_of_contact": "ncei.orders@noaa.gov",
+    "originator": "NOAA NCEI",
+    "metadata_contact": "ncei.orders@noaa.gov",
+    "publisher": "NOAA",
+    "distributor": "NOAA Climate Data Online",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Climate Services", "url": "https://www.climate.gov/maps-data" }
+    ],
+    "associated_projects": [],
+    "attached_files": [
+      {
+        "file_id": 3001,
+        "file_name": "normals-methodology.pdf",
+        "file_size": "850 KB",
+        "description": "Methodology for computing climate normals"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation", "Humidity", "Wind Speed", "Pressure"]
+  }
+]

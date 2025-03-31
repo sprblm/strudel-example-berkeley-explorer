@@ -1,0 +1,110 @@
+[
+  {
+    "id": "era5-001",
+    "title": "ERA5 Monthly Averaged Data on Pressure Levels",
+    "publication_date": "2023-01-10",
+    "start_date": "1979-01-01",
+    "end_date": "2022-12-31",
+    "citation": "Hersbach, H., Bell, B., Berrisford, P., et al. (2020). The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049.",
+    "doi": "10.1002/qj.3803",
+    "summary": "Monthly averaged atmospheric reanalysis data on pressure levels, including temperature, geopotential, humidity, wind components, and vertical velocity",
+    "source": "era5",
+    "tags": ["Reanalysis", "Pressure Levels", "Atmospheric"],
+    "category": "Reanalysis",
+    "purpose": "Climate monitoring and research",
+    "point_of_contact": "copernicus-support@ecmwf.int",
+    "originator": "European Centre for Medium-Range Weather Forecasts",
+    "metadata_contact": "copernicus-support@ecmwf.int",
+    "publisher": "Copernicus Climate Change Service",
+    "distributor": "Climate Data Store",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Climate Science", "url": "https://climate.copernicus.eu/" },
+      { "title": "Meteorology", "url": "https://www.ecmwf.int/" }
+    ],
+    "associated_projects": [
+      { "title": "Copernicus Climate Change Service", "url": "https://climate.copernicus.eu/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 13001,
+        "file_name": "era5-pressure-levels-documentation.pdf",
+        "file_size": "4.5 MB",
+        "description": "Documentation for ERA5 pressure level data"
+      }
+    ],
+    "variables": ["Temperature", "Geopotential", "Humidity", "Wind Speed", "Vertical Velocity", "Pressure"]
+  },
+  {
+    "id": "era5-002",
+    "title": "ERA5 Monthly Averaged Data on Single Levels",
+    "publication_date": "2023-01-10",
+    "start_date": "1979-01-01",
+    "end_date": "2022-12-31",
+    "citation": "Hersbach, H., Bell, B., Berrisford, P., et al. (2020). The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049.",
+    "doi": "10.1002/qj.3803",
+    "summary": "Monthly averaged atmospheric reanalysis data on single levels, including 2m temperature, precipitation, radiation, wind, and surface pressure",
+    "source": "era5",
+    "tags": ["Reanalysis", "Surface", "Atmospheric"],
+    "category": "Reanalysis",
+    "purpose": "Climate monitoring and research",
+    "point_of_contact": "copernicus-support@ecmwf.int",
+    "originator": "European Centre for Medium-Range Weather Forecasts",
+    "metadata_contact": "copernicus-support@ecmwf.int",
+    "publisher": "Copernicus Climate Change Service",
+    "distributor": "Climate Data Store",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Climate Science", "url": "https://climate.copernicus.eu/" },
+      { "title": "Meteorology", "url": "https://www.ecmwf.int/" }
+    ],
+    "associated_projects": [
+      { "title": "Copernicus Climate Change Service", "url": "https://climate.copernicus.eu/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 14001,
+        "file_name": "era5-single-levels-documentation.pdf",
+        "file_size": "3.8 MB",
+        "description": "Documentation for ERA5 single level data"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation", "Solar Radiation", "Wind Speed", "Surface Pressure", "Soil Moisture"]
+  },
+  {
+    "id": "era5-003",
+    "title": "ERA5-Land Monthly Averaged Data",
+    "publication_date": "2022-11-15",
+    "start_date": "1981-01-01",
+    "end_date": "2022-10-31",
+    "citation": "Muñoz-Sabater, J., et al. (2021). ERA5-Land: a state-of-the-art global reanalysis dataset for land applications. Earth System Science Data, 13(9), 4349-4383.",
+    "doi": "10.5194/essd-13-4349-2021",
+    "summary": "Monthly averaged land-surface reanalysis data with enhanced resolution, including soil moisture, soil temperature, and snow depth",
+    "source": "era5",
+    "tags": ["Reanalysis", "Land Surface", "Soil", "Snow"],
+    "category": "Reanalysis",
+    "purpose": "Land surface monitoring and research",
+    "point_of_contact": "copernicus-support@ecmwf.int",
+    "originator": "European Centre for Medium-Range Weather Forecasts",
+    "metadata_contact": "copernicus-support@ecmwf.int",
+    "publisher": "Copernicus Climate Change Service",
+    "distributor": "Climate Data Store",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Hydrology", "url": "https://climate.copernicus.eu/" },
+      { "title": "Land Surface Modeling", "url": "https://www.ecmwf.int/" }
+    ],
+    "associated_projects": [
+      { "title": "Copernicus Climate Change Service", "url": "https://climate.copernicus.eu/" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 15001,
+        "file_name": "era5-land-documentation.pdf",
+        "file_size": "3.2 MB",
+        "description": "Documentation for ERA5-Land data"
+      }
+    ],
+    "variables": ["Soil Moisture", "Soil Temperature", "Snow Depth", "Temperature", "Precipitation"]
+  }
+]

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "user-001",
+    "title": "Arctic Sea Ice Extent Analysis",
+    "publication_date": "2023-04-12",
+    "start_date": "1979-01-01",
+    "end_date": "2023-03-31",
+    "citation": "Smith, J. (2023). Arctic Sea Ice Extent Analysis. Climate Data Analysis Platform.",
+    "doi": "10.5281/zenodo.1234567",
+    "summary": "Processed dataset of Arctic sea ice extent derived from satellite observations with seasonal trend analysis",
+    "source": "user",
+    "tags": ["Sea Ice", "Arctic", "Satellite", "Trend Analysis"],
+    "category": "Derived",
+    "purpose": "Arctic climate change assessment",
+    "point_of_contact": "jsmith@example.edu",
+    "originator": "Dr. Jane Smith, Arctic Research Institute",
+    "metadata_contact": "jsmith@example.edu",
+    "publisher": "Climate Data Analysis Platform",
+    "distributor": "CDAP User Contributions",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Polar Research", "url": "https://example.org/polar-research" },
+      { "title": "Climate Change", "url": "https://example.org/climate-change" }
+    ],
+    "associated_projects": [
+      { "title": "Arctic Monitoring Initiative", "url": "https://example.org/arctic-monitoring" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 16001,
+        "file_name": "arctic-sea-ice-methodology.pdf",
+        "file_size": "1.2 MB",
+        "description": "Methodology for sea ice extent calculation"
+      },
+      {
+        "file_id": 16002,
+        "file_name": "arctic-sea-ice-data.nc",
+        "file_size": "45.8 MB",
+        "description": "NetCDF file containing processed sea ice data"
+      }
+    ],
+    "variables": ["Sea Ice Extent", "Sea Ice Concentration"]
+  },
+  {
+    "id": "user-002",
+    "title": "Urban Heat Island Effect in Major US Cities",
+    "publication_date": "2022-09-30",
+    "start_date": "2010-01-01",
+    "end_date": "2022-08-31",
+    "citation": "Johnson, M. & Garcia, P. (2022). Urban Heat Island Effect in Major US Cities. Climate Data Analysis Platform.",
+    "doi": "10.5281/zenodo.7654321",
+    "summary": "Analysis of temperature differences between urban centers and surrounding rural areas for 50 major US cities, including seasonal and diurnal patterns",
+    "source": "user",
+    "tags": ["Urban Heat Island", "Temperature", "Cities", "United States"],
+    "category": "Analysis",
+    "purpose": "Urban climate research and planning",
+    "point_of_contact": "mjohnson@example.edu",
+    "originator": "Dr. Michael Johnson, Urban Climate Research Group",
+    "metadata_contact": "mjohnson@example.edu",
+    "publisher": "Climate Data Analysis Platform",
+    "distributor": "CDAP User Contributions",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Urban Planning", "url": "https://example.org/urban-planning" },
+      { "title": "Climate Adaptation", "url": "https://example.org/climate-adaptation" }
+    ],
+    "associated_projects": [
+      { "title": "Resilient Cities Initiative", "url": "https://example.org/resilient-cities" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 17001,
+        "file_name": "uhi-analysis-report.pdf",
+        "file_size": "3.5 MB",
+        "description": "Full research report on urban heat island analysis"
+      },
+      {
+        "file_id": 17002,
+        "file_name": "city-temperature-data.csv",
+        "file_size": "8.2 MB",
+        "description": "CSV file with temperature data for all cities"
+      }
+    ],
+    "variables": ["Temperature", "Urban Heat Island Intensity"]
+  },
+  {
+    "id": "user-003",
+    "title": "Global Drought Index Compilation",
+    "publication_date": "2023-02-15",
+    "start_date": "1950-01-01",
+    "end_date": "2022-12-31",
+    "citation": "Chen, L. et al. (2023). Global Drought Index Compilation. Climate Data Analysis Platform.",
+    "doi": "10.5281/zenodo.9876543",
+    "summary": "Compilation of multiple drought indices (PDSI, SPI, SPEI) calculated globally at 0.5-degree resolution, with focus on major agricultural regions",
+    "source": "user",
+    "tags": ["Drought", "PDSI", "SPI", "SPEI", "Agriculture"],
+    "category": "Derived",
+    "purpose": "Drought monitoring and agricultural planning",
+    "point_of_contact": "lchen@example.edu",
+    "originator": "Dr. Li Chen, Agricultural Climate Research Center",
+    "metadata_contact": "lchen@example.edu",
+    "publisher": "Climate Data Analysis Platform",
+    "distributor": "CDAP User Contributions",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Agricultural Research", "url": "https://example.org/agricultural-research" },
+      { "title": "Drought Monitoring", "url": "https://example.org/drought-monitoring" }
+    ],
+    "associated_projects": [
+      { "title": "Global Food Security Initiative", "url": "https://example.org/food-security" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 18001,
+        "file_name": "drought-indices-documentation.pdf",
+        "file_size": "2.8 MB",
+        "description": "Documentation of drought indices calculation methods"
+      },
+      {
+        "file_id": 18002,
+        "file_name": "global-drought-data.nc",
+        "file_size": "120.5 MB",
+        "description": "NetCDF file with global drought indices"
+      }
+    ],
+    "variables": ["Drought Index", "Precipitation", "Temperature", "Evapotranspiration"]
+  }
+]

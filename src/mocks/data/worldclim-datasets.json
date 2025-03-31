@@ -1,0 +1,106 @@
+[
+  {
+    "id": "worldclim-001",
+    "title": "WorldClim Global Climate Data Version 2.1",
+    "publication_date": "2020-01-15",
+    "start_date": "1970-01-01",
+    "end_date": "2000-12-31",
+    "citation": "Fick, S.E. and R.J. Hijmans (2017). WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+    "doi": "10.1002/joc.5086",
+    "summary": "High-resolution global climate data for current conditions (1970-2000) including temperature, precipitation, solar radiation, wind speed, and water vapor pressure",
+    "source": "worldclim",
+    "tags": ["Temperature", "Precipitation", "Solar Radiation", "Wind Speed", "Water Vapor"],
+    "category": "Observational",
+    "purpose": "Climate research and ecological modeling",
+    "point_of_contact": "rhijmans@ucdavis.edu",
+    "originator": "University of California, Davis",
+    "metadata_contact": "info@worldclim.org",
+    "publisher": "WorldClim",
+    "distributor": "WorldClim.org",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Ecological Modeling", "url": "https://www.worldclim.org/data/applications.html" },
+      { "title": "Climate Research", "url": "https://www.worldclim.org/data/applications.html" }
+    ],
+    "associated_projects": [],
+    "attached_files": [
+      {
+        "file_id": 7001,
+        "file_name": "worldclim-documentation.pdf",
+        "file_size": "1.8 MB",
+        "description": "Documentation for WorldClim Version 2.1"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation", "Solar Radiation", "Wind Speed", "Water Vapor"]
+  },
+  {
+    "id": "worldclim-002",
+    "title": "WorldClim Future Climate Projections CMIP6",
+    "publication_date": "2021-06-30",
+    "start_date": "2021-01-01",
+    "end_date": "2100-12-31",
+    "citation": "Hijmans, R.J., Cameron, S.E., Parra, J.L., Jones, P.G. and Jarvis, A. (2021). Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology.",
+    "doi": "10.1002/joc.1276",
+    "summary": "Downscaled future climate projections from CMIP6 models for different shared socioeconomic pathways (SSPs) and time periods",
+    "source": "worldclim",
+    "tags": ["Climate Projections", "Temperature", "Precipitation", "CMIP6"],
+    "category": "Projection",
+    "purpose": "Climate change impact assessment",
+    "point_of_contact": "rhijmans@ucdavis.edu",
+    "originator": "University of California, Davis",
+    "metadata_contact": "info@worldclim.org",
+    "publisher": "WorldClim",
+    "distributor": "WorldClim.org",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Climate Change Research", "url": "https://www.worldclim.org/data/applications.html" },
+      { "title": "Impact Assessment", "url": "https://www.worldclim.org/data/applications.html" }
+    ],
+    "associated_projects": [
+      { "title": "CMIP6", "url": "https://www.wcrp-climate.org/wgcm-cmip/wgcm-cmip6" }
+    ],
+    "attached_files": [
+      {
+        "file_id": 8001,
+        "file_name": "cmip6-models-documentation.pdf",
+        "file_size": "2.5 MB",
+        "description": "Documentation for CMIP6 models used in projections"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation", "Solar Radiation", "Wind Speed"]
+  },
+  {
+    "id": "worldclim-003",
+    "title": "WorldClim Bioclimatic Variables",
+    "publication_date": "2020-03-10",
+    "start_date": "1970-01-01",
+    "end_date": "2000-12-31",
+    "citation": "Fick, S.E. and R.J. Hijmans (2017). WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.",
+    "doi": "10.1002/joc.5086",
+    "summary": "Biologically relevant climate variables derived from monthly temperature and rainfall values, including seasonality, temperature extremes, and precipitation patterns",
+    "source": "worldclim",
+    "tags": ["Bioclimatic", "Temperature", "Precipitation", "Seasonality"],
+    "category": "Derived",
+    "purpose": "Ecological modeling and species distribution analysis",
+    "point_of_contact": "rhijmans@ucdavis.edu",
+    "originator": "University of California, Davis",
+    "metadata_contact": "info@worldclim.org",
+    "publisher": "WorldClim",
+    "distributor": "WorldClim.org",
+    "usgs_mission_area": "N/A",
+    "communities": [
+      { "title": "Biodiversity Research", "url": "https://www.worldclim.org/data/applications.html" },
+      { "title": "Ecology", "url": "https://www.worldclim.org/data/applications.html" }
+    ],
+    "associated_projects": [],
+    "attached_files": [
+      {
+        "file_id": 9001,
+        "file_name": "bioclimatic-variables-explanation.pdf",
+        "file_size": "950 KB",
+        "description": "Explanation of bioclimatic variables and their derivation"
+      }
+    ],
+    "variables": ["Temperature", "Precipitation", "Bioclimatic Indices"]
+  }
+]
