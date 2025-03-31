@@ -60,11 +60,17 @@ const DatasetExplorer: React.FC = () => {
         <Container maxWidth="xl">
           {/* Page header with title and search input */}
           <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <SearchIcon size={24} sx={{ color: 'primary.main', mr: 2 }} />
-              <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-                Search Climate Data
-              </Typography>
+            {/* Updated header style to match Monitor page */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+              <SearchIcon size={24} color="#3B82F6" />
+              <Box>
+                <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
+                  Search Climate Data
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Find and explore climate datasets from various sources and repositories.
+                </Typography>
+              </Box>
             </Box>
             
             <Paper 

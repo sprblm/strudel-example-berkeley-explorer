@@ -13,6 +13,7 @@ export type Path =
   | `/explore-data`
   | `/explore-data/:id`
   | `/home`
+  | `/monitor`
   | `/monitor-activities`
   | `/monitor-activities/calendar`
   | `/monitor-activities/detail`

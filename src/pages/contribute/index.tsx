@@ -97,22 +97,21 @@ const ContributePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fafafa' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#fafafa' }}>
       <Box sx={{ p: 3, flex: 1 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <UploadIcon size={22} />
-            <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+        {/* Updated Header with Monitor-style formatting */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <UploadIcon size={24} color="#3B82F6" />
+          <Box>
+            <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
               Contribute Data
             </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Share climate datasets with the scientific community and contribute to climate research.
+            </Typography>
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            Share your climate datasets with the scientific community. All contributions are reviewed and validated before publication.
-          </Typography>
         </Box>
-        
-        {/* Main content */}
+
         <Grid container spacing={3}>
           {/* Left column with upload and form */}
           <Grid item xs={12} md={8}>

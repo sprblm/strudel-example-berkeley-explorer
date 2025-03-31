@@ -18,7 +18,8 @@ import {
   AccordionDetails,
   Stack,
   LinearProgress,
-  Chip
+  Chip,
+  Container
 } from '@mui/material';
 import { ChevronDown, PlayCircle, ClockIcon, Server as ServerIcon } from '../../components/Icons';
 
@@ -120,39 +121,23 @@ const RunComputationPage: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#f5f7fa' }}>
       <Box sx={{ p: 3, flex: 1 }}>
-        {/* Main content */}
-        <Box maxWidth="1200px" mx="auto">
-          {/* Run Computation Section */}
-          <Accordion 
-            defaultExpanded 
-            elevation={0}
-            sx={{
-              mb: 3,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'divider',
-              overflow: 'hidden',
-              '&:before': { display: 'none' } // Remove default divider
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ChevronDown />}
-              sx={{ backgroundColor: '#f8fafd' }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <PlayCircle size={20} />
-                <Typography variant="h6" component="h2" fontWeight={600}>
-                  Run Computation
-                </Typography>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography variant="body2" color="text.secondary" mb={2}>
+        {/* Updated Header with Monitor-style formatting */}
+        <Box maxWidth="1200px" mx="auto" mb={4}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <PlayCircle size={24} color="#3B82F6" />
+            <Box>
+              <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
+                Run Computation
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
                 Execute climate data analysis and modeling tasks using our high-performance computing infrastructure.
               </Typography>
-            </AccordionDetails>
-          </Accordion>
+            </Box>
+          </Box>
+        </Box>
 
+        {/* Main content */}
+        <Box maxWidth="1200px" mx="auto">
           {/* Job Configuration and System Status */}
           <Grid container spacing={3}>
             {/* Job Configuration */}
@@ -201,266 +186,289 @@ const RunComputationPage: React.FC = () => {
                         inputProps={{ 'aria-label': 'Computation Type' }}
                       >
                         <MenuItem value="Data Analysis">Data Analysis</MenuItem>
-                        <MenuItem value="Predictive Modeling">Predictive Modeling</MenuItem>
-                        <MenuItem value="Statistical Analysis">Statistical Analysis</MenuItem>
-                        <MenuItem value="Climate Simulation">Climate Simulation</MenuItem>
+                        <MenuItem value="Model Training">Model Training</MenuItem>
+                        <MenuItem value="Data Visualization">Data Visualization</MenuItem>
+                        <MenuItem value="Statistical Testing">Statistical Testing</MenuItem>
+                        <MenuItem value="Prediction">Climate Prediction</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
 
-                  {/* Parameters Section */}
+                  {/* Dataset Selection */}
                   <Grid item xs={12}>
-                    <Typography variant="body2" fontWeight={500} sx={{ mb: 1 }}>
-                      Parameters
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      Dataset
                     </Typography>
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={dataset}
+                        onChange={(e) => setDataset(e.target.value)}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Dataset' }}
+                      >
+                        <MenuItem value="" disabled>
+                          <em>Select a dataset</em>
+                        </MenuItem>
+                        <MenuItem value="noaa-ghcn">NOAA Global Historical Climatology Network</MenuItem>
+                        <MenuItem value="nasa-gistemp">NASA GISTEMP Surface Temperature Analysis</MenuItem>
+                        <MenuItem value="hadcrut5">HadCRUT5 Global Temperature</MenuItem>
+                        <MenuItem value="era5">ERA5 Reanalysis</MenuItem>
+                        <MenuItem value="cmip6">CMIP6 Multi-Model Ensemble</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-                    {/* Dataset */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                        Dataset
-                      </Typography>
-                      <FormControl fullWidth size="small">
-                        <Select
-                          value={dataset}
-                          onChange={(e) => setDataset(e.target.value)}
-                          displayEmpty
-                          inputProps={{ 'aria-label': 'Dataset' }}
-                        >
-                          <MenuItem value="" disabled>
-                            Select a dataset
-                          </MenuItem>
-                          <MenuItem value="global-temp-2020-2024">Global Temperature Records 2020-2024</MenuItem>
-                          <MenuItem value="sea-level-1990-2024">Sea Level Data 1990-2024</MenuItem>
-                          <MenuItem value="arctic-ice-2010-2024">Arctic Ice Extent 2010-2024</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-
-                    {/* Variables */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                        Variables
-                      </Typography>
-                      <FormGroup row>
-                        <FormControlLabel
-                          control={
-                            <Checkbox 
-                              checked={variables.temperature}
-                              onChange={handleVariableChange}
-                              name="temperature"
-                              size="small"
-                            />
-                          }
-                          label="Temperature"
-                        />
-                        <FormControlLabel
-                          control={
-                            <Checkbox 
-                              checked={variables.precipitation}
-                              onChange={handleVariableChange}
-                              name="precipitation"
-                              size="small"
-                            />
-                          }
-                          label="Precipitation"
-                        />
-                        <FormControlLabel
-                          control={
-                            <Checkbox 
-                              checked={variables.humidity}
-                              onChange={handleVariableChange}
-                              name="humidity"
-                              size="small"
-                            />
-                          }
-                          label="Humidity"
-                        />
-                        <FormControlLabel
-                          control={
-                            <Checkbox 
-                              checked={variables.windSpeed}
-                              onChange={handleVariableChange}
-                              name="windSpeed"
-                              size="small"
-                            />
-                          }
-                          label="Wind Speed"
-                        />
-                      </FormGroup>
-                    </Box>
-
-                    {/* Date Range */}
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                          Start Date
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          type="date"
-                          size="small"
-                          InputLabelProps={{ shrink: true }}
-                          placeholder="mm/dd/yyyy"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                        />
+                  {/* Variables */}
+                  <Grid item xs={12}>
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      Variables to Include
+                    </Typography>
+                    <FormGroup>
+                      <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={variables.temperature}
+                                onChange={handleVariableChange}
+                                name="temperature"
+                              />
+                            }
+                            label="Temperature"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={variables.precipitation}
+                                onChange={handleVariableChange}
+                                name="precipitation"
+                              />
+                            }
+                            label="Precipitation"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={variables.humidity}
+                                onChange={handleVariableChange}
+                                name="humidity"
+                              />
+                            }
+                            label="Humidity"
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={variables.windSpeed}
+                                onChange={handleVariableChange}
+                                name="windSpeed"
+                              />
+                            }
+                            label="Wind Speed"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                          End Date
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          type="date"
-                          size="small"
-                          InputLabelProps={{ shrink: true }}
-                          placeholder="mm/dd/yyyy"
-                          value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                        />
-                      </Grid>
-                    </Grid>
+                    </FormGroup>
+                  </Grid>
 
-                    {/* Analysis Method */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                        Analysis Method
-                      </Typography>
-                      <FormControl fullWidth size="small">
-                        <Select
-                          value={analysisMethod}
-                          onChange={(e) => setAnalysisMethod(e.target.value)}
-                          displayEmpty
-                          inputProps={{ 'aria-label': 'Analysis Method' }}
-                        >
-                          <MenuItem value="Standard Analysis">Standard Analysis</MenuItem>
-                          <MenuItem value="Advanced Regression">Advanced Regression</MenuItem>
-                          <MenuItem value="Statistical Modeling">Statistical Modeling</MenuItem>
-                          <MenuItem value="Machine Learning">Machine Learning</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-
-                    {/* Time Resolution */}
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
-                        Time Resolution
-                      </Typography>
-                      <FormControl fullWidth size="small">
-                        <Select
-                          value={timeResolution}
-                          onChange={(e) => setTimeResolution(e.target.value)}
-                          displayEmpty
-                          inputProps={{ 'aria-label': 'Time Resolution' }}
-                        >
-                          <MenuItem value="Hourly">Hourly</MenuItem>
-                          <MenuItem value="Daily">Daily</MenuItem>
-                          <MenuItem value="Weekly">Weekly</MenuItem>
-                          <MenuItem value="Monthly">Monthly</MenuItem>
-                          <MenuItem value="Yearly">Yearly</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-
-                    {/* Submit Button */}
-                    <Button
-                      variant="contained"
+                  {/* Time Range */}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      Start Date
+                    </Typography>
+                    <TextField
                       fullWidth
-                      onClick={handleSubmitJob}
-                      sx={{ py: 1 }}
-                    >
-                      Submit Job
-                    </Button>
+                      type="date"
+                      size="small"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      End Date
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      size="small"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </Grid>
+
+                  {/* Analysis Method */}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      Analysis Method
+                    </Typography>
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={analysisMethod}
+                        onChange={(e) => setAnalysisMethod(e.target.value)}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Analysis Method' }}
+                      >
+                        <MenuItem value="Standard Analysis">Standard Analysis</MenuItem>
+                        <MenuItem value="Advanced Statistics">Advanced Statistics</MenuItem>
+                        <MenuItem value="Machine Learning">Machine Learning</MenuItem>
+                        <MenuItem value="Neural Networks">Neural Networks</MenuItem>
+                        <MenuItem value="Ensemble Methods">Ensemble Methods</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  {/* Time Resolution */}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="caption" display="block" sx={{ mb: 0.5 }}>
+                      Time Resolution
+                    </Typography>
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={timeResolution}
+                        onChange={(e) => setTimeResolution(e.target.value)}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Time Resolution' }}
+                      >
+                        <MenuItem value="Hourly">Hourly</MenuItem>
+                        <MenuItem value="Daily">Daily</MenuItem>
+                        <MenuItem value="Weekly">Weekly</MenuItem>
+                        <MenuItem value="Monthly">Monthly</MenuItem>
+                        <MenuItem value="Yearly">Yearly</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  {/* Submit Button */}
+                  <Grid item xs={12}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmitJob}
+                        startIcon={<PlayCircle size={18} />}
+                      >
+                        Run Computation
+                      </Button>
+                    </Box>
                   </Grid>
                 </Grid>
               </Paper>
             </Grid>
 
-            {/* System Status */}
+            {/* Active Jobs and System Status */}
             <Grid item xs={12} md={4}>
-              <Paper 
+              {/* Active Jobs */}
+              <Paper
+                elevation={0}
+                sx={{ 
+                  p: 3, 
+                  mb: 3, 
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <ClockIcon size={18} sx={{ color: 'primary.main', mr: 1 }} />
+                  <Typography variant="h6" component="h2" fontWeight={500}>
+                    Active Jobs
+                  </Typography>
+                </Box>
+
+                <Stack spacing={2}>
+                  {activeJobs.map((job) => (
+                    <Box
+                      key={job.id}
+                      sx={{
+                        p: 2,
+                        borderRadius: 1,
+                        bgcolor: 'background.default',
+                        border: '1px solid',
+                        borderColor: 'grey.200',
+                      }}
+                    >
+                      <Typography variant="subtitle2" fontWeight={500} gutterBottom>
+                        {job.name}
+                      </Typography>
+                      <Box sx={{ mb: 1 }}>
+                        {getJobStatusComponent(job.status, job.progress)}
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        Started {job.startedTime}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Paper>
+
+              {/* System Status */}
+              <Paper
                 elevation={0}
                 sx={{ 
                   p: 3, 
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider',
-                  mb: 3
                 }}
               >
-                <Typography variant="h6" component="h2" fontWeight={500} sx={{ mb: 2 }}>
-                  System Status
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <ServerIcon size={18} sx={{ color: 'primary.main', mr: 1 }} />
+                  <Typography variant="h6" component="h2" fontWeight={500}>
+                    System Status
+                  </Typography>
+                </Box>
 
-                <Stack spacing={2}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ClockIcon size={16} color="#6B7280" />
-                      <Typography variant="body2" color="text.secondary">
-                        Queue Time
-                      </Typography>
-                    </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="body2">CPU Usage</Typography>
                     <Typography variant="body2" fontWeight={500}>
-                      ~6 minutes
+                      64%
                     </Typography>
                   </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={64}
+                    sx={{ height: 8, borderRadius: 1 }}
+                  />
+                </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ServerIcon size={16} color="#6B7280" />
-                      <Typography variant="body2" color="text.secondary">
-                        Available Nodes
-                      </Typography>
-                    </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="body2">Memory Usage</Typography>
                     <Typography variant="body2" fontWeight={500}>
-                      12/20
+                      42%
                     </Typography>
                   </Box>
-                </Stack>
-              </Paper>
+                  <LinearProgress
+                    variant="determinate"
+                    value={42}
+                    sx={{ height: 8, borderRadius: 1 }}
+                  />
+                </Box>
 
-              {/* Active Jobs */}
-              <Paper 
-                elevation={0}
-                sx={{ 
-                  p: 3, 
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: 'divider'
-                }}
-              >
-                <Typography variant="h6" component="h2" fontWeight={500} sx={{ mb: 2 }}>
-                  Active Jobs
-                </Typography>
-
-                <Stack spacing={2.5}>
-                  {activeJobs.map((job) => (
-                    <Box key={job.id}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        <Typography variant="body2" fontWeight={500} color="text.primary">
-                          {job.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Started {job.startedTime} ago
-                        </Typography>
-                        <Box sx={{ mt: 0.5 }}>
-                          {getJobStatusComponent(job.status, job.progress)}
-                        </Box>
-                      </Box>
-                    </Box>
-                  ))}
-                </Stack>
-
-                <Box sx={{ mt: 2, textAlign: 'center' }}>
-                  <Button
-                    variant="text"
-                    size="small"
-                    endIcon={<ChevronDown size={16} />}
-                  >
-                    View Results
-                  </Button>
+                <Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="body2">Available Nodes</Typography>
+                    <Typography variant="body2" fontWeight={500}>
+                      8/12
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={(8 / 12) * 100}
+                    sx={{ height: 8, borderRadius: 1 }}
+                  />
                 </Box>
               </Paper>
             </Grid>

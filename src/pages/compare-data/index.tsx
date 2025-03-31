@@ -2,6 +2,7 @@ import { Box, Typography, Paper, Grid, Button } from '@mui/material';
 import React from 'react';
 import { Link, Routes, Route } from 'react-router-dom';
 import CompareDatasets from './compare';
+import { BarChartIcon } from '../../components/Icons';
 
 /**
  * Compare Data main component with routing
@@ -24,14 +25,17 @@ const CompareDataLanding: React.FC = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fafafa' }}>
       
       <Box sx={{ p: 3, flex: 1 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 0.5 }}>
-            Compare Climate Datasets
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Explore and compare different climate datasets to identify patterns and variations
-          </Typography>
+        {/* Updated Header with Monitor-style formatting */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <BarChartIcon size={24} color="#3B82F6" />
+          <Box>
+            <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
+              Compare Climate Datasets
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Explore and compare different climate datasets to identify patterns and variations.
+            </Typography>
+          </Box>
         </Box>
         
         {/* Main content */}
@@ -49,53 +53,65 @@ const CompareDataLanding: React.FC = () => {
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Dataset Comparison
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                The Compare Data feature allows you to:
+              <Typography paragraph>
+                Our comparison tool allows you to analyze multiple climate datasets side by side, 
+                identifying correlations, disparities, and patterns across different sources of climate data.
               </Typography>
-              <Box component="ul" sx={{ pl: 2, mb: 3 }}>
-                <Box component="li" sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    View multiple climate datasets side by side
-                  </Typography>
-                </Box>
-                <Box component="li" sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Compare temperature trends across different data sources
-                  </Typography>
-                </Box>
-                <Box component="li" sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Synchronize timelines and axes for better comparison
-                  </Typography>
-                </Box>
-                <Box component="li" sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Export comparison results for reporting
-                  </Typography>
-                </Box>
-              </Box>
-              
-              <Link to="compare" style={{ textDecoration: 'none' }}>
-                <Button variant="contained" color="primary">
-                  Start Comparing Datasets
-                </Button>
-              </Link>
+              <Typography paragraph>
+                You can compare temperature records, precipitation patterns, sea level measurements, 
+                and other climate variables from different research institutions and time periods.
+              </Typography>
+              <Button 
+                component={Link}
+                to="/compare-data/compare"
+                variant="contained"
+                size="large"
+                sx={{ mt: 2 }}
+              >
+                Start Comparing Datasets
+              </Button>
             </Grid>
             
             <Grid item xs={12} md={6}>
-              <Box
-                component="img"
-                src="/comparison-preview.png"
-                alt="Dataset comparison preview"
-                sx={{
-                  width: '100%',
-                  maxWidth: 500,
-                  height: 'auto',
-                  borderRadius: 1,
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  p: 2, 
+                  height: '100%',
+                  borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'grey.200'
+                  borderColor: 'grey.200',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2
                 }}
-              />
+              >
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Key Features
+                  </Typography>
+                  <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
+                    <li>Side-by-side visual comparison</li>
+                    <li>Statistical analysis of dataset differences</li>
+                    <li>Time series alignment</li>
+                    <li>Multiple visualization options</li>
+                    <li>Export comparison results</li>
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Supported Dataset Types
+                  </Typography>
+                  <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
+                    <li>Temperature records</li>
+                    <li>Precipitation data</li>
+                    <li>Sea level measurements</li>
+                    <li>Atmospheric composition</li>
+                    <li>Climate model outputs</li>
+                  </Typography>
+                </Box>
+              </Paper>
             </Grid>
           </Grid>
         </Paper>
