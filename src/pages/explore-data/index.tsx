@@ -1,142 +1,76 @@
-import { Box, Paper, Stack } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { FilterContextProvider } from '../../components/FilterContext';
 import { PageHeader } from '../../components/PageHeader';
-import { SharedPreviewPanel } from '../../components/SharedPreviewPanel';
-import { DataView } from './_components/DataView';
-import { DataViewHeader } from './_components/DataViewHeader';
-import { FiltersPanel } from './_components/FiltersPanel';
-import { taskflow } from './_config/taskflow.config';
-import { ChartView } from './_components/ChartView';
-import { MapView } from './_components/MapView';
-import { CardView } from './_components/CardView';
+import { ControlsPanel } from './_components/ControlsPanel';
+import { VisualizationView } from './_components/VisualizationView';
 
 /**
- * Main explorer page in the explore-data Task Flow.
- * This page includes the page header, filters panel,
- * main table, and the table row preview panel.
+ * Main explore data page that allows users to visualize
+ * and analyze climate data through interactive charts and maps.
  */
+const ExploreData: React.FC = () => {
+  const [activeChart, setActiveChart] = useState<'timeSeries' | 'map' | 'histogram' | 'distribution'>('timeSeries');
+  const [showControls, setShowControls] = useState(true);
 
-interface PreviewItem {
-  id: string;
-  title: string;
-  description?: string;
-  // Add other necessary fields based on your data structure
-}
-
-const DataExplorer: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [previewItem, setPreviewItem] = useState<PreviewItem | null>(null);
-  const [showFiltersPanel, setShowFiltersPanel] = useState(true);
-  const [viewMode, setViewMode] = useState('table');
-
-  const handleCloseFilters = () => {
-    setShowFiltersPanel(false);
-  };
-
-  const handleToggleFilters = () => {
-    setShowFiltersPanel(!showFiltersPanel);
-  };
-
-  const handleClosePreview = () => {
-    setPreviewItem(null);
-  };
-
-  const handleViewModeChange = (mode: string) => {
-    setViewMode(mode);
+  const handleToggleControls = () => {
+    setShowControls(!showControls);
   };
 
   return (
     <FilterContextProvider>
-      <Box>
-        <PageHeader
-          pageTitle={taskflow.pages.index.title}
-          description={taskflow.pages.index.description}
-          sx={{
-            marginBottom: 1,
-            padding: 2,
-          }}
-        />
-        <Box>
-          <Stack direction="row">
-            {showFiltersPanel && (
-              <Box
-                sx={{
-                  width: '350px',
-                }}
-              >
-                <FiltersPanel onClose={handleCloseFilters} />
-              </Box>
-            )}
-            <Paper
-              elevation={0}
-              sx={{
-                flex: 1,
-                minHeight: '600px',
-                minWidth: 0,
-              }}
-            >
-              <DataViewHeader
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                onToggleFiltersPanel={handleToggleFilters}
-                viewMode={viewMode}
-                onViewModeChange={handleViewModeChange}
-              />
-              
-              {viewMode === 'table' && (
-                <DataView
-                  searchTerm={searchTerm}
-                  setPreviewItem={setPreviewItem}
-                />
-              )}
-              
-              {viewMode === 'chart' && (
-                <ChartView 
-                  searchTerm={searchTerm}
-                  setPreviewItem={setPreviewItem}
-                />
-              )}
-              
-              {viewMode === 'map' && (
-                <MapView 
-                  searchTerm={searchTerm}
-                  setPreviewItem={setPreviewItem}
-                />
-              )}
-              
-              {viewMode === 'card' && (
-                <CardView 
-                  searchTerm={searchTerm}
-                  setPreviewItem={setPreviewItem}
-                />
-              )}
-            </Paper>
-            
-            {previewItem && (
-              <Box
-                sx={{
-                  maxWidth: '600px',
-                  minWidth: '400px',
-                }}
-              >
-                <SharedPreviewPanel
-                  previewItem={previewItem}
-                  onClose={handleClosePreview}
-                  idField={taskflow.data.list.idField}
-                  columns={taskflow.pages.index.tableColumns}
-                  detailsConfig={{ 
-                    enabled: true, 
-                    path: '/explore' 
-                  }}
-                />
-              </Box>
-            )}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100vh',
+        bgcolor: '#fafafa' 
+      }}>
+        <Box sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+            <PageHeader 
+              title="Explore Data"
+              subtitle="Visualize and analyze climate data through interactive charts and maps."
+              onToggleControls={handleToggleControls}
+              showControls={showControls}
+            />
           </Stack>
+
+          <Box sx={{ 
+            display: 'flex',
+            flex: 1,
+            gap: 3,
+            height: 'calc(100% - 60px)'
+          }}>
+            {showControls && (
+              <ControlsPanel 
+                activeChart={activeChart}
+                setActiveChart={setActiveChart}
+              />
+            )}
+            
+            <Box sx={{ flex: 1 }}>
+              <Paper 
+                elevation={0}
+                sx={{ 
+                  height: '100%', 
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  borderRadius: 2
+                }}
+              >
+                <VisualizationView 
+                  activeChart={activeChart}
+                />
+              </Paper>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </FilterContextProvider>
   );
 };
 
-export default DataExplorer;
+export default ExploreData;

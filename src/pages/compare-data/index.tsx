@@ -1,111 +1,107 @@
-import { Box, Button, Container, Link, Paper, Stack } from '@mui/material';
-import { GridToolbar } from '@mui/x-data-grid';
+import { Box, Typography, Paper, Grid, Button } from '@mui/material';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { PageHeader } from '../../components/PageHeader';
-import { useCompareData } from './_context/ContextProvider';
-import { setSelectedRows } from './_context/actions';
-import { taskflow } from './_config/taskflow.config';
-import { SciDataGrid } from '../../components/SciDataGrid';
+import { Link, Routes, Route } from 'react-router-dom';
+import CompareDatasets from './compare';
 
 /**
- * List page to show comparable items in the compare-data Task Flow.
- * Items in this table are selectable and can be sent to the `<ScenarioComparison>`
- * page to be rendered in the comparison table.
+ * Compare Data main component with routing
  */
-const ScenarioList: React.FC = () => {
-  const { state, dispatch } = useCompareData();
-
-  /**
-   * Content to render on the page for this component
-   */
+const CompareData: React.FC = () => {
   return (
-    <Box>
-      <PageHeader
-        pageTitle={taskflow.pages.index.title}
-        description={taskflow.pages.index.description}
-        actions={
-          <Stack direction="row">
-            <Box>
-              {state.selectedRows.length < 2 && (
-                <Button
-                  variant="outlined"
-                  disabled
-                  data-testid="cpd-compare-button"
-                >
-                  Compare {taskflow.properties.itemNamePlural}
-                </Button>
-              )}
-              {state.selectedRows.length > 1 && (
-                <Link component={RouterLink} to="compare">
-                  <Button variant="contained" data-testid="cpd-compare-button">
-                    Compare {taskflow.properties.itemNamePlural} (
-                    {state.selectedRows.length})
-                  </Button>
-                </Link>
-              )}
-            </Box>
-            <Box>
-              <Link component={RouterLink} to="new">
-                <Button variant="contained" data-testid="cpd-new-button">
-                  New {taskflow.properties.itemName}
+    <Routes>
+      <Route path="/" element={<CompareDataLanding />} />
+      <Route path="/compare" element={<CompareDatasets />} />
+    </Routes>
+  );
+};
+
+/**
+ * Compare Data landing page
+ * Provides an introduction to the dataset comparison feature
+ */
+const CompareDataLanding: React.FC = () => {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fafafa' }}>
+      
+      <Box sx={{ p: 3, flex: 1 }}>
+        {/* Header */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 0.5 }}>
+            Compare Climate Datasets
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Explore and compare different climate datasets to identify patterns and variations
+          </Typography>
+        </Box>
+        
+        {/* Main content */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 3, 
+            borderRadius: 2, 
+            border: '1px solid',
+            borderColor: 'grey.200'
+          }}
+        >
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Dataset Comparison
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                The Compare Data feature allows you to:
+              </Typography>
+              <Box component="ul" sx={{ pl: 2, mb: 3 }}>
+                <Box component="li" sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    View multiple climate datasets side by side
+                  </Typography>
+                </Box>
+                <Box component="li" sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Compare temperature trends across different data sources
+                  </Typography>
+                </Box>
+                <Box component="li" sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Synchronize timelines and axes for better comparison
+                  </Typography>
+                </Box>
+                <Box component="li" sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Export comparison results for reporting
+                  </Typography>
+                </Box>
+              </Box>
+              
+              <Link to="compare" style={{ textDecoration: 'none' }}>
+                <Button variant="contained" color="primary">
+                  Start Comparing Datasets
                 </Button>
               </Link>
-            </Box>
-          </Stack>
-        }
-        sx={{
-          padding: 3,
-          backgroundColor: 'white',
-        }}
-      />
-      <Container
-        maxWidth="xl"
-        sx={{
-          paddingTop: 3,
-          paddingBottom: 3,
-        }}
-      >
-        <Paper>
-          <SciDataGrid
-            rows={state.data}
-            getRowId={(row) => row[state.dataIdField]}
-            columns={state.columns}
-            checkboxSelection
-            rowSelectionModel={state.selectedRows}
-            onRowSelectionModelChange={(rows) =>
-              dispatch(setSelectedRows(rows))
-            }
-            disableRowSelectionOnClick
-            disableDensitySelector
-            disableColumnFilter
-            initialState={{
-              pagination: { paginationModel: { page: 1, pageSize: 25 } },
-            }}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-              },
-            }}
-            sx={{
-              '& .MuiDataGrid-toolbarContainer': {
-                padding: 2,
-                paddingBottom: 0,
-              },
-            }}
-          />
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                src="/comparison-preview.png"
+                alt="Dataset comparison preview"
+                sx={{
+                  width: '100%',
+                  maxWidth: 500,
+                  height: 'auto',
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'grey.200'
+                }}
+              />
+            </Grid>
+          </Grid>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 };
 
-// const ScenarioList: React.FC = () => {
-//   const { state, dispatch } = useCompareData();
-//   return (
-//     <h1>Compare Data List</h1>
-//   )
-// }
-
-export default ScenarioList;
+export default CompareData;
