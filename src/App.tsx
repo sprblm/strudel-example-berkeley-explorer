@@ -1,11 +1,14 @@
-import React from 'react';
+// React is needed for JSX transformation
 import { Box, CssBaseline, Typography, Button, Paper } from '@mui/material';
 import { Routes, Route } from 'react-router-dom';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import ErrorBoundary from './components/ErrorBoundary';
 import { TopBar } from './components/TopBar';
 import SearchRepositories from './pages/search-repositories';
-import DataExplorer from './pages/explore-data';
+import ExploreData from './pages/explore-data';
+import CompareData from './pages/compare-data';
+import ContributePage from './pages/contribute';
+import RunComputationPage from './pages/run-computation/RunComputation';
 import { HomePage } from './pages/home/index';
 import { AboutPage } from './pages/about/index';
 
@@ -22,7 +25,10 @@ const App = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/search-repositories/*" element={<SearchRepositories />} />
-            <Route path="/explore-data/*" element={<DataExplorer />} />
+            <Route path="/explore-data/*" element={<ExploreData />} />
+            <Route path="/compare-data/*" element={<CompareData />} />
+            <Route path="/run-computation" element={<RunComputationPage />} />
+            <Route path="/contribute" element={<ContributePage />} />
             <Route path="/about" element={<AboutPage />} />
           </Routes>
         </ErrorBoundary>
