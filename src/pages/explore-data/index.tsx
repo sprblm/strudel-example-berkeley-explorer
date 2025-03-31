@@ -1,9 +1,9 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { FilterContextProvider } from '../../components/FilterContext';
-import { PageHeader } from '../../components/PageHeader';
 import { ControlsPanel } from './_components/ControlsPanel';
 import { VisualizationView } from './_components/VisualizationView';
+import { GlobeIcon } from '../../components/Icons';
 
 /**
  * Main explore data page that allows users to visualize
@@ -26,14 +26,18 @@ const ExploreData: React.FC = () => {
         bgcolor: '#fafafa' 
       }}>
         <Box sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-            <PageHeader 
-              title="Explore Data"
-              subtitle="Visualize and analyze climate data through interactive charts and maps."
-              onToggleControls={handleToggleControls}
-              showControls={showControls}
-            />
-          </Stack>
+          {/* Page Header with Monitor-style formatting */}
+          <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <GlobeIcon size={24} color="#3B82F6" />
+            <Box>
+              <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
+                Explore Data
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Visualize and analyze climate data through interactive charts and maps.
+              </Typography>
+            </Box>
+          </Box>
 
           <Box sx={{ 
             display: 'flex',
@@ -52,17 +56,20 @@ const ExploreData: React.FC = () => {
               <Paper 
                 elevation={0}
                 sx={{ 
-                  height: '100%', 
+                  height: '100%',
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  borderRadius: 2,
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
-                  border: '1px solid',
-                  borderColor: 'grey.200',
-                  borderRadius: 2
+                  position: 'relative'
                 }}
               >
                 <VisualizationView 
-                  activeChart={activeChart}
+                  activeChart={activeChart} 
+                  onToggleControls={handleToggleControls}
+                  showControls={showControls}
                 />
               </Paper>
             </Box>
