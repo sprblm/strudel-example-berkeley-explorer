@@ -9,6 +9,7 @@ export type Path =
   | `/compare-data`
   | `/compare-data/compare`
   | `/compare-data/new`
+  | `/contribute`
   | `/explore-data`
   | `/explore-data/:id`
   | `/home`
@@ -20,6 +21,7 @@ export type Path =
   | `/run-computation/:id/results`
   | `/run-computation/:id/running`
   | `/run-computation/:id/settings`
+  | `/run-computation/RunComputation`
   | `/search-repositories`
   | `/search-repositories/:id`;
 
