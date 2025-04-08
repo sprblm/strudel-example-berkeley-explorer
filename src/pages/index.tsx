@@ -25,9 +25,7 @@ const HomePage: React.FC = () => {
   const appRoutes = [
     { path: '/compare-data', label: 'Compare Data' },
     { path: '/explore-data', label: 'Explore Data' },
-    { path: '/monitor-activities', label: 'Monitor Activities' },
     { path: '/playground', label: 'Playground' },
-    { path: '/run-computation', label: 'Run Computation' },
     { path: '/search-repositories', label: 'Search Repositories' },
   ];
 
