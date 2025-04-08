@@ -8,10 +8,8 @@ import SearchRepositories from './pages/search-repositories';
 import ExploreData from './pages/explore-data';
 import CompareData from './pages/compare-data';
 import ContributePage from './pages/contribute';
-import RunComputationPage from './pages/run-computation/RunComputation';
 import { HomePage } from './pages/home/index';
 import { AboutPage } from './pages/about/index';
-import MonitorPage from './pages/monitor';
 
 /**
  * Main App component that sets up routing and global layout
@@ -28,9 +26,7 @@ const App = () => {
             <Route path="/search-repositories/*" element={<SearchRepositories />} />
             <Route path="/explore-data/*" element={<ExploreData />} />
             <Route path="/compare-data/*" element={<CompareData />} />
-            <Route path="/run-computation" element={<RunComputationPage />} />
             <Route path="/contribute" element={<ContributePage />} />
-            <Route path="/monitor" element={<MonitorPage />} />
             <Route path="/about" element={<AboutPage />} />
           </Routes>
         </ErrorBoundary>

@@ -103,40 +103,6 @@ export const TopBar: React.FC = () => {
           
           <Button
             component={Link}
-            to="/run-computation"
-            startIcon={<PlayCircle size={18} />}
-            sx={{ 
-              color: 'text.secondary',
-              mr: 1.5,
-              fontSize: '0.875rem',
-              '&:hover': { 
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                color: 'text.primary'
-              }
-            }}
-          >
-            Run Computation
-          </Button>
-          
-          <Button
-            component={Link}
-            to="/monitor"
-            startIcon={<MonitorIcon size={18} />}
-            sx={{ 
-              color: 'text.secondary',
-              mr: 1.5,
-              fontSize: '0.875rem',
-              '&:hover': { 
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                color: 'text.primary'
-              }
-            }}
-          >
-            Monitor
-          </Button>
-          
-          <Button
-            component={Link}
             to="/contribute"
             startIcon={<UploadIcon size={18} />}
             sx={{
