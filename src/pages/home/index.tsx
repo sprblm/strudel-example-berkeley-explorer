@@ -1,19 +1,32 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import { Box, Container, Typography, Grid, Paper } from '@mui/material';
+import { Box, Container, Grid, Paper, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { 
   SearchIcon, 
   LineChartIcon, 
   BarChartIcon, 
-  PlayIcon, 
-  ActivityIcon, 
   UploadIcon 
 } from '../../components/Icons';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 
+import { Button } from '../../components/Button';
+
+/**
+ * HomePage Component
+ * 
+ * Main landing page for the Climate Data Analysis Platform
+ * Displays a grid of feature cards that link to the main application sections
+ */
 export const HomePage = () => {
+  /**
+   * Feature definitions for the main application sections
+   * Each feature includes:
+   * - title: Display name for the feature
+   * - description: Brief explanation of the feature's purpose
+   * - icon: Visual representation of the feature
+   * - path: Route to navigate to when clicked
+   * - color: Theme color for the feature card
+   */
   const features = [
     {
       title: 'Search Data',
@@ -37,20 +50,6 @@ export const HomePage = () => {
       color: '#8b5cf6', // purple
     },
     {
-      title: 'Run Computation',
-      description: 'Access data processing tools and features',
-      icon: <PlayIcon size={24} />,
-      path: '/run-computation',
-      color: '#f59e0b', // amber
-    },
-    {
-      title: 'Monitor',
-      description: 'Track and monitor tools and features',
-      icon: <ActivityIcon size={24} />,
-      path: '/monitor',
-      color: '#ef4444', // red
-    },
-    {
       title: 'Contribute',
       description: 'Upload and share your own datasets',
       icon: <UploadIcon size={24} />,
@@ -62,6 +61,7 @@ export const HomePage = () => {
   return (
     <Box sx={{ py: 8, backgroundColor: 'background.default' }}>
       <Container maxWidth="lg">
+        {/* Hero section with main heading and subheading */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 2 }}>
             Welcome to Climate Data Analysis Platform
@@ -71,9 +71,11 @@ export const HomePage = () => {
           </Typography>
         </Box>
 
+        {/* Feature cards grid layout */}
         <Grid container spacing={3}>
           {features.map((feature, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
+              {/* Feature card with hover effect */}
               <Paper
                 elevation={0}
                 sx={{
@@ -89,6 +91,7 @@ export const HomePage = () => {
                   },
                 }}
               >
+                {/* Card content container */}
                 <Box
                   sx={{
                     p: 3,
@@ -97,6 +100,7 @@ export const HomePage = () => {
                     height: '100%',
                   }}
                 >
+                  {/* Feature header with icon and title */}
                   <Box
                     sx={{
                       display: 'flex',
@@ -104,6 +108,7 @@ export const HomePage = () => {
                       mb: 2,
                     }}
                   >
+                    {/* Colored icon container */}
                     <Box
                       sx={{
                         width: 40,
@@ -112,7 +117,7 @@ export const HomePage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: `${feature.color}15`,
+                        backgroundColor: `${feature.color}15`, // Color with 15% opacity
                         color: feature.color,
                         mr: 2,
                       }}
@@ -124,10 +129,12 @@ export const HomePage = () => {
                     </Typography>
                   </Box>
                   
+                  {/* Feature description with flex grow to push button to bottom */}
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flex: 1 }}>
                     {feature.description}
                   </Typography>
 
+                  {/* Navigation button to feature section */}
                   <Button
                     component={RouterLink}
                     to={feature.path}
@@ -143,6 +150,7 @@ export const HomePage = () => {
           ))}
         </Grid>
 
+        {/* Footer section */}
         <Box sx={{ textAlign: 'center', mt: 8, color: 'text.secondary' }}>
           <Typography variant="body2">
             2025 Climate Data Analysis Platform. All rights reserved.
