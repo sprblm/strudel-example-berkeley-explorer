@@ -60,9 +60,9 @@ export const HomePage = () => {
 
   return (
     <Box sx={{ py: 8, backgroundColor: 'background.default' }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         {/* Hero section with main heading and subheading */}
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 2 }}>
             Welcome to Climate Data Analysis Platform
           </Typography>
@@ -72,9 +72,9 @@ export const HomePage = () => {
         </Box>
 
         {/* Feature cards grid layout */}
-        <Grid container spacing={3}>
+        <Grid container spacing={4} justifyContent="center">
           {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index}>
               {/* Feature card with hover effect */}
               <Paper
                 elevation={0}
@@ -85,6 +85,8 @@ export const HomePage = () => {
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
+                  border: '1px solid',
+                  borderColor: 'grey.100',
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
@@ -94,7 +96,7 @@ export const HomePage = () => {
                 {/* Card content container */}
                 <Box
                   sx={{
-                    p: 3,
+                    p: 4,
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
@@ -153,7 +155,6 @@ export const HomePage = () => {
         {/* Footer section */}
         <Box sx={{ textAlign: 'center', mt: 8, color: 'text.secondary' }}>
           <Typography variant="body2">
-            2025 Climate Data Analysis Platform. All rights reserved.
           </Typography>
         </Box>
       </Container>
