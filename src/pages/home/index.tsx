@@ -135,15 +135,15 @@ export const HomePage = () => {
                   </Typography>
 
                   {/* Navigation button to feature section */}
-                  <Button
-                    component={RouterLink}
-                    to={feature.path}
-                    variant="text"
-                    color="primary"
-                    sx={{ alignSelf: 'flex-start', fontWeight: 500 }}
-                  >
-                    Learn more
-                  </Button>
+                  <RouterLink to={feature.path} style={{ textDecoration: 'none' }}>
+                    <Button
+                      variant="text"
+                      color="primary"
+                      sx={{ alignSelf: 'flex-start', fontWeight: 500 }}
+                    >
+                      Learn more
+                    </Button>
+                  </RouterLink>
                 </Box>
               </Paper>
             </Grid>
