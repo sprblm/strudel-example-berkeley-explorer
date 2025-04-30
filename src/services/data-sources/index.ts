@@ -13,24 +13,12 @@ import { DataSourceAdapter, HttpClientConfig } from './types';
  */
 export function createAllDataSources(params: Partial<HttpClientConfig> = {}): DataSourceAdapter[] {
   return [
-    new NOAAAdapter({
-      baseUrl: import.meta.env.VITE_NOAA_API_URL as string || '',
+    new UrbanTreeInventoryAdapter({
+      baseUrl: import.meta.env.VITE_URBAN_TREE_INVENTORY_API_URL as string || '',
       ...params,
     }),
-    new NASAAdapter({
-      baseUrl: import.meta.env.VITE_NASA_API_URL as string || '',
-      ...params,
-    }),
-    new WorldClimAdapter({
-      baseUrl: import.meta.env.VITE_WORLDCLIM_API_URL as string || '',
-      ...params,
-    }),
-    new CMIP6Adapter({
-      baseUrl: import.meta.env.VITE_CMIP6_API_URL as string || '',
-      ...params,
-    }),
-    new ERA5Adapter({
-      baseUrl: import.meta.env.VITE_ERA5_API_URL as string || '',
+    new AirQualityAdapter({
+      baseUrl: import.meta.env.VITE_AIR_QUALITY_API_URL as string || '',
       ...params,
     }),
     new UserContributedAdapter({
@@ -48,6 +36,11 @@ export function createAllDataSources(params: Partial<HttpClientConfig> = {}): Da
  */
 export function createDataSource(sourceId: string, params: Partial<HttpClientConfig> = {}): DataSourceAdapter | undefined {
   switch (sourceId.toLowerCase()) {
+    case 'urban-tree-inventory':
+      return new UrbanTreeInventoryAdapter(params);
+    case 'air-quality':
+      return new AirQualityAdapter(params);
+    // Add cases for other data sources if necessary
     case 'noaa':
       return new NOAAAdapter({
         baseUrl: import.meta.env.VITE_NOAA_API_URL as string || '',
