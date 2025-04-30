@@ -4,10 +4,6 @@
  * used across the search data repositories application
  */
 
-/**
- * Configuration for list-based data operations
- * Defines how data lists are fetched and processed
- */
 export interface ListConfig {
   source: string;
   idField: string;
@@ -15,10 +11,6 @@ export interface ListConfig {
   staticParams?: Record<string, unknown>;
 }
 
-/**
- * Represents a dataset in the system
- * Contains all metadata and associated information for a single dataset
- */
 export interface Dataset {
   id: string;
   title: string;
@@ -48,10 +40,6 @@ export interface Dataset {
   }>;
 }
 
-/**
- * Props for the DataListCard component
- * Defines the data structure for the individual list item component
- */
 export interface CardFields {
   titleField: string;
   contentField: string;
@@ -60,223 +48,44 @@ export interface CardFields {
   idField: string;
 }
 
-/**
- * Props for the DataListCard component
- * Defines the data structure for the individual list item component
- */
 export interface DataListCardProps {
   id: string;
-  title:
-    | string
-    | string[]
-    | { title: string; url: string }[]
-    | {
-        file_id: number;
-        file_name: string;
-        file_size: string;
-        description: string;
-      }[];
-  content:
-    | string
-    | string[]
-    | { title: string; url: string }[]
-    | {
-        file_id: number;
-        file_name: string;
-        file_size: string;
-        description: string;
-      }[];
-  date?:
-    | string
-    | string[]
-    | { title: string; url: string }[]
-    | {
-        file_id: number;
-        file_name: string;
-        file_size: string;
-        description: string;
-      }[];
-  category?:
-    | string
-    | string[]
-    | { title: string; url: string }[]
-    | {
-        file_id: number;
-        file_name: string;
-        file_size: string;
-        description: string;
-      }[];
-  onClick: () => void;
-  isSelected: boolean;
-}
-
-/**
- * Main configuration interface for search data repositories
- * Contains all configuration settings for the application
- */
-export interface SearchDataRepositoriesConfig {
-  /**
-   * Data configuration section
-   * Defines how data is fetched and processed
-   */
-  data: {
-    /**
-     * Configuration for the initial list of items
-     */
-    list: {
-      source: string; // API endpoint or data source URL
-      staticParams: { limit: number; offset: number } | null; // Default query parameters
-      idField: string; // Field name for unique identifier
-      queryMode: 'client' | 'server'; // Where filtering happens
-    };
-
-    /**
-     * Configuration for individual item details
-     */
-    detail: {
-      source: string; // API endpoint for single item
-      staticParams: Record<string, unknown> | null; // Default query parameters
-      idField: string; // Field name for unique identifier
-      queryMode: 'client' | 'server'; // Where filtering happens
-    };
-
-    /**
-     * List of available data repositories
-     */
-    repositories: {
-      id: string; // Unique repository identifier
-      name: string; // Repository display name
-      enabled: boolean; // Whether repository is active
-    }[];
-  };
-
-  /**
-   * Page configuration section
-   * Defines UI and behavior settings for application pages
-   */
-  pages: {
-    index: {
-      title: string; // Main page title
-      description: string; // Main page description
-
-      /**
-       * Mapping of card fields to data properties
-       */
-      cardFields: Record<string, string>;
-
-      /**
-       * Filter configuration for search results
-       */
-      cardFilters: {
-        field: string; // Data field to filter on
-        label: string; // Display label for filter
-        operator: string; // Filter operation (equals, contains, etc.)
-        filterComponent: string; // UI component to use
-        filterProps: Record<string, unknown>; // Component-specific properties
-      }[];
-
-      /**
-       * Map search configuration
-       */
-      mapSearch: {
-        enabled: boolean; // Whether map search is active
-        defaultCenter: [number, number]; // Initial map center [lat, lng]
-        defaultZoom: number; // Initial zoom level
-        maxBounds: [[number, number], [number, number]]; // Map boundaries
-      };
-
-      /**
-       * Search history configuration
-       */
-      searchHistory: {
-        enabled: boolean; // Whether history is tracked
-        maxItems: number; // Maximum history entries to store
-      };
-    };
-  };
-}
-
-/**
- * Simplified taskflow configuration interface
- * Contains core data and UI configuration settings
- */
-export interface TaskflowConfig {
-  data: {
-    list: ListConfig;
-    detail: Record<string, unknown>;
-    repositories: Record<string, unknown>[];
-  };
-  cards: CardFields;
-  pages?: Record<string, unknown>;
-}
-
-export interface TaskflowPages {
-  index: {
-    filters?: {
-      fields: Array<{
-        field: string;
-        label: string;
-        type: string;
-        options?: Array<{ value: string; label: string }>;
-        min?: number;
-        max?: number;
-        step?: number;
-      }>;
-    };
-  };
+  title: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
+  content: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
+  date?: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
+  category?: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
 }
 
 export interface FilterFieldProps {
   filter: {
     field: string;
     label: string;
-    type: string;
-    options?: Array<{ value: string; label: string }>;
+    type: 'range' | 'select' | 'toggle' | 'checkbox';
+    filterComponent?: string;
+    filterProps?: Record<string, unknown>;
+    operator?: string;
     min?: number;
     max?: number;
     step?: number;
+    options?: { value: string; label: string }[];
   };
 }
 
-/**
- * Props for the DataListPanel component
- * Defines the data structure for the main list panel component
- */
-export interface DataListPanelProps {
-  searchResults: Dataset[];
-  previewItem: Dataset | null;
-  setPreviewItem: (item: Dataset | null) => void;
+export interface TaskflowPages {
+  index: {
+    description: string;
+    cardFields: CardFields;
+    filters: {
+      fields: FilterFieldProps['filter'][];
+    };
+  };
 }
 
-export enum FilterType {
-  CHECKBOX_LIST = 'CHECKBOX_LIST',
-  RANGE_SLIDER = 'RANGE_SLIDER',
-}
-
-export interface Filter {
-  label: string;
-  field: string;
-  type: FilterType;
-  defaultValue: any;
-}
-
-export enum FilterOperator {
-  EQUALS = 'EQUALS',
-  CONTAINS = 'CONTAINS',
-  STARTS_WITH = 'STARTS_WITH',
-  ENDS_WITH = 'ENDS_WITH',
-  GREATER_THAN = 'GREATER_THAN',
-  LESS_THAN = 'LESS_THAN',
-  BETWEEN = 'BETWEEN'
-}
-
-export interface DataFilter {
-  field: string;
-  value: unknown;
-  operator: FilterOperator;
-}
-
-export interface FilterAction {
-  type: 'SET_FILTER';
-  payload: DataFilter[];
+export interface TaskflowConfig {
+  data: {
+    list: ListConfig;
+    detail: ListConfig;
+    repositories: { id: string; name: string; enabled: boolean }[];
+  };
+  pages: TaskflowPages;
 }

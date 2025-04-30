@@ -1,8 +1,8 @@
-# STRUDEL Kit Case Study: Climate Data Analysis Platform
+# STRUDEL Kit Case Study: Urban Environmental Health Platform
 
 ## Introduction
 
-This case study demonstrates how STRUDEL Kit, a React framework for research software engineers, can be used to create a comprehensive scientific application. The Climate Data Analysis Platform (CDAP) showcases STRUDEL's task flows and design system to create a user-centered application that addresses real needs in climate research.
+This case study demonstrates how STRUDEL Kit, a React framework for research software engineers, can be used to create a comprehensive scientific application. The Urban Environmental Health Platform (UEHP) showcases STRUDEL's task flows and design system to create a user-centered application that addresses real needs in understanding the relationship between urban trees and air quality.
 
 ## STRUDEL Kit Overview
 
@@ -13,71 +13,63 @@ STRUDEL (Scientific sofTware Research for User experience, Design, Engagement, a
 2. **Design System**: A set of reusable components and patterns organized around Task Flows, which are the stepwise flows a user takes to accomplish specified tasks.
 
 3. **Task Flows**: Predefined interaction patterns for common scientific workflows, including:
-   - Search Data Repositories
+   - Search Repositories
    - Explore Data
    - Compare Data
-   - Run Computation
-   - Run Interactive Computation
-   - Monitor Activities
    - Contribute Data
-   - Manage Account
-   - Track State
+   Plus home and about pages for context and navigation.
 
-## Example Application: Climate Data Analysis Platform
+## Example Application: Urban Environmental Health Platform
 
 ### Application Overview
 
-The Climate Data Analysis Platform (CDAP) is a comprehensive web application that enables climate scientists, researchers, and policy makers to discover, explore, analyze, and share climate data. It integrates multiple STRUDEL task flows to create a seamless user experience for working with complex climate datasets.
+The Urban Environmental Health Platform (UEHP) is a comprehensive web application that enables environmental scientists, urban planners, and citizen scientists to discover, explore, analyze, and contribute to urban tree inventory and air quality data. It integrates multiple STRUDEL task flows to create a seamless user experience for working with these interconnected datasets.
 
-### Why Climate Data Analysis?
+### Why Urban Environmental Health?
 
-Climate data analysis was selected as the optimal example application because:
+Urban Environmental Health data analysis was selected as the optimal example application because:
 
-1. It naturally incorporates multiple task flows in a cohesive workflow
-2. Climate data is inherently complex (multidimensional, multivariate, temporal, spatial)
-3. It requires diverse visualization capabilities
-4. It spans from simple analyses to complex computations
+1. It naturally combines two complementary datasets (urban trees and air quality)
+2. It enables meaningful citizen science contributions
+3. It has clear local relevance and impact
+4. It requires diverse visualization capabilities (maps, time series)
 5. It includes both individual and collaborative aspects
-6. It addresses a scientifically relevant and broadly accessible domain
+6. It addresses scientifically relevant and broadly accessible environmental health concerns
 
 ### Implemented Task Flows
 
-The CDAP implements six key STRUDEL task flows:
+The UEHP implements four key STRUDEL task flows:
 
-1. **Search Data Repositories**: Enables users to search across multiple climate data repositories with advanced filtering options for variables, regions, time periods, and data sources.
+1. **Search Repositories**: Enables users to search across urban tree inventories and air quality monitoring data with filtering options for location, time periods, and measurement types.
 
-2. **Explore Data**: Provides interactive visualization tools including maps, time series, and statistical summaries to help users understand climate datasets.
+2. **Explore Data**: Provides interactive visualization tools including map overlays of tree coverage and air quality measurements, time series analysis, and statistical summaries.
 
-3. **Compare Data**: Allows side-by-side comparison of different climate datasets, models, or scenarios with difference calculation and statistical comparison tools.
+3. **Compare Data**: Allows analysis of relationships between tree coverage and air quality metrics, with tools for temporal and spatial correlation analysis.
 
-4. **Run Computation**: Offers a workflow builder for configuring and executing climate analyses from simple statistical calculations to complex climate models.
-
-5. **Monitor Activities**: Provides a dashboard for tracking the progress of long-running climate analyses and data processing tasks.
-
-6. **Contribute Data**: Enables users to upload processed datasets, analysis results, or model outputs to share with the scientific community.
+4. **Contribute Data**: Enables citizens and researchers to contribute tree inventory data and air quality measurements, with built-in validation processes.
 
 ### User Interface Design
 
-The CDAP interface is designed following STRUDEL's design system principles, with:
+The UEHP interface is designed following STRUDEL's design system principles, with:
 
 1. Responsive layout with adjustable panels
 2. Task-based navigation structure
 3. Consistent interaction patterns across all task flows
-4. Specialized interfaces for each task flow
-5. Integration between task flows for seamless workflows
+4. Specialized interfaces for data validation and contribution
+5. Integration between task flows for seamless analysis
 
 ### Technical Implementation
 
 The application leverages STRUDEL Kit's React components and templates to implement:
 
-1. Data integration with multiple climate data sources
-2. Support for various climate data formats
-3. Visualization components for different data types
-4. Workflow management for computational tasks
-5. Collaborative features for sharing and contribution
+1. Integration of urban tree inventory and air quality data sources
+2. Support for standardized data formats
+3. Interactive mapping and visualization components
+4. Data validation workflows for citizen contributions
+5. Collaborative features for community engagement
 
 ## Conclusion
 
-This case study demonstrates how STRUDEL Kit provides a powerful framework for building scientific applications. By implementing the Climate Data Analysis Platform using STRUDEL's task flows and design system, research software engineers can create a comprehensive, user-centered application that addresses real scientific needs while maintaining development efficiency and consistency.
+This case study demonstrates how STRUDEL Kit provides a powerful framework for building scientific applications. By implementing the Urban Environmental Health Platform using STRUDEL's task flows and design system, research software engineers can create a comprehensive, user-centered application that addresses real environmental health needs while maintaining development efficiency and consistency.
 
-The product requirements document provides detailed specifications for implementing this example application, serving as a blueprint for similar scientific software projects using STRUDEL Kit.
+The accompanying product requirements document provides detailed specifications for implementing this example application, serving as a blueprint for similar scientific software projects using STRUDEL Kit.
