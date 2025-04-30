@@ -8,12 +8,10 @@ import { taskflow } from '../_config/taskflow.config';
 const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
 
 interface FilterCategories {
-  metadata: FilterFieldProps['filter'][];
-  temporal: FilterFieldProps['filter'][];
+  urbanTreeInventory: FilterFieldProps['filter'][];
+  airQuality: FilterFieldProps['filter'][];
   spatial: FilterFieldProps['filter'][];
-  source: FilterFieldProps['filter'][];
-  content: FilterFieldProps['filter'][];
-  quality: FilterFieldProps['filter'][];
+  temporal: FilterFieldProps['filter'][];
 }
 
 /**
@@ -21,6 +19,31 @@ interface FilterCategories {
  */
 const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value: any) => void }> = ({ filter, onChange }) => {
   const { field, label, type, options = [] } = filter;
+
+  // Add specific filter fields for urban tree inventory and air quality
+  if (field === 'tree-species') {
+    return (
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
+        <Select
+          size="small"
+          fullWidth
+          value={options[0]?.value || ''}
+          onChange={(e: SelectChangeEvent) => onChange(field, e.target.value)}
+        >
+          {options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    );
+  }
+
+  if (field === 'air-quality-parameter') {
+    // Similar implementation for air quality parameter filter
+  }
 
   if (type === 'range' && filter.min !== undefined && filter.max !== undefined) {
     return (
@@ -95,7 +118,7 @@ const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value
     <Box sx={{ mb: 2 }}>
       <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
       <Typography variant="caption" color="text.secondary">
-        Filter type &quot;{type}&quot; not supported
+        Filter type "{type}" not supported
       </Typography>
     </Box>
   );
@@ -117,13 +140,8 @@ const FiltersPanel: React.FC = () => {
     checked: false
   }));
 
-  // Data formats for filter (common formats used in climate data)
-  const dataFormats = [
-    { id: 'netcdf', name: 'NetCDF', checked: false },
-    { id: 'csv', name: 'CSV', checked: false },
-    { id: 'hdf5', name: 'HDF5', checked: false },
-    { id: 'geotiff', name: 'GeoTIFF', checked: false },
-  ];
+  // Use filter fields from taskflow.config
+  const filters = pageConfig?.filters?.fields || [];
 
   // Fetch data based on filter changes
   useEffect(() => {
@@ -161,77 +179,20 @@ const FiltersPanel: React.FC = () => {
     }));
   };
 
-  // Handle data source checkbox changes
-  const handleDataSourceChange = (sourceId: string) => {
-    const newFilterValue = { 
-      ...filterValues,
-      source: {
-        ...filterValues.source,
-        [sourceId]: !filterValues.source?.[sourceId]
-      }
-    };
-    
-    // Extract the true values for the filter
-    const selectedSources = Object.entries(newFilterValue.source || {})
-      .filter(([_, isSelected]) => isSelected)
-      .map(([id]) => id);
-    
-    // Apply it using setFilter helper function instead of direct dispatch
-    if (selectedSources.length > 0) {
-      setFilter('source', selectedSources);
-    } else {
-      // If no sources selected, set an empty array to effectively clear the filter
-      setFilter('source', []);
-    }
-    
-    setFilterValues(newFilterValue);
-  };
-
   // Group filters by category based on Dataset interface
   const filterCategories: FilterCategories = {
-    metadata: pageConfig?.filters?.fields.filter(f => 
-      f.field === 'title' ||
-      f.field === 'summary' ||
-      f.field === 'citation' ||
-      f.field === 'doi'
-    ) || [],
-    temporal: pageConfig?.filters?.fields.filter(f =>
-      f.field === 'publication_date' ||
-      f.field === 'start_date' ||
-      f.field === 'end_date'
-    ) || [],
-    spatial: pageConfig?.filters?.fields.filter(f =>
-      f.field === 'spatial_coverage' ||
-      f.field === 'spatial_resolution'
-    ) || [],
-    source: pageConfig?.filters?.fields.filter(f =>
-      f.field === 'source' ||
-      f.field === 'publisher' ||
-      f.field === 'distributor'
-    ) || [],
-    content: pageConfig?.filters?.fields.filter(f =>
-      f.field === 'variables' ||
-      f.field === 'category' ||
-      f.field === 'tags'
-    ) || [],
-    quality: pageConfig?.filters?.fields.filter(f =>
-      f.field === 'quality' ||
-      f.field === 'usgs_mission_area'
-    ) || []
-  };
-
-  // Handle sort change
-  const handleSortChange = (event: SelectChangeEvent<string>, _child: ReactNode) => {
-    const newSortValue = event.target.value;
-    setSortBy(newSortValue);
-    
-    // Since FilterContext doesn't directly support sorting,
-    // we can use the expandedGroup to indicate sorting preference
-    // or implement sorting UI-side only
-    dispatch({
-      type: 'SET_EXPANDED_GROUP',
-      payload: `sort:${newSortValue}`
-    });
+    urbanTreeInventory: filters.filter((f: any) =>
+      f.field === 'tree-species'
+    ),
+    airQuality: filters.filter((f: any) =>
+      f.field === 'air-quality-parameter'
+    ),
+    spatial: filters.filter((f: any) =>
+      f.field === 'location'
+    ),
+    temporal: filters.filter((f: any) =>
+      f.field === 'time-period'
+    ),
   };
 
   return (
@@ -269,60 +230,11 @@ const FiltersPanel: React.FC = () => {
                   control={
                     <Checkbox 
                       checked={filterValues.source?.[source.id] || false}
-                      onChange={() => handleDataSourceChange(source.id)}
+                      onChange={() => handleFilterChange('source', source.id)}
                       size="small"
                     />
                   }
                   label={<Typography variant="body2">{source.name}</Typography>}
-                />
-              </Box>
-            ))}
-          </FormGroup>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Data Formats Section */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500 }}>
-            Data Formats
-          </Typography>
-          <FormGroup>
-            {dataFormats.map(format => (
-              <Box key={format.id}>
-                <FormControlLabel
-                  control={
-                    <Checkbox 
-                      checked={filterValues.format?.[format.id] || false}
-                      onChange={() => {
-                        // Update the format filter
-                        const newFormatValue = {
-                          ...filterValues,
-                          format: {
-                            ...(filterValues.format || {}),
-                            [format.id]: !(filterValues.format?.[format.id] || false)
-                          }
-                        };
-                        
-                        // Extract the true values
-                        const selectedFormats = Object.entries(newFormatValue.format || {})
-                          .filter(([_, isSelected]) => isSelected)
-                          .map(([id]) => id);
-                        
-                        // Apply it using the setFilter helper
-                        if (selectedFormats.length > 0) {
-                          setFilter('format', selectedFormats);
-                        } else {
-                          // If no formats selected, set empty array
-                          setFilter('format', []);
-                        }
-                        
-                        setFilterValues(newFormatValue);
-                      }}
-                      size="small"
-                    />
-                  }
-                  label={<Typography variant="body2">{format.name}</Typography>}
                 />
               </Box>
             ))}
@@ -349,7 +261,7 @@ const FiltersPanel: React.FC = () => {
                 }}>
                   {category}
                 </Typography>
-                {filterCategories[category].map((filter: FilterFieldProps['filter']) => (
+                {filterCategories[category].map((filter: any) => (
                   <FilterField 
                     key={filter.field} 
                     filter={filter}
@@ -359,34 +271,16 @@ const FiltersPanel: React.FC = () => {
               </Box>
             ))}
         </Box>
+      </Box>
 
-        <Divider sx={{ my: 2 }} />
+      <Divider sx={{ my: 2 }} />
 
-        {/* Sort Section */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SortAscIcon size={16} />
-            Sort Results
-          </Typography>
-          <Select
-            value={sortBy}
-            onChange={handleSortChange}
-            fullWidth
-            size="small"
-            sx={{ 
-              fontSize: '0.875rem',
-              '& .MuiSelect-select': {
-                padding: '0.5rem 1rem',
-              }
-            }}
-          >
-            <MenuItem value="relevance">Relevance</MenuItem>
-            <MenuItem value="date_newest">Date (Newest First)</MenuItem>
-            <MenuItem value="date_oldest">Date (Oldest First)</MenuItem>
-            <MenuItem value="name_asc">Name (A-Z)</MenuItem>
-            <MenuItem value="name_desc">Name (Z-A)</MenuItem>
-          </Select>
-        </Box>
+      {/* Sort Section */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SortAscIcon size={16} />
+          Sort Results
+        </Typography>
       </Box>
     </Paper>
   );

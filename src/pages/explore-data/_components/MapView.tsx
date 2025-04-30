@@ -20,13 +20,28 @@ export const MapView: React.FC<MapViewProps> = ({
 }) => {
   const { activeFilters } = useFilters();
   const filterConfigs = taskflow.pages.index.tableFilters;
-  
+   
   const { isPending, isError, data, error } = useListQuery({
     activeFilters,
-    dataSource: taskflow.data.list.source,
+    dataSource: 'urban-tree-inventory',
     filterConfigs,
-    queryMode: taskflow.data.list.queryMode,
-    staticParams: taskflow.data.list.staticParams,
+    queryMode: 'client',
+    staticParams: { /* Add static params if necessary */ },
+    offset: 0,
+    page: 1,
+    pageSize: 100,
+  });
+
+  // Add similar useListQuery for air quality data
+  const { isPending: isPendingAirQuality, isError: isErrorAirQuality, data: airQualityData, error: airQualityError } = useListQuery({
+    activeFilters,
+    dataSource: 'air-quality',
+    filterConfigs,
+    queryMode: 'client',
+    staticParams: { /* Add static params if necessary */ },
+    offset: 0,
+    page: 1,
+    pageSize: 100,
   });
 
   if (isPending) {
@@ -46,16 +61,59 @@ export const MapView: React.FC<MapViewProps> = ({
   }
 
   // Filter the data based on active filters and search term
-  const filteredData = filterData(data, activeFilters, filterConfigs, searchTerm);
+  const filteredTreeData = filterData(data, activeFilters, filterConfigs, searchTerm);
+  const filteredAirQualityData = filterData(airQualityData, activeFilters, filterConfigs, searchTerm);
+
+  // Combine and visualize both tree and air quality data on the map
+  const combinedData: Plotly.Data[] = [
+    // Tree location data
+    {
+      type: 'scattermapbox' as const,
+      lat: filteredTreeData.map((item: any) => item.lat),
+      lon: filteredTreeData.map((item: any) => item.lon),
+      text: filteredTreeData.map((item: any) => item.species),
+      mode: 'markers' as const,
+      marker: {
+        size: 10,
+      },
+    },
+    // Air quality data
+    {
+      type: 'scattermapbox' as const,
+      lat: filteredAirQualityData.map((item: any) => item.lat),
+      lon: filteredAirQualityData.map((item: any) => item.lon),
+      text: filteredAirQualityData.map((item: any) => item.parameter),
+      mode: 'markers' as const,
+      marker: {
+        size: 10,
+      },
+    },
+  ];
+
+  const layout = {
+    mapbox: {
+      style: 'open-street-map',
+      center: { lat: 37.7749, lon: -122.4194 }, // Example coordinates
+      zoom: 12,
+    },
+  };
+
+  return (
+    <Plot
+      data={combinedData}
+      layout={layout}
+      // Add other Plotly configurations
+    />
+  );
 
   // Extract columns for potential map data
   const columns = taskflow.pages.index.tableColumns;
-  const numericColumns = columns.filter(col => col.type === 'number');
+  const numericColumns = columns.filter((col: any) => col.type === 'number');
   
   // For a map, we need to generate some latitude and longitude data
   // In a real application, this would come from the actual data
   // Here we'll generate random coordinates for demonstration
-  const mapData = filteredData.map((item, index) => {
+  const mapData = filteredTreeData.map((item, index) => {
     // Generate random coordinates centered around different regions based on some property
     // This is just for demonstration - in a real app, you'd use actual coordinates
     const baseLatitude = 0;
@@ -98,7 +156,7 @@ export const MapView: React.FC<MapViewProps> = ({
     
     // Use a numeric field for the size of the marker if available
     const sizeField = numericColumns[0]?.field;
-    const size = sizeField ? Math.max(5, Math.min(20, item[sizeField] / 10)) : 10;
+    const size = sizeField ? Math.max(5, Math.min(20, (item as any)[sizeField] / 10)) : 10;
     
     return {
       ...item,
@@ -111,12 +169,12 @@ export const MapView: React.FC<MapViewProps> = ({
   // Handle clicking on a map point to show preview
   const handleMapClick = (data: any) => {
     const pointIndex = data.points[0].pointIndex;
-    setPreviewItem(filteredData[pointIndex]);
+    setPreviewItem(filteredTreeData[pointIndex]);
   };
 
   // Get a field to use for coloring the points
   const colorField = numericColumns[1]?.field || numericColumns[0]?.field;
-  const colorValues = colorField ? mapData.map(item => item[colorField]) : [];
+  const colorValues = colorField ? mapData.map((item: any) => item[colorField]) : [];
   
   // Get a field for the hover text
   const titleField = columns[0].field;
@@ -135,14 +193,14 @@ export const MapView: React.FC<MapViewProps> = ({
                 mode: 'markers',
                 lon: mapData.map(item => item.longitude),
                 lat: mapData.map(item => item.latitude),
-                text: mapData.map(item => item[titleField]),
+                text: mapData.map((item: any) => item[titleField]),
                 marker: {
                   size: mapData.map(item => item.size),
                   color: colorField ? colorValues : 'blue',
                   colorscale: 'Viridis',
                   showscale: !!colorField,
                   colorbar: colorField ? {
-                    title: columns.find(col => col.field === colorField)?.headerName || colorField
+                    title: columns.find((col: any) => col.field === colorField)?.headerName || colorField
                   } : undefined,
                   opacity: 0.8,
                 },
@@ -150,9 +208,9 @@ export const MapView: React.FC<MapViewProps> = ({
                 hoverinfo: 'text',
                 hovertext: mapData.map(item => {
                   // Create hover text with key information
-                  return `${item[titleField]}<br>` + 
-                    columns.slice(1, 4).map(col => 
-                      `${col.headerName}: ${item[col.field]}${col.units ? ` ${col.units}` : ''}`
+                  return `${(item as any)[titleField]}<br>` +
+                    columns.slice(1, 4).map((col: any) =>
+                      `${col.headerName}: ${(item as any)[col.field]}${col.units ? ` ${col.units}` : ''}`
                     ).join('<br>');
                 })
               }

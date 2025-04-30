@@ -22,6 +22,16 @@ import { DataGrid } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { taskflow } from '../_config/taskflow.config';
 
+// Add type definitions for urban tree inventory and air quality datasets
+interface Dataset {
+  type: 'urban-tree-inventory' | 'air-quality';
+  species?: string;
+  location?: string;
+  parameter?: string;
+  value?: number;
+  // Add other relevant fields
+}
+
 /**
  * Placeholder columns for attached files table
  */

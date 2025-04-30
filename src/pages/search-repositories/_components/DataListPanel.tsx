@@ -8,10 +8,14 @@ import { DataListPanelProps } from '../_config/taskflow.types';
  * Shows dataset title, description, and metadata
  */
 const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListPanelProps) => {
-  // Format downloads for display
-  const formatDownloads = (downloads?: number): string => {
-    if (!downloads) return '0';
-    return downloads.toLocaleString();
+  // Format data for urban tree inventory and air quality datasets
+  const formatData = (data: Dataset): string => {
+    if (data.type === 'urban-tree-inventory') {
+      return `Tree Species: ${data.species}, Location: ${data.location}`;
+    } else if (data.type === 'air-quality') {
+      return `Air Quality Parameter: ${data.parameter}, Value: ${data.value}`;
+    }
+    return 'Unknown dataset type';
   };
 
   if (!searchResults || searchResults.length === 0) {

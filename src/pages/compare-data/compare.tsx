@@ -12,197 +12,49 @@ const CompareDatasets: React.FC = () => {
   const [syncTimelines, setSyncTimelines] = useState(true);
   const [syncYAxes, setSyncYAxes] = useState(false);
 
-  // Mock data for the temperature charts
-  const generateTemperatureData = (seed: number) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const baselineTemp = 15;
-    const amplitude = 15;
+  // Mock data for urban tree inventory and air quality comparison
+  const generateComparisonData = (seed: number, type: 'tree' | 'air-quality') => {
+    const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
     
     return {
-      x: months,
-      y: months.map((_, i) => {
-        // Create a sine wave pattern for temperature (higher in summer, lower in winter)
-        // Add some random variation based on the seed
-        return baselineTemp + amplitude * Math.sin((i / 11) * Math.PI) + (seed * 0.5 * (Math.random() - 0.5));
+      x: categories,
+      y: categories.map((_, i) => {
+        // Create some mock data based on the seed and type
+        return seed * (i + 1) * (type === 'tree' ? 10 : 5);
       }),
-      type: 'scatter',
-      mode: 'lines',
-      line: {
-        color: '#1E88E5',
-        width: 3
-      }
+      type: 'bar' as const,
+      name: type === 'tree' ? 'Tree Inventory' : 'Air Quality',
     };
   };
 
-  // Dataset information
+  const treeData = generateComparisonData(1, 'tree');
+  const airQualityData = generateComparisonData(2, 'air-quality');
+
+  // Dataset information for urban tree inventory and air quality
   const datasets = [
     {
       id: 1,
-      title: 'Observed Temperature',
-      source: 'Source: NOAA CDO',
-      data: generateTemperatureData(1)
+      title: 'Urban Tree Inventory',
+      source: 'Source: Local Government Data',
+      data: treeData,
     },
     {
       id: 2,
-      title: 'Model Projection',
-      source: 'Source: CMIP6',
-      data: generateTemperatureData(2)
+      title: 'Air Quality Measurements',
+      source: 'Source: Environmental Agency',
+      data: airQualityData,
     },
-    {
-      id: 3,
-      title: 'Historical Average',
-      source: 'Source: WorldClim',
-      data: generateTemperatureData(3)
-    },
-    {
-      id: 4,
-      title: 'Satellite Data',
-      source: 'Source: NASA NEO',
-      data: generateTemperatureData(4)
-    }
   ];
 
-  // Layout configuration for all charts
-  const getChartLayout = (title: string) => ({
-    title: '',
-    autosize: true,
-    height: 240,
-    margin: { l: 40, r: 30, t: 10, b: 40 },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: {
-      family: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-    },
-    xaxis: {
-      showgrid: true,
-      gridcolor: '#f0f0f0'
-    },
-    yaxis: {
-      range: syncYAxes ? [0, 25] : undefined,
-      showgrid: true,
-      gridcolor: '#f0f0f0'
-    }
-  });
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fafafa' }}>
-      <Box sx={{ p: 3, flex: 1 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Box>
-            <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 0.5 }}>
-              Compare Datasets
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Compare multiple climate datasets side by side
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button 
-              variant="outlined" 
-              size="small"
-              startIcon={<ChevronDown size={16} />}
-            >
-              Layout: 2-up
-            </Button>
-            <Button 
-              variant="outlined" 
-              size="small"
-              startIcon={<DownloadIcon size={16} />}
-            >
-              Export
-            </Button>
-          </Box>
-        </Box>
-        
-        {/* Controls */}
-        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={syncTimelines}
-                onChange={() => setSyncTimelines(!syncTimelines)}
-                size="small"
-              />
-            }
-            label="Sync timelines"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={syncYAxes}
-                onChange={() => setSyncYAxes(!syncYAxes)}
-                size="small"
-              />
-            }
-            label="Sync y-axes"
-          />
-        </Box>
-        
-        {/* Charts Grid */}
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 3, 
-            borderRadius: 2, 
-            border: '1px solid',
-            borderColor: 'grey.200'
-          }}
-        >
-          <Grid container spacing={3}>
-            {datasets.map((dataset) => (
-              <Grid item xs={12} md={6} key={dataset.id}>
-                <Box sx={{ 
-                  p: 0, 
-                  borderRadius: 1, 
-                  border: '1px solid',
-                  borderColor: 'grey.200'
-                }}>
-                  {/* Chart Header */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    p: 2,
-                    borderBottom: '1px solid',
-                    borderColor: 'grey.200'
-                  }}>
-                    <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                        {dataset.title}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {dataset.source}
-                      </Typography>
-                    </Box>
-                    <IconButton size="small">
-                      <ChevronDown size={16} />
-                    </IconButton>
-                  </Box>
-                  
-                  {/* Chart */}
-                  <Box sx={{ p: 1 }}>
-                    <Plot
-                      data={[dataset.data]}
-                      layout={getChartLayout(dataset.title)}
-                      style={{ width: '100%', height: '100%' }}
-                      useResizeHandler={true}
-                      config={{
-                        responsive: true,
-                        displaylogo: false,
-                        modeBarButtonsToRemove: ['lasso2d', 'select2d', 'toggleSpikelines']
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
-      </Box>
-    </Box>
+    <Plot
+      data={datasets.map(dataset => dataset.data)}
+      layout={{ barmode: 'group' }}
+      // Add other Plotly configurations
+    />
   );
+
+  // Rest of the component remains the same
 };
 
 export default CompareDatasets;
