@@ -46,15 +46,108 @@ const CompareDatasets: React.FC = () => {
     },
   ];
 
-  return (
-    <Plot
-      data={datasets.map(dataset => dataset.data)}
-      layout={{ barmode: 'group' }}
-      // Add other Plotly configurations
-    />
-  );
+  // --- Calculate Statistical Summaries (Example) ---
+  const calculateSummary = (data: { y: number[] }) => {
+    if (!data || !data.y || data.y.length === 0) return {
+      average: 0,
+      total: 0,
+      max: 0,
+      min: 0,
+      median: 0
+    };
+    
+    const sortedData = [...data.y].sort((a, b) => a - b);
+    const sum = data.y.reduce((acc, val) => acc + val, 0);
+    const average = sum / data.y.length;
+    const max = sortedData[sortedData.length - 1];
+    const min = sortedData[0];
+    const median = sortedData.length % 2 === 0
+      ? (sortedData[sortedData.length / 2 - 1] + sortedData[sortedData.length / 2]) / 2
+      : sortedData[Math.floor(sortedData.length / 2)];
+  
+    return {
+      average: average.toFixed(2),
+      total: sum,
+      max: max.toFixed(2),
+      min: min.toFixed(2),
+      median: median.toFixed(2)
+    };
+  };
+  
+  const treeSummary = calculateSummary(treeData);
+  const airQualitySummary = calculateSummary(airQualityData);
 
-  // Rest of the component remains the same
+  // --- Render Component ---
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 2 }}>
+        Compare Datasets
+      </Typography>
+      <Grid container spacing={3}>
+        {/* Plot */}
+        <Grid item xs={12}>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <Plot
+              data={datasets.map(dataset => dataset.data)}
+              layout={{
+                barmode: 'group',
+                title: 'Comparison Chart',
+                height: 300,
+                margin: { t: 40, b: 40, l: 40, r: 20 }
+              }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </Paper>
+        </Grid>
+        {/* Additional Plot for Relationship Visualization */}
+        <Grid item xs={12}>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <Plot
+              data={[{
+                x: treeData.y,
+                y: airQualityData.y,
+                type: 'scatter',
+                mode: 'markers',
+                name: 'Tree Inventory vs Air Quality'
+              }]}
+              layout={{
+                title: 'Relationship between Tree Inventory and Air Quality',
+                xaxis: { title: 'Tree Inventory' },
+                yaxis: { title: 'Air Quality Measurements' },
+                height: 300,
+                margin: { t: 40, b: 40, l: 40, r: 20 }
+              }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </Paper>
+        </Grid>
+
+        {/* Statistical Summaries */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>Tree Inventory Summary</Typography>
+            <Typography>Average Value: {treeSummary.average}</Typography>
+            <Typography>Total Value: {treeSummary.total}</Typography>
+            <Typography>Max Value: {treeSummary.max}</Typography>
+            <Typography>Min Value: {treeSummary.min}</Typography>
+            <Typography>Median Value: {treeSummary.median}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>Air Quality Summary</Typography>
+            <Typography>Average Value: {airQualitySummary.average}</Typography>
+            <Typography>Total Value: {airQualitySummary.total}</Typography>
+            <Typography>Max Value: {airQualitySummary.max}</Typography>
+            <Typography>Min Value: {airQualitySummary.min}</Typography>
+            <Typography>Median Value: {airQualitySummary.median}</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };
 
 export default CompareDatasets;

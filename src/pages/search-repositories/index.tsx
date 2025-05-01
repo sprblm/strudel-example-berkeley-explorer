@@ -65,10 +65,10 @@ const DatasetExplorer: React.FC = () => {
               <SearchIcon size={24} color="#3B82F6" />
               <Box>
                 <Typography variant="h4" fontWeight={600} sx={{ mb: 0.5 }}>
-                  Search Climate Data
+                  Search Urban Environmental Data
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Find and explore climate datasets from various sources and repositories.
+                  Find and explore datasets from the local various sources and repositories.
                 </Typography>
               </Box>
             </Box>
