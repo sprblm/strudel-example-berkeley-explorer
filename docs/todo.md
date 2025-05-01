@@ -1,141 +1,129 @@
-# Urban Environmental Health Platform Development
+# Berkeley Campus & Community Canopy-Air Quality Hub (BCCAH) Development Tasks
 
-## Overall Development Tasks
+## Overall Development Tasks (Educational Focus)
 
-- [x] Set up development environment
-- [x] Initialize STRUDEL Kit project
-- [ ] Implement Search Repositories flow
-- [ ] Implement Explore Data flow
-- [ ] Implement Compare Data flow
-- [ ] Implement Contribute Data flow
-- [ ] Integrate all components
-- [ ] Test and refine application
-- [ ] Deploy and demonstrate application
+-   [x] Set up development environment
+-   [x] Initialize STRUDEL Kit project (`strudel create-app bccah`) [4]
+-   [ ] **Phase 1: Load Baseline Data**
+    -   [ ] Obtain and process UCB Campus Tree Inventory data (if available)
+    -   [ ] Identify and integrate nearby BAQMD air quality station data
+    -   [ ] Define mock data structures for initial development [1]
+-   [ ] **Phase 1: Implement Core Task Flows (Minimum Viable Educational Tool)**
+    -   [ ] Implement Search Repositories (basic map search, filter by species/location) [1]
+    -   [ ] Implement Explore Data (basic map visualization of trees & AQ points) [1]
+    -   [ ] Implement Contribute Data (Tree observations primarily, mobile-friendly form) [1]
+-   [ ] **Phase 2: Enhance Functionality**
+    -   [ ] Implement Compare Data flow (side-by-side zone/time comparison) [1]
+    -   [ ] Add Air Quality spot measurement contribution
+    -   [ ] Improve visualizations (time series charts, better map layers) [1]
+    -   [ ] Refine search filters and explore interactions
+    -   [ ] Implement basic user accounts (for tracking student contributions)
+-   [ ] **Phase 3: Refine & Integrate**
+    -   [ ] Add educational content snippets/links
+    -   [ ] Implement data export for student reports
+    -   [ ] Conduct usability testing with students
+    -   [ ] Refine UI based on feedback
+    -   [ ] (Optional) Develop instructor review features
+-   [ ] Deploy and integrate into course structure
 
-### Mock Data Implementation
+### Mock Data Implementation (Campus Focus)
 
-#### Phase 1: Data Structure & Organization
+#### Phase 1: Structure & Baseline Simulation
 
-1. **Mock Data Architecture**
-   - [x] Define JSON structure for tree inventory and air quality datasets
-   - [x] Establish directory structure for mock data
-   - [x] Create index files to simplify imports
-   - [x] Add TypeScript interfaces for data types
-
-2. **Core Dataset Creation**
-   - [x] Urban Tree Inventory dataset (location, species, size, health)
-   - [x] Local Air Quality Measurements dataset (NO2, PM2.5, PM10)
-   - [ ] Add metadata consistency across datasets
-
-3. **Mock API Implementation**
-   - [x] Create basic mock initialization in src/mocks
-   - [ ] Set up mock API routes for data retrieval
-   - [ ] Implement pagination and filtering
-   - [ ] Add simulated network delays (optional)
+1.  **Mock Data Architecture**
+    *   [x] Define JSON structure for campus trees and AQ points [1]
+    *   [x] Establish directory structure (`src/mocks/campus-data`) [1]
+    *   [x] Create index files [1]
+    *   [x] Add TypeScript interfaces (TreeObservation, AQReading) [1]
+2.  **Core Dataset Simulation**
+    *   [x] Create small mock Urban Tree Inventory dataset representative of campus species/locations [1]
+    *   [x] Create mock Air Quality Measurements dataset simulating nearby station data [1]
+    *   [ ] Ensure metadata consistency (units, field names) [1]
+3.  **Mock API Implementation**
+    *   [x] Basic mock initialization [1]
+    *   [ ] Set up mock API routes for retrieving campus data (filtered by location/species/time) [1]
+    *   [ ] Implement basic pagination for search results [1]
+    *   [ ] Add mock endpoint for *receiving* student contributions (initially just log them)
 
 #### Phase 2: Integration with Components
 
-1. **Search Integration**
-   - [ ] Connect search filters to mock data
-   - [ ] Implement dataset previews using mock data
-   - [ ] Add mock search results pagination
+1.  **Search Integration**
+    *   [ ] Connect campus search filters to mock data retrieval [1]
+    *   [ ] Display mock tree/AQ points on search results map/list [1]
+2.  **Visualization Integration**
+    *   [ ] Use mock data to populate Explore map (tree locations, AQ points) [1]
+    *   [ ] Implement basic time series chart using mock AQ data [1]
+3.  **Contribution Simulation**
+    *   [ ] Ensure Contribute form data can be captured and sent to mock 'submit' endpoint
+    *   [ ] (Later) Visualize submitted mock contributions on the Explore map
 
-2. **Visualization Integration**
-   - [ ] Create map visualization for tree locations and air quality zones
-   - [ ] Implement time series charts for air quality trends
-   - [ ] Add statistical visualizations for correlation analysis
+### Search Repositories Page (Campus Focus)
 
-3. **Cross-Flow Data**
-   - [ ] Implement dataset selection persistence between flows
-   - [ ] Create mock user preferences/history storage
+#### Phase 1: Core Campus Search
 
-### Search Repositories Page
-
-#### Phase 1: Core Search Interface
-
-1. **Search Interface Foundation**
-   - [x] Create basic search form component
-   - [ ] Implement location-based search with map interface
-   - [ ] Add filters (tree species, air quality parameters, time period)
-
-2. **Interactive Map**
-   - [ ] Integrate map component
-   - [ ] Add neighborhood/district selection
-   - [ ] Implement map controls (zoom, pan, reset)
-
-3. **Search Results Display**
-   - [x] Create results list component
-   - [x] Add sorting options (proximity, data completeness)
-   - [ ] Implement pagination controls
+1.  **Search Interface Foundation**
+    *   [x] Basic search form component [1]
+    *   [ ] Implement map interface centered on Berkeley campus [1]
+    *   [ ] Add basic filters (Tree species dropdown, location search input) [1]
+2.  **Interactive Campus Map**
+    *   [ ] Integrate map component (e.g., Leaflet, Mapbox GL JS) [1]
+    *   [ ] Define campus boundaries/zones for context [1]
+    *   [ ] Implement basic map controls (zoom, pan) [1]
+3.  **Search Results Display**
+    *   [x] Results list component [1]
+    *   [ ] Display results as pins on the map [1]
+    *   [ ] Implement basic pagination if many results [1]
 
 #### Phase 2: Advanced Features
 
-1. **Dataset Details**
-   - [x] Create dataset preview cards
-   - [x] Add metadata display (source, parameters, coverage)
-   - [x] Implement data quality indicators
+1.  **Data Preview**
+    *   [x] Create preview cards/popups for search results [1]
+    *   [ ] Show key attributes (species, health, AQ value) [1]
+2.  **Integration**
+    *   [ ] Link search results to Explore Data view
 
-2. **Data Access**
-   - [ ] Add download/import options
-   - [ ] Implement API connections
-   - [ ] Set up data caching layer
+### Explore Data Page (Campus Focus)
 
-### Explore Data Page
+-   [ ] Complete visualization components:
+    *   [ ] Tree location map overlays (color/size by attribute) [1]
+    *   [ ] Air quality data point display [1]
+-   [ ] Implement filtering linked to map:
+    *   [ ] Tree species/health filters [1]
+    *   [ ] Time period selection for AQ data [1]
+-   [ ] Add UI components:
+    *   [ ] Interactive campus map [1]
+    *   [ ] Simple time series chart [1]
+    *   [ ] Filter controls panel [1]
 
-- [ ] Complete data visualization components:
-  - [ ] Tree location map overlays
-  - [ ] Air quality heatmaps
-  - [ ] Combined visualization views
-- [ ] Implement filtering:
-  - [ ] Tree species/age
-  - [ ] Air quality parameters
-  - [ ] Time period selection
-- [ ] Add data export functionality
-- [ ] Create API endpoints:
-  - [ ] Data retrieval
-  - [ ] Filter application
-- [ ] Add UI components:
-  - [ ] Interactive maps
-  - [ ] Time series charts
-  - [ ] Filter controls
+### Contribute Data Flow (Campus Focus)
 
-### Contribute Data Flow
+1.  **Data Contribution Interface (Mobile First)**
+    *   [ ] Create Tree Inventory submission form (location picker, species, DBH, health, photo) [1]
+    *   [ ] Implement Air Quality spot data upload form [1]
+    *   [ ] Ensure forms are responsive and easy to use on phones [1]
+2.  **Basic Validation**
+    *   [ ] Implement campus geofencing for location input [1]
+    *   [ ] Add required field validation [1]
+    *   [ ] Basic data format checks (numeric inputs) [1]
+3.  **Contribution Handling**
+    *   [ ] Link contribution to logged-in user (Phase 2)
+    *   [ ] Send data to mock API endpoint
 
-1. **Data Contribution Interface**
-   - [ ] Create tree inventory submission form
-   - [ ] Implement air quality data upload
-   - [ ] Add photo upload for tree documentation
-   - [ ] Create validation rules
+### Cross-Flow Integration (Campus Focus)
 
-2. **Data Validation**
-   - [ ] Implement location verification
-   - [ ] Add data format validation
-   - [ ] Create duplicate detection
-   - [ ] Set up expert review workflow
+1.  **Data Flow**
+    *   [ ] Allow selecting a search result to view it in the Explore map [1]
+    *   [ ] Allow selecting map features in Explore to potentially compare them (Phase 2) [1]
+2.  **User Features (Phase 2/3)**
+    *   [ ] Saved map views or locations (optional) [1]
+    *   [ ] Display user's own contributions
 
-3. **Contribution Management**
-   - [ ] Create contributor dashboard
-   - [ ] Implement contribution history
-   - [ ] Add contribution status tracking
-   - [ ] Set up notification system
+## Implementation Notes (Educational Focus)
 
-### Cross-Flow Integration
+-   **Prioritize simplicity and ease of use** for students learning the concepts and the tool.
+-   Focus on **mobile-friendliness for the Contribute flow** to support field data collection.
+-   Provide clear instructions and context within the UI, especially for measurement techniques (like DBH).
+-   Start with mock data, then integrate real baseline data. Student contributions are key.
+-   Ensure visual distinction between baseline data and student-contributed data.
 
-1. **Data Sharing**
-   - [ ] Enable data sharing between search and explore flows
-   - [ ] Implement comparison view setup
-   - [ ] Create data export functionality
-
-2. **User Features**
-   - [ ] Add saved searches
-   - [ ] Implement favorite locations
-   - [ ] Create custom views storage
-
-## Implementation Notes
-
-- [ ] Focus on user-friendly interfaces for citizen scientists
-- [ ] Ensure data validation for contributed information
-- [ ] Implement clear visualization of relationships between trees and air quality
-- [ ] Prioritize mobile-friendly design for field data collection
-- [ ] Include educational components about urban environmental health
-- [ ] Add metadata consistency across urban tree and air quality datasets
+Next immediate task: Obtain or create realistic mock baseline data for UCB campus trees.
