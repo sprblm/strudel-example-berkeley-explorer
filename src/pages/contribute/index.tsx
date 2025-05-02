@@ -1,101 +1,94 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Button, MenuItem, Select } from '@mui/material';
 
 const ContributeData: React.FC = () => {
-  const [treeInventoryData, setTreeInventoryData] = useState('');
-  const [airQualityData, setAirQualityData] = useState('');
-  const [errors, setErrors] = useState({ treeInventory: '', airQuality: '' });
+  const [location, setLocation] = useState('');
+  const [species, setSpecies] = useState('');
+  const [dbh, setDbh] = useState('');
+  const [healthCondition, setHealthCondition] = useState('');
+  const [observationDate, setObservationDate] = useState('');
+  const [photos, setPhotos] = useState('');
+  const [notes, setNotes] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const validateData = (data: string, type: 'treeInventory' | 'airQuality') => {
-    if (!data.trim()) {
-      setErrors(prev => ({ ...prev, [type]: 'This field is required' }));
-      return false;
-    }
-    try {
-      const parsedData = JSON.parse(data);
-      if (type === 'treeInventory') {
-        if (!parsedData.trees || !Array.isArray(parsedData.trees)) {
-          setErrors(prev => ({ ...prev, [type]: 'Invalid tree inventory format' }));
-          return false;
-        }
-        for (const tree of parsedData.trees) {
-          if (!tree.species || typeof tree.species !== 'string' || !tree.count || typeof tree.count !== 'number') {
-            setErrors(prev => ({ ...prev, [type]: 'Invalid tree inventory data' }));
-            return false;
-          }
-        }
-      }
-      if (type === 'airQuality') {
-        if (!parsedData.readings || !Array.isArray(parsedData.readings)) {
-          setErrors(prev => ({ ...prev, [type]: 'Invalid air quality format' }));
-          return false;
-        }
-        for (const reading of parsedData.readings) {
-          if (!reading.pollutant || typeof reading.pollutant !== 'string' || !reading.value || typeof reading.value !== 'number') {
-            setErrors(prev => ({ ...prev, [type]: 'Invalid air quality data' }));
-            return false;
-          }
-        }
-      }
-      setErrors(prev => ({ ...prev, [type]: '' }));
-      return true;
-    } catch (e) {
-      setErrors(prev => ({ ...prev, [type]: 'Invalid JSON format' }));
-      return false;
-    }
-  };
-
-  const handleTreeInventoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTreeInventoryData(e.target.value);
-    validateData(e.target.value, 'treeInventory');
-  };
-
-  const handleAirQualityChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setAirQualityData(e.target.value);
-    validateData(e.target.value, 'airQuality');
+  const validateData = () => {
+    const newErrors = {};
+    if (!location) newErrors.location = 'Location is required';
+    if (!species) newErrors.species = 'Species is required';
+    if (!dbh) newErrors.dbh = 'DBH is required';
+    if (!healthCondition) newErrors.healthCondition = 'Health Condition is required';
+    if (!observationDate) newErrors.observationDate = 'Observation Date is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
-    const isTreeValid = validateData(treeInventoryData, 'treeInventory');
-    const isAirQualityValid = validateData(airQualityData, 'airQuality');
-    if (isTreeValid && isAirQualityValid) {
-      if (window.confirm('Are you sure you want to submit the data?')) {
-        // Submit the data
-        console.log('Data submitted:', { treeInventoryData, airQualityData });
-      }
+    if (validateData()) {
+      // Submit the data
+      console.log('Data submitted:', { location, species, dbh, healthCondition, observationDate, photos, notes });
     }
   };
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 600, mx: 'auto' }}>
       <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}>
-        Contribute Environmental Data
-      </Typography>
-      <Typography variant="body1" sx={{ mb: 2 }}>
-        Please provide the following data in JSON format. Example for tree inventory: {'{ "trees": [{ "species": "Oak", "count": 10 }] }'}
+        Contribute Tree Observation
       </Typography>
       <TextField
-        label="Urban Tree Inventory Data (JSON)"
-        multiline
-        rows={6}
-        value={treeInventoryData}
-        onChange={handleTreeInventoryChange}
-        error={!!errors.treeInventory}
-        helperText={errors.treeInventory || 'Example: {"trees": [{"species": "Oak", "count": 10}]}'}
-        sx={{ mb: 2, width: '100%', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+        label="Location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        error={!!errors.location}
+        helperText={errors.location}
+        sx={{ mb: 2, width: '100%' }}
       />
-      <Typography variant="body1" sx={{ mb: 2 }}>
-        Please provide the following data in JSON format. Example for air quality: {'{ "readings": [{ "pollutant": "PM2.5", "value": 10 }] }'}
-      </Typography>
       <TextField
-        label="Air Quality Measurements (JSON)"
-        multiline
-        rows={6}
-        value={airQualityData}
-        onChange={handleAirQualityChange}
-        error={!!errors.airQuality}
-        helperText={errors.airQuality || 'Example: {"readings": [{"pollutant": "PM2.5", "value": 10}]}'}
-        sx={{ mb: 2, width: '100%', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+        label="Species"
+        value={species}
+        onChange={(e) => setSpecies(e.target.value)}
+        error={!!errors.species}
+        helperText={errors.species}
+        sx={{ mb: 2, width: '100%' }}
+      />
+      <TextField
+        label="DBH (cm)"
+        value={dbh}
+        onChange={(e) => setDbh(e.target.value)}
+        error={!!errors.dbh}
+        helperText={errors.dbh}
+        sx={{ mb: 2, width: '100%' }}
+      />
+      <Select
+        label="Health Condition"
+        value={healthCondition}
+        onChange={(e) => setHealthCondition(e.target.value)}
+        error={!!errors.healthCondition}
+        sx={{ mb: 2, width: '100%' }}
+      >
+        <MenuItem value="Good">Good</MenuItem>
+        <MenuItem value="Fair">Fair</MenuItem>
+        <MenuItem value="Poor">Poor</MenuItem>
+      </Select>
+      <TextField
+        label="Observation Date"
+        type="date"
+        value={observationDate}
+        onChange={(e) => setObservationDate(e.target.value)}
+        error={!!errors.observationDate}
+        helperText={errors.observationDate}
+        sx={{ mb: 2, width: '100%' }}
+      />
+      <TextField
+        label="Photos (URL)"
+        value={photos}
+        onChange={(e) => setPhotos(e.target.value)}
+        sx={{ mb: 2, width: '100%' }}
+      />
+      <TextField
+        label="Notes"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        sx={{ mb: 2, width: '100%' }}
       />
       <Button variant="contained" onClick={handleSubmit} sx={{ width: '100%', py: 1.5 }}>
         Submit Data
@@ -105,4 +98,3 @@ const ContributeData: React.FC = () => {
 };
 
 export default ContributeData;
-
