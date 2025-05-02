@@ -12,8 +12,20 @@ const CompareDatasets: React.FC = () => {
   const [syncTimelines, setSyncTimelines] = useState(true);
   const [syncYAxes, setSyncYAxes] = useState(false);
 
-  // Mock data for urban tree inventory and air quality comparison
-  const generateComparisonData = (seed: number, type: 'tree' | 'air-quality') => {
+  // Fetch actual tree data and air quality data
+  const treeData = {
+    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+    y: [10, 20, 30, 40],
+    type: 'bar' as const,
+    name: 'Tree Inventory',
+  };
+
+  const airQualityData = {
+    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+    y: [5, 10, 15, 20],
+    type: 'bar' as const,
+    name: 'Air Quality',
+  };
     const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
     
     return {
@@ -27,11 +39,34 @@ const CompareDatasets: React.FC = () => {
     };
   };
 
-  const treeData = generateComparisonData(1, 'tree');
-  const airQualityData = generateComparisonData(2, 'air-quality');
+  const treeData = {
+    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+    y: [10, 20, 30, 40],
+    type: 'bar' as const,
+    name: 'Tree Inventory',
+  };
+
+  const airQualityData = {
+    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+    y: [5, 10, 15, 20],
+    type: 'bar' as const,
+    name: 'Air Quality',
+  };
 
   // Dataset information for urban tree inventory and air quality
   const datasets = [
+    {
+      id: 1,
+      title: 'Urban Tree Inventory',
+      source: 'Source: Local Government Data',
+      data: treeData,
+    },
+    {
+      id: 2,
+      title: 'Air Quality Measurements',
+      source: 'Source: Environmental Agency',
+      data: airQualityData,
+    },
     {
       id: 1,
       title: 'Urban Tree Inventory',
