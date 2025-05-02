@@ -66,15 +66,52 @@ export const MapView: React.FC<MapViewProps> = ({
 
   // Combine and visualize both tree and air quality data on the map
   const combinedData: Plotly.Data[] = [
-    // Tree location data
+    // Baseline Tree location data
     {
       type: 'scattermapbox' as const,
-      lat: filteredTreeData.map((item: any) => item.lat),
-      lon: filteredTreeData.map((item: any) => item.lon),
-      text: filteredTreeData.map((item: any) => item.species),
+      lat: filteredTreeData.filter((item: any) => item.isBaseline).map((item: any) => item.location[1]),
+      lon: filteredTreeData.filter((item: any) => item.isBaseline).map((item: any) => item.location[0]),
+      text: filteredTreeData.filter((item: any) => item.isBaseline).map((item: any) => item.species),
       mode: 'markers' as const,
       marker: {
         size: 10,
+        color: 'grey', // Baseline trees
+      },
+    },
+    // Contributed Tree location data
+    {
+      type: 'scattermapbox' as const,
+      lat: filteredTreeData.filter((item: any) => !item.isBaseline).map((item: any) => item.location[1]),
+      lon: filteredTreeData.filter((item: any) => !item.isBaseline).map((item: any) => item.location[0]),
+      text: filteredTreeData.filter((item: any) => !item.isBaseline).map((item: any) => item.species),
+      mode: 'markers' as const,
+      marker: {
+        size: 10,
+        color: 'green', // Contributed trees
+      },
+    },
+    // Air quality data
+    {
+      type: 'scattermapbox' as const,
+      lat: filteredAirQualityData.filter((item: any) => item.isBaseline).map((item: any) => item.location[1]),
+      lon: filteredAirQualityData.filter((item: any) => item.isBaseline).map((item: any) => item.location[0]),
+      text: filteredAirQualityData.filter((item: any) => item.isBaseline).map((item: any) => item.parameter),
+      mode: 'markers' as const,
+      marker: {
+        size: 10,
+        color: 'blue', // AirNow data
+      },
+    },
+    // Contributed AQ Readings
+    {
+      type: 'scattermapbox' as const,
+      lat: filteredAirQualityData.filter((item: any) => !item.isBaseline).map((item: any) => item.location[1]),
+      lon: filteredAirQualityData.filter((item: any) => !item.isBaseline).map((item: any) => item.location[0]),
+      text: filteredAirQualityData.filter((item: any) => !item.isBaseline).map((item: any) => item.parameter),
+      mode: 'markers' as const,
+      marker: {
+        size: 10,
+        color: 'red', // Contributed AQ readings
       },
     },
     // Air quality data
