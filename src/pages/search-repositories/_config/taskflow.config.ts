@@ -43,12 +43,59 @@ export const taskflow: TaskflowConfig = {
             filterComponent: 'CheckboxList',
             filterProps: {
               options: [
-                { label: 'Urban Tree Inventory', value: 'urban-tree-inventory' },
-                { label: 'Air Quality', value: 'air-quality' },
+                { label: 'Baseline Inventory', value: 'baseline' },
+                { label: 'User Contributions', value: 'user-contributed' },
               ],
             },
           },
-          // Add other filter fields with the 'type' property
+          {
+            field: 'species',
+            label: 'Tree Species',
+            type: 'select',
+            operator: 'contains-one-of',
+            filterComponent: 'Autocomplete',
+            filterProps: {
+              options: [
+                { label: 'Oak', value: 'oak' },
+                { label: 'Pine', value: 'pine' },
+                // Add more species options as needed
+              ],
+            },
+          },
+          {
+            field: 'dbh',
+            label: 'DBH (cm)',
+            type: 'range',
+            operator: 'between',
+            filterProps: {
+              min: 0,
+              max: 100,
+              step: 1,
+            },
+          },
+          {
+            field: 'healthCondition',
+            label: 'Health Condition',
+            type: 'select',
+            operator: 'contains-one-of',
+            filterComponent: 'CheckboxList',
+            filterProps: {
+              options: [
+                { label: 'Good', value: 'good' },
+                { label: 'Fair', value: 'fair' },
+                { label: 'Poor', value: 'poor' },
+              ],
+            },
+          },
+          {
+            field: 'observationDate',
+            label: 'Observation Date',
+            type: 'date-range',
+            operator: 'between',
+            filterProps: {
+              // Date range picker props
+            },
+          },
         ]
       }
     }

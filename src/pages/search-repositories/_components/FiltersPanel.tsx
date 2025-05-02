@@ -113,6 +113,25 @@ const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value
     );
   }
 
+  if (type === 'date-range') {
+    return (
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
+        {/* Implement date range picker here */}
+        <input
+          type="date"
+          onChange={(e) => onChange(field, e.target.value)}
+          placeholder="Start Date"
+        />
+        <input
+          type="date"
+          onChange={(e) => onChange(field, e.target.value)}
+          placeholder="End Date"
+        />
+      </Box>
+    );
+  }
+
   // Default fallback for other types
   return (
     <Box sx={{ mb: 2 }}>
@@ -182,7 +201,7 @@ const FiltersPanel: React.FC = () => {
   // Group filters by category based on Dataset interface
   const filterCategories: FilterCategories = {
     urbanTreeInventory: filters.filter((f: any) =>
-      f.field === 'tree-species'
+      ['species', 'dbh', 'healthCondition', 'observationDate'].includes(f.field)
     ),
     airQuality: filters.filter((f: any) =>
       f.field === 'air-quality-parameter'

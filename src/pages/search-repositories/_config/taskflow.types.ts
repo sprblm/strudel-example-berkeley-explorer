@@ -60,7 +60,7 @@ export interface FilterFieldProps {
   filter: {
     field: string;
     label: string;
-    type: 'range' | 'select' | 'toggle' | 'checkbox';
+    type: 'range' | 'select' | 'toggle' | 'checkbox' | 'date-range';
     filterComponent?: string;
     filterProps?: Record<string, unknown>;
     operator?: string;
