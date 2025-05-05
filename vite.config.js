@@ -11,8 +11,7 @@ export default defineConfig(function (_a) {
         plugins: [react(), generouted()],
         base: env.VITE_BASE_URL,
         server: {
-            port: 5175,
-            strictPort: true,
+            port: 5176,
         },
     };
 });
