@@ -10,41 +10,39 @@ import {
   ListItemIcon,
   ListItemText,
   Switch,
-  Divider,
   ToggleButton,
   ToggleButtonGroup
 } from '@mui/material';
 import { TreeIcon, SensorIcon, InfoCircleIcon } from '../../../components/Icons';
 
 interface ControlsPanelProps {
-  activeChart: 'timeSeries' | 'map' | 'histogram' | 'distribution';
-  setActiveChart: React.Dispatch<React.SetStateAction<'timeSeries' | 'map' | 'histogram' | 'distribution'>>;
+  activeChart: 'map' | 'timeSeries' | 'histogram' | 'distribution';
+  setActiveChart: React.Dispatch<React.SetStateAction<'map' | 'timeSeries' | 'histogram' | 'distribution'>>;
+  dataType: string;
+  setDataType: React.Dispatch<React.SetStateAction<string>>;
+  treesLayerEnabled: boolean;
+  setTreesLayerEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  sensorsLayerEnabled: boolean;
+  setSensorsLayerEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /**
- * Controls panel for the explore data page
- * Displays data layers, campus overview, and how-to instructions
+ * Left panel control component with chart type selection and other controls.
  */
 export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   activeChart,
-  setActiveChart
+  setActiveChart,
+  dataType,
+  setDataType,
+  treesLayerEnabled,
+  setTreesLayerEnabled,
+  sensorsLayerEnabled,
+  setSensorsLayerEnabled
 }) => {
   const [tabValue, setTabValue] = useState(0);
-  const [treesLayerEnabled, setTreesLayerEnabled] = useState(true);
-  const [sensorsLayerEnabled, setSensorsLayerEnabled] = useState(true);
-  const [dataType, setDataType] = useState<string>("trees");
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const handleDataTypeChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newDataType: string,
-  ) => {
-    if (newDataType !== null) {
-      setDataType(newDataType);
-    }
   };
 
   // Overview Tab Content
@@ -198,866 +196,283 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             height: '100%', 
             pl: 3, 
             alignItems: 'flex-end',
-            pt: 2,
-            position: 'relative'
+            gap: 2
           }}>
-            {/* Grid Lines */}
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 13,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 124,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-          
-            {/* First Bar - Taller */}
-            <Box sx={{ 
-              width: 26, 
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column', 
-              alignItems: 'center',
-              mx: 0.5
-            }}>
-              <Box sx={{ width: '100%', height: '80%', bgcolor: '#1976d2', borderRadius: '2px 2px 0 0' }} />
-              <Typography variant="caption" sx={{ 
-                mt: 1,
-                fontSize: '7px',
-                maxWidth: 30,
-                textAlign: 'center',
-                transform: 'rotate(-45deg)',
-                transformOrigin: 'top left',
-                whiteSpace: 'nowrap'
-              }}>
-                Coast Live Oak
-              </Typography>
+            {/* Oak */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+              <Box sx={{ width: '100%', height: '50%', bgcolor: '#4CAF50', borderRadius: '3px 3px 0 0' }} />
+              <Typography variant="caption" sx={{ mt: 1 }}>Oak</Typography>
             </Box>
-
-            {/* Other Bars - All Same Height */}
-            {['California Redwood', 'American Elm', 'London Plane', 'Monterey Pine', 'California Bay Laurel'].map((tree, index) => (
-              <Box key={index} sx={{ 
-                width: 26, 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column', 
-                alignItems: 'center',
-                mx: 0.5
-              }}>
-                <Box sx={{ width: '100%', height: '30%', bgcolor: '#1976d2', borderRadius: '2px 2px 0 0' }} />
-                <Typography variant="caption" sx={{ 
-                  mt: 1,
-                  fontSize: '7px',
-                  maxWidth: 30,
-                  textAlign: 'center',
-                  transform: 'rotate(-45deg)',
-                  transformOrigin: 'top left',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {tree}
-                </Typography>
-              </Box>
-            ))}
+            
+            {/* Maple */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+              <Box sx={{ width: '100%', height: '100%', bgcolor: '#4CAF50', borderRadius: '3px 3px 0 0' }} />
+              <Typography variant="caption" sx={{ mt: 1 }}>Maple</Typography>
+            </Box>
+            
+            {/* Pine */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+              <Box sx={{ width: '100%', height: '75%', bgcolor: '#4CAF50', borderRadius: '3px 3px 0 0' }} />
+              <Typography variant="caption" sx={{ mt: 1 }}>Pine</Typography>
+            </Box>
+            
+            {/* Birch */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+              <Box sx={{ width: '100%', height: '25%', bgcolor: '#4CAF50', borderRadius: '3px 3px 0 0' }} />
+              <Typography variant="caption" sx={{ mt: 1 }}>Birch</Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
-
-      {/* Tree Health Status Chart */}
-      <Box>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          Tree Health Status
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Distribution of tree health conditions
-        </Typography>
-        
-        {/* Pie Chart Visualization */}
-        <Box sx={{ position: 'relative', height: 200, display: 'flex', justifyContent: 'center' }}>
-          {/* Simplified Pie Chart Representation */}
-          <Box sx={{ 
-            width: 180, 
-            height: 180, 
-            borderRadius: '50%', 
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            {/* Excellent Slice - Green - 29% */}
-            <Box sx={{ 
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              background: 'conic-gradient(transparent 0deg, transparent 105deg, #8BC34A 105deg, #8BC34A 360deg)',
-              transform: 'rotate(0deg)'
-            }} />
-            
-            {/* Good Slice - Light Green - 43% */}
-            <Box sx={{ 
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              background: 'conic-gradient(transparent 0deg, transparent 0deg, #AEEA00 0deg, #AEEA00 155deg, transparent 155deg)',
-              transform: 'rotate(0deg)'
-            }} />
-            
-            {/* Fair Slice - Yellow - 29% */}
-            <Box sx={{ 
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              background: 'conic-gradient(transparent 0deg, transparent 0deg, #FFD600 0deg, #FFD600 105deg, transparent 105deg)',
-              transform: 'rotate(155deg)'
-            }} />
-          </Box>
-          
-          {/* Labels */}
-          <Typography sx={{ 
-            position: 'absolute', 
-            top: 20, 
-            right: 20, 
-            color: '#8BC34A',
-            fontWeight: 'bold' 
-          }}>
-            Excellent 29%
-          </Typography>
-          
-          <Typography sx={{ 
-            position: 'absolute', 
-            top: 80, 
-            left: 10, 
-            color: '#AEEA00',
-            fontWeight: 'bold' 
-          }}>
-            Good 43%
-          </Typography>
-          
-          <Typography sx={{ 
-            position: 'absolute', 
-            bottom: 20, 
-            right: 40, 
-            color: '#FFD600',
-            fontWeight: 'bold' 
-          }}>
-            Fair 29%
-          </Typography>
-        </Box>
-      </Box>
-    </>
-  );
-
-  // Render Air Quality Visualization Content
-  const renderAirQualityVisualizationContent = () => (
-    <>
-      {/* PM2.5 Levels Chart */}
+      
+      {/* Air Quality Trends */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          PM2.5 Levels
+          Air Quality Trends
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          PM2.5 readings throughout the day
+          Average PM2.5 readings over time
         </Typography>
         
-        {/* Bar Chart Visualization */}
-        <Box sx={{ height: 200, position: 'relative' }}>
+        {/* Line Chart Visualization */}
+        <Box sx={{ height: 200, position: 'relative', pl: 3, pr: 2 }}>
           {/* Y-Axis Labels */}
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 0 }}>16</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 50 }}>8</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>4</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 150 }}>0</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 0 }}>15</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>7.5</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, bottom: 0 }}>0</Typography>
           
-          {/* Bars */}
+          {/* X-Axis Labels */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+            <Typography variant="caption">Jan</Typography>
+            <Typography variant="caption">Mar</Typography>
+            <Typography variant="caption">May</Typography>
+            <Typography variant="caption">Jul</Typography>
+          </Box>
+          
+          {/* Line Chart */}
           <Box sx={{ 
-            display: 'flex', 
             height: '100%', 
-            pl: 3, 
-            alignItems: 'flex-end',
-            pt: 2,
-            position: 'relative'
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              borderBottom: '1px dashed',
+              borderColor: 'grey.300'
+            }
           }}>
-            {/* Grid Lines */}
+            {/* Line Graph (simplified representation) */}
+            <Box sx={{ 
+              position: 'absolute',
+              top: '30%',
+              left: 0,
+              right: 0,
+              height: '2px',
+              bgcolor: '#2196F3',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: '-50%',
+                left: '20%',
+                width: '60%',
+                height: '200%',
+                borderRadius: '50%',
+                border: '2px solid #2196F3',
+                borderBottom: 'none',
+                borderLeft: 'none',
+                borderRight: 'none'
+              }
+            }} />
+            
+            {/* Data Points */}
             <Box sx={{ 
               position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 13,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
+              top: '30%', 
+              left: '10%', 
+              width: 8, 
+              height: 8, 
+              bgcolor: '#2196F3', 
+              borderRadius: '50%',
+              transform: 'translate(-50%, -50%)'
             }} />
             <Box sx={{ 
               position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 63,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
+              top: '40%', 
+              left: '30%', 
+              width: 8, 
+              height: 8, 
+              bgcolor: '#2196F3', 
+              borderRadius: '50%',
+              transform: 'translate(-50%, -50%)'
             }} />
             <Box sx={{ 
               position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 113,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
+              top: '20%', 
+              left: '50%', 
+              width: 8, 
+              height: 8, 
+              bgcolor: '#2196F3', 
+              borderRadius: '50%',
+              transform: 'translate(-50%, -50%)'
             }} />
             <Box sx={{ 
               position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 163,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
+              top: '30%', 
+              left: '70%', 
+              width: 8, 
+              height: 8, 
+              bgcolor: '#2196F3', 
+              borderRadius: '50%',
+              transform: 'translate(-50%, -50%)'
             }} />
-          
-            {/* PM2.5 Bars with varying heights */}
-            {[
-              { time: '10:30 AM', height: '40%' },
-              { time: '10:40 AM', height: '55%' },
-              { time: '11:00 AM', height: '35%' },
-              { time: '11:20 AM', height: '65%' },
-              { time: '11:30 AM', height: '50%' }
-            ].map((reading, index) => (
-              <Box key={index} sx={{ 
-                width: 26, 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column', 
-                alignItems: 'center',
-                mx: 1.5
-              }}>
-                <Box sx={{ 
-                  width: '100%', 
-                  height: reading.height, 
-                  bgcolor: '#e91e63', 
-                  borderRadius: '2px 2px 0 0' 
-                }} />
-                <Typography variant="caption" sx={{ 
-                  mt: 1,
-                  fontSize: '9px',
-                  textAlign: 'center',
-                  width: 50
-                }}>
-                  {reading.time}
-                </Typography>
-              </Box>
-            ))}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: '25%', 
+              left: '90%', 
+              width: 8, 
+              height: 8, 
+              bgcolor: '#2196F3', 
+              borderRadius: '50%',
+              transform: 'translate(-50%, -50%)'
+            }} />
           </Box>
         </Box>
       </Box>
-
-      {/* Temperature vs. Ozone Chart */}
+      
+      {/* Data Insights */}
       <Box>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          Temperature vs. Ozone
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Correlation between temperature and ozone levels
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+          Data Insights
         </Typography>
         
-        {/* Double Bar Chart */}
-        <Box sx={{ height: 220, position: 'relative' }}>
-          {/* Y-Axis Labels - Left (Temperature) */}
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 0 }}>20</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 50 }}>10</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>5</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 150 }}>0</Typography>
+        <List dense disablePadding>
+          <ListItem sx={{ pb: 1, alignItems: 'flex-start' }}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <InfoCircleIcon size={16} color="#666666" />
+            </ListItemIcon>
+            <ListItemText 
+              primary="Maple trees are the most common species on campus."
+              primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+            />
+          </ListItem>
           
-          {/* Y-Axis Labels - Right (Ozone) */}
-          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 0 }}>40</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 50 }}>20</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 100 }}>10</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 150 }}>0</Typography>
+          <ListItem sx={{ pb: 1, alignItems: 'flex-start' }}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <InfoCircleIcon size={16} color="#666666" />
+            </ListItemIcon>
+            <ListItemText 
+              primary="Air quality readings have improved by 15% since January."
+              primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+            />
+          </ListItem>
           
-          {/* Bars */}
-          <Box sx={{ 
-            display: 'flex', 
-            height: '100%', 
-            px: 3, 
-            alignItems: 'flex-end',
-            pt: 2,
-            position: 'relative'
-          }}>
-            {/* Grid Lines */}
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 13,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 63,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 113,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              width: '100%', 
-              height: '1px', 
-              bgcolor: '#e0e0e0', 
-              top: 163,
-              left: 0,
-              borderStyle: 'dashed',
-              borderWidth: '0 0 1px 0',
-              borderColor: '#ccc'
-            }} />
-          
-            {/* Temperature & Ozone Bar Pairs */}
-            {[
-              { time: '10:35 AM', tempHeight: '60%', ozoneHeight: '45%' },
-              { time: '10:50 AM', tempHeight: '70%', ozoneHeight: '55%' },
-              { time: '11:15 AM', tempHeight: '65%', ozoneHeight: '40%' },
-              { time: '11:30 AM', tempHeight: '75%', ozoneHeight: '60%' }
-            ].map((reading, index) => (
-              <Box key={index} sx={{ 
-                width: 50, 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column', 
-                alignItems: 'center',
-                mx: 1
-              }}>
-                <Box sx={{ 
-                  width: '100%', 
-                  display: 'flex',
-                  height: '100%',
-                  alignItems: 'flex-end'
-                }}>
-                  {/* Temperature Bar */}
-                  <Box sx={{
-                    width: '45%',
-                    height: reading.tempHeight,
-                    bgcolor: '#2196F3',
-                    borderRadius: '2px 2px 0 0',
-                    mr: 0.5
-                  }} />
-                  
-                  {/* Ozone Bar */}
-                  <Box sx={{
-                    width: '45%',
-                    height: reading.ozoneHeight,
-                    bgcolor: '#FFC107',
-                    borderRadius: '2px 2px 0 0'
-                  }} />
-                </Box>
-                <Typography variant="caption" sx={{ 
-                  mt: 1,
-                  fontSize: '9px',
-                  textAlign: 'center'
-                }}>
-                  {reading.time}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
-    </>
-  );
-
-  // Details Tab Content
-  const renderTreeDetails = () => (
-    <>
-      {/* Tree Details Listing */}
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
-          Coast Live Oak
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Height:</Typography>
-              <Typography variant="body2" fontWeight={500}>45 ft</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>DBH:</Typography>
-              <Typography variant="body2" fontWeight={500}>24&quot;</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Date:</Typography>
-              <Typography variant="body2" fontWeight={500}>2024-03-15</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ 
-            bgcolor: '#4CAF50', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            excellent
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
-          California Redwood
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Height:</Typography>
-              <Typography variant="body2" fontWeight={500}>80 ft</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>DBH:</Typography>
-              <Typography variant="body2" fontWeight={500}>36&quot;</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Date:</Typography>
-              <Typography variant="body2" fontWeight={500}>2024-03-10</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ 
-            bgcolor: '#8BC34A', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            good
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
-          American Elm
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Height:</Typography>
-              <Typography variant="body2" fontWeight={500}>35 ft</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>DBH:</Typography>
-              <Typography variant="body2" fontWeight={500}>18&quot;</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Date:</Typography>
-              <Typography variant="body2" fontWeight={500}>2024-02-28</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ 
-            bgcolor: '#FFC107', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            fair
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
-          London Plane
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Height:</Typography>
-              <Typography variant="body2" fontWeight={500}>40 ft</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>DBH:</Typography>
-              <Typography variant="body2" fontWeight={500}>20&quot;</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Date:</Typography>
-              <Typography variant="body2" fontWeight={500}>2024-03-05</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ 
-            bgcolor: '#8BC34A', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            good
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
-          Monterey Pine
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Height:</Typography>
-              <Typography variant="body2" fontWeight={500}>55 ft</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>DBH:</Typography>
-              <Typography variant="body2" fontWeight={500}>22&quot;</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', mt: 0.5 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>Date:</Typography>
-              <Typography variant="body2" fontWeight={500}>2024-02-20</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ 
-            bgcolor: '#FFC107', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            fair
-          </Box>
-        </Box>
-      </Box>
-    </>
-  );
-
-  const renderAirQualityDetails = () => (
-    <>
-      {/* Air Quality Details Listing */}
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            5/1/2024, 10:30:00 AM
-          </Typography>
-          <Box sx={{ 
-            bgcolor: '#2196F3', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            official
-          </Box>
-        </Box>
-        <Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM2.5:</Typography>
-            <Typography variant="body2" fontWeight={500}>8.3 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM10:</Typography>
-            <Typography variant="body2" fontWeight={500}>15.2 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Ozone:</Typography>
-            <Typography variant="body2" fontWeight={500}>32 ppb</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Temperature:</Typography>
-            <Typography variant="body2" fontWeight={500}>18.5°C</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Humidity:</Typography>
-            <Typography variant="body2" fontWeight={500}>65%</Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            5/1/2024, 10:35:00 AM
-          </Typography>
-          <Box sx={{ 
-            bgcolor: '#2196F3', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            official
-          </Box>
-        </Box>
-        <Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM2.5:</Typography>
-            <Typography variant="body2" fontWeight={500}>10.1 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM10:</Typography>
-            <Typography variant="body2" fontWeight={500}>18.7 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Ozone:</Typography>
-            <Typography variant="body2" fontWeight={500}>35 ppb</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Temperature:</Typography>
-            <Typography variant="body2" fontWeight={500}>19.2°C</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Humidity:</Typography>
-            <Typography variant="body2" fontWeight={500}>62%</Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            5/1/2024, 10:40:00 AM
-          </Typography>
-          <Box sx={{ 
-            bgcolor: '#2196F3', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            official
-          </Box>
-        </Box>
-        <Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM2.5:</Typography>
-            <Typography variant="body2" fontWeight={500}>7.8 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM10:</Typography>
-            <Typography variant="body2" fontWeight={500}>14.5 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Ozone:</Typography>
-            <Typography variant="body2" fontWeight={500}>29 ppb</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Temperature:</Typography>
-            <Typography variant="body2" fontWeight={500}>18.8°C</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Humidity:</Typography>
-            <Typography variant="body2" fontWeight={500}>64%</Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            5/1/2024, 11:15:00 AM
-          </Typography>
-          <Box sx={{ 
-            bgcolor: '#FF9800', 
-            color: 'white', 
-            px: 1.5, 
-            py: 0.5, 
-            borderRadius: '16px',
-            fontSize: '12px'
-          }}>
-            student
-          </Box>
-        </Box>
-        <Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM2.5:</Typography>
-            <Typography variant="body2" fontWeight={500}>12.3 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>PM10:</Typography>
-            <Typography variant="body2" fontWeight={500}>22.1 μg/m³</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Ozone:</Typography>
-            <Typography variant="body2" fontWeight={500}>37 ppb</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Temperature:</Typography>
-            <Typography variant="body2" fontWeight={500}>19.5°C</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', mt: 0.5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ width: 90 }}>Humidity:</Typography>
-            <Typography variant="body2" fontWeight={500}>60%</Typography>
-          </Box>
-        </Box>
+          <ListItem sx={{ alignItems: 'flex-start' }}>
+            <ListItemIcon sx={{ minWidth: 28 }}>
+              <InfoCircleIcon size={16} color="#666666" />
+            </ListItemIcon>
+            <ListItemText 
+              primary="PM2.5 levels peak during morning rush hour (7-9am)."
+              primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
+            />
+          </ListItem>
+        </List>
       </Box>
     </>
   );
   
   // Details Tab Content
   const renderDetailsTab = () => (
-    <>
-      {/* Raw Data Section with Toggles */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          Raw Data
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Select data type to view
-        </Typography>
-        
-        <ToggleButtonGroup
-          value={dataType}
-          onChange={handleDataTypeChange}
-          exclusive
-          aria-label="data type"
-          sx={{ width: '100%', mb: 3 }}
-        >
-          <ToggleButton 
-            value="trees" 
-            aria-label="trees" 
-            sx={{ 
-              flex: 1, 
-              py: 1.5,
-              bgcolor: dataType === 'trees' ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <TreeIcon size={18} color="#4CAF50" />
-            <Typography sx={{ ml: 1 }}>Trees</Typography>
-          </ToggleButton>
-          <ToggleButton 
-            value="airQuality" 
-            aria-label="air quality"
-            sx={{ 
-              flex: 1,
-              py: 1.5,
-              bgcolor: dataType === 'airQuality' ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <SensorIcon size={18} color="#2196F3" />
-            <Typography sx={{ ml: 1 }}>Air Quality</Typography>
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-
-      {/* Conditional Raw Data Content */}
-      {dataType === 'trees' ? renderTreeDetails() : renderAirQualityDetails()}
-    </>
-  );
-
-  // Visualizations Tab Content
-  const renderVisualizationsTab = () => (
-    <>
-      {/* Data Type Selector */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-          Data Type
+    <Box>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+        Raw Data
+      </Typography>
+      
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        View detailed data for all campus elements.
+      </Typography>
+      
+      {/* Data Table Placeholder */}
+      <Box sx={{ 
+        border: '1px solid',
+        borderColor: 'grey.300',
+        borderRadius: 1,
+        p: 2,
+        mb: 3
+      }}>
+        <Typography variant="body2" fontWeight={500}>
+          Trees Data
         </Typography>
         
-        <ToggleButtonGroup
-          value={dataType}
-          onChange={handleDataTypeChange}
-          exclusive
-          aria-label="data type"
-          sx={{ width: '100%' }}
-        >
-          <ToggleButton 
-            value="trees" 
-            aria-label="trees" 
-            sx={{ 
-              flex: 1, 
-              py: 1.5,
-              bgcolor: dataType === 'trees' ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <TreeIcon size={18} color="#4CAF50" />
-            <Typography sx={{ ml: 1 }}>Trees</Typography>
-          </ToggleButton>
-          <ToggleButton 
-            value="airQuality" 
-            aria-label="air quality"
-            sx={{ 
-              flex: 1,
-              py: 1.5,
-              bgcolor: dataType === 'airQuality' ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <SensorIcon size={18} color="#2196F3" />
-            <Typography sx={{ ml: 1 }}>Air Quality</Typography>
-          </ToggleButton>
-        </ToggleButtonGroup>
+        <Box component="table" sx={{ width: '100%', mt: 1, borderCollapse: 'collapse' }}>
+          <Box component="thead">
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.300' }}>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>ID</Box>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Species</Box>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Height</Box>
+            </Box>
+          </Box>
+          <Box component="tbody">
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T001</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Oak</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>15m</Box>
+            </Box>
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T002</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Maple</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>12m</Box>
+            </Box>
+            <Box component="tr">
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T003</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Pine</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>18m</Box>
+            </Box>
+          </Box>
+        </Box>
       </Box>
-
-      {/* Conditional Rendering Based on Selected Data Type */}
-      {dataType === 'trees' 
-        ? renderTreeVisualizationContent() 
-        : renderAirQualityVisualizationContent()
-      }
-    </>
+      
+      <Box sx={{ 
+        border: '1px solid',
+        borderColor: 'grey.300',
+        borderRadius: 1,
+        p: 2
+      }}>
+        <Typography variant="body2" fontWeight={500}>
+          Sensor Data
+        </Typography>
+        
+        <Box component="table" sx={{ width: '100%', mt: 1, borderCollapse: 'collapse' }}>
+          <Box component="thead">
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.300' }}>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>ID</Box>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Type</Box>
+              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Value</Box>
+            </Box>
+          </Box>
+          <Box component="tbody">
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S001</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>PM2.5</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>8.2 μg/m³</Box>
+            </Box>
+            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S002</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>CO2</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>412 ppm</Box>
+            </Box>
+            <Box component="tr">
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S003</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Temp</Box>
+              <Box component="td" sx={{ py: 1, fontSize: 13 }}>22.5°C</Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
-
-  // Render the appropriate tab content
-  const renderTabContent = () => {
-    switch (tabValue) {
-      case 0:
-        return renderOverviewTab();
-      case 1:
-        return renderVisualizationsTab();
-      case 2:
-        return renderDetailsTab();
-      default:
-        return renderOverviewTab();
-    }
-  };
 
   return (
     <Paper 
@@ -1065,41 +480,110 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       sx={{ 
         width: 320, 
         height: '100%',
-        borderRadius: 2,
+        p: 3,
         border: '1px solid',
         borderColor: 'grey.200',
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column'
+        borderRadius: 2,
+        overflow: 'auto'
       }}
     >
-      {/* Header with Title and Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Typography variant="h6" fontWeight={600} sx={{ px: 3, pt: 3, pb: 2 }}>
-          Data Exploration
-        </Typography>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange}
-          variant="fullWidth"
-          sx={{ px: 2 }}
-        >
-          <Tab label="Overview" />
-          <Tab label="Visualizations" sx={{ 
-            ...(tabValue === 1 && {
-              color: '#4CAF50',
-              border: '1px solid #4CAF50', 
-              borderRadius: 1
-            })
-          }} />
-          <Tab label="Details" />
-        </Tabs>
-      </Box>
+      <Tabs 
+        value={tabValue} 
+        onChange={handleTabChange}
+        sx={{ 
+          mb: 3,
+          '.MuiTab-root': {
+            minWidth: 'auto',
+            px: 2,
+            py: 1,
+            minHeight: 'auto',
+            textTransform: 'none',
+            fontWeight: 500
+          }
+        }}
+      >
+        <Tab label="Overview" />
+        <Tab label="Charts" />
+        <Tab label="Details" />
+      </Tabs>
 
-      {/* Main Content Area */}
-      <Box sx={{ p: 3, flex: 1 }}>
-        {renderTabContent()}
-      </Box>
+      {/* Data Type Selection - Only show in Charts tab */}
+      {tabValue === 1 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            Data Type
+          </Typography>
+          
+          <ToggleButtonGroup
+            value={dataType}
+            exclusive
+            onChange={(e, newValue) => newValue && setDataType(newValue)}
+            aria-label="data type"
+            size="small"
+            sx={{ 
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 1,
+              width: '100%',
+              '.MuiToggleButton-root': {
+                textTransform: 'none',
+                py: 1
+              }
+            }}
+          >
+            <ToggleButton value="trees">
+              Trees
+            </ToggleButton>
+            <ToggleButton value="airQuality">
+              Air Quality
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
+
+      {/* Chart Type Selection - Only show in Charts tab */}
+      {tabValue === 1 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            Chart Type
+          </Typography>
+          
+          <ToggleButtonGroup
+            value={activeChart}
+            exclusive
+            onChange={(e, newValue) => newValue && setActiveChart(newValue)}
+            aria-label="chart type"
+            size="small"
+            sx={{ 
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 1,
+              width: '100%',
+              '.MuiToggleButton-root': {
+                textTransform: 'none',
+                py: 1
+              }
+            }}
+          >
+            <ToggleButton value="map">
+              Map View
+            </ToggleButton>
+            <ToggleButton value="timeSeries">
+              Time Series
+            </ToggleButton>
+            <ToggleButton value="histogram">
+              Histogram
+            </ToggleButton>
+            <ToggleButton value="distribution">
+              Distribution
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
+
+      {tabValue === 0 && renderOverviewTab()}
+      {tabValue === 1 && renderTreeVisualizationContent()}
+      {tabValue === 2 && renderDetailsTab()}
     </Paper>
   );
 };
