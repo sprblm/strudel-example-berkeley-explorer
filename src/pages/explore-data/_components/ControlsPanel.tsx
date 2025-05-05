@@ -174,54 +174,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     </>
   );
 
-  // Visualizations Tab Content
-  const renderVisualizationsTab = () => (
+  // Tree Visualizations
+  const renderTreeVisualizations = () => (
     <>
-      {/* Data Type Selector */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-          Data Type
-        </Typography>
-        
-        <ToggleButtonGroup
-          value={dataType}
-          onChange={handleDataTypeChange}
-          aria-label="data type"
-          sx={{ width: '100%' }}
-        >
-          <ToggleButton 
-            value="trees" 
-            aria-label="trees" 
-            sx={{ 
-              flex: 1, 
-              py: 1.5,
-              bgcolor: dataType.includes('trees') ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <TreeIcon size={18} color="#4CAF50" />
-            <Typography sx={{ ml: 1 }}>Trees</Typography>
-          </ToggleButton>
-          <ToggleButton 
-            value="airQuality" 
-            aria-label="air quality"
-            sx={{ 
-              flex: 1,
-              py: 1.5,
-              bgcolor: dataType.includes('airQuality') ? '#FFF9C4' : 'transparent',
-              '&.Mui-selected': {
-                bgcolor: '#FFF9C4',
-              }
-            }}
-          >
-            <SensorIcon size={18} color="#2196F3" />
-            <Typography sx={{ ml: 1 }}>Air Quality</Typography>
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-
       {/* Tree Species Distribution Chart */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
@@ -400,6 +355,235 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
           </Typography>
         </Box>
       </Box>
+    </>
+  );
+
+  // Air Quality Visualizations
+  const renderAirQualityVisualizations = () => (
+    <>
+      {/* PM2.5 Daily Average */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
+          PM2.5 Daily Average
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Air quality readings over time
+        </Typography>
+        
+        {/* Line Chart Visualization */}
+        <Box sx={{ height: 200, position: 'relative' }}>
+          {/* Y-Axis Labels */}
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 10 }}>15</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>5</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 190 }}>0</Typography>
+          
+          {/* X-Axis Labels */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            width: 'calc(100% - 20px)',
+            position: 'absolute',
+            bottom: -20,
+            left: 20,
+          }}>
+            <Typography variant="caption">Mon</Typography>
+            <Typography variant="caption">Tue</Typography>
+            <Typography variant="caption">Wed</Typography>
+            <Typography variant="caption">Thu</Typography>
+            <Typography variant="caption">Fri</Typography>
+            <Typography variant="caption">Sat</Typography>
+            <Typography variant="caption">Sun</Typography>
+          </Box>
+          
+          {/* Line Chart */}
+          <Box sx={{ 
+            height: '100%', 
+            pl: 3, 
+            position: 'relative',
+            pr: 1
+          }}>
+            {/* Grid Lines */}
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 13,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 103,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 193,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            
+            {/* Line Path */}
+            <Box
+              component="svg"
+              sx={{
+                width: '100%',
+                height: '100%',
+                display: 'block',
+                position: 'relative'
+              }}
+              viewBox="0 0 280 200"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M20,80 L60,50 L100,90 L140,30 L180,70 L220,45 L260,60"
+                fill="none"
+                stroke="#2196F3"
+                strokeWidth="3"
+              />
+              {/* Data Points */}
+              <circle cx="20" cy="80" r="4" fill="#2196F3" />
+              <circle cx="60" cy="50" r="4" fill="#2196F3" />
+              <circle cx="100" cy="90" r="4" fill="#2196F3" />
+              <circle cx="140" cy="30" r="4" fill="#2196F3" />
+              <circle cx="180" cy="70" r="4" fill="#2196F3" />
+              <circle cx="220" cy="45" r="4" fill="#2196F3" />
+              <circle cx="260" cy="60" r="4" fill="#2196F3" />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Air Quality Category Distribution */}
+      <Box>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
+          Air Quality Categories
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Distribution of AQI readings by category
+        </Typography>
+        
+        {/* Horizontal Bar Chart */}
+        <Box sx={{ pl: 2, height: 200 }}>
+          {/* Good */}
+          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ width: 70 }}>Good</Typography>
+            <Box sx={{ 
+              height: 24, 
+              width: '70%', 
+              bgcolor: '#00E676',
+              borderRadius: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              pr: 1
+            }}>
+              <Typography variant="caption" color="white" fontWeight="bold">70%</Typography>
+            </Box>
+          </Box>
+          
+          {/* Moderate */}
+          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ width: 70 }}>Moderate</Typography>
+            <Box sx={{ 
+              height: 24, 
+              width: '20%', 
+              bgcolor: '#FFEB3B',
+              borderRadius: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              pr: 1
+            }}>
+              <Typography variant="caption" fontWeight="bold">20%</Typography>
+            </Box>
+          </Box>
+          
+          {/* Unhealthy for Sensitive Groups */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ width: 70 }}>Unhealthy</Typography>
+            <Box sx={{ 
+              height: 24, 
+              width: '10%', 
+              bgcolor: '#FF9800',
+              borderRadius: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              pr: 1
+            }}>
+              <Typography variant="caption" color="white" fontWeight="bold">10%</Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
+
+  // Visualizations Tab Content
+  const renderVisualizationsTab = () => (
+    <>
+      {/* Data Type Selector */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+          Data Type
+        </Typography>
+        
+        <ToggleButtonGroup
+          value={dataType}
+          onChange={handleDataTypeChange}
+          aria-label="data type"
+          sx={{ width: '100%' }}
+        >
+          <ToggleButton 
+            value="trees" 
+            aria-label="trees" 
+            sx={{ 
+              flex: 1, 
+              py: 1.5,
+              bgcolor: dataType.includes('trees') ? '#FFF9C4' : 'transparent',
+              '&.Mui-selected': {
+                bgcolor: '#FFF9C4',
+              }
+            }}
+          >
+            <TreeIcon size={18} color="#4CAF50" />
+            <Typography sx={{ ml: 1 }}>Trees</Typography>
+          </ToggleButton>
+          <ToggleButton 
+            value="airQuality" 
+            aria-label="air quality"
+            sx={{ 
+              flex: 1,
+              py: 1.5,
+              bgcolor: dataType.includes('airQuality') ? '#FFF9C4' : 'transparent',
+              '&.Mui-selected': {
+                bgcolor: '#FFF9C4',
+              }
+            }}
+          >
+            <SensorIcon size={18} color="#2196F3" />
+            <Typography sx={{ ml: 1 }}>Air Quality</Typography>
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+
+      {/* Render different content based on selected data type */}
+      {dataType.includes('trees') ? renderTreeVisualizations() : renderAirQualityVisualizations()}
     </>
   );
 
