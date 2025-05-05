@@ -1,4 +1,4 @@
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { FilterContextProvider } from '../../components/FilterContext';
 import { ControlsPanel } from './_components/ControlsPanel';

@@ -2,276 +2,193 @@ import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
-  Paper, 
-  FormControlLabel, 
-  Checkbox, 
-  TextField,
-  Button,
-  IconButton,
-  Divider,
-  Stack
+  Paper,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  Divider
 } from '@mui/material';
-import { ChevronDown, ChevronUp } from '../../../components/Icons';
-import { useFilters } from '../../../components/FilterContext';
+import { TreeIcon, SensorIcon, InfoCircleIcon } from '../../../components/Icons';
 
 interface ControlsPanelProps {
   activeChart: 'timeSeries' | 'map' | 'histogram' | 'distribution';
   setActiveChart: React.Dispatch<React.SetStateAction<'timeSeries' | 'map' | 'histogram' | 'distribution'>>;
-  onClose: () => void;
 }
 
 /**
  * Controls panel for the explore data page
- * Allows users to select variables and data sources
+ * Displays data layers, campus overview, and how-to instructions
  */
 export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   activeChart,
-  setActiveChart,
-  onClose
+  setActiveChart
 }) => {
-  // State for collapsible sections
-  const [expandedSections, setExpandedSections] = useState({
-    timeRange: true,
-    variables: true,
-    dataSources: true
-  });
+  const [tabValue, setTabValue] = useState(0);
+  const [treesLayerEnabled, setTreesLayerEnabled] = useState(true);
+  const [sensorsLayerEnabled, setSensorsLayerEnabled] = useState(true);
 
-  // Toggle section expansion
-  const toggleSection = (section: 'timeRange' | 'variables' | 'dataSources') => {
-    setExpandedSections({
-      ...expandedSections,
-      [section]: !expandedSections[section]
-    });
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
-
-  // Variables
-  const [selectedVariables, setSelectedVariables] = useState({
-    temperature: true,
-    precipitation: false,
-    humidity: false,
-    windSpeed: false,
-    pressure: false
-  });
-
-  // Data sources
-  const [selectedDataSources, setSelectedDataSources] = useState({
-    noaa: true,
-    nasa: false,
-    ecmwf: false,
-    cmip6: false,
-    worldClim: false,
-    reanalysis: false
-  });
-
-  // Handle variable selection
-  const handleVariableChange = (variable: keyof typeof selectedVariables) => {
-    setSelectedVariables({
-      ...selectedVariables,
-      [variable]: !selectedVariables[variable]
-    });
-  };
-
-  // Handle data source selection
-  const handleDataSourceChange = (source: keyof typeof selectedDataSources) => {
-    setSelectedDataSources({
-      ...selectedDataSources,
-      [source]: !selectedDataSources[source]
-    });
-  };
-
-  // Render a collapsible section
-  const renderSection = (
-    title: string, 
-    section: 'timeRange' | 'variables' | 'dataSources', 
-    content: React.ReactNode
-  ) => (
-    <Box sx={{ mb: 3 }}>
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          cursor: 'pointer',
-          mb: 1 
-        }}
-        onClick={() => toggleSection(section)}
-      >
-        <Typography variant="subtitle1" fontWeight={600}>
-          {title}
-        </Typography>
-        <IconButton size="small">
-          {expandedSections[section] ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </IconButton>
-      </Box>
-      {expandedSections[section] && content}
-      <Divider sx={{ mt: 2 }} />
-    </Box>
-  );
 
   return (
     <Paper 
       elevation={0} 
       sx={{ 
-        p: 3, 
-        height: '100%', 
+        width: 320, 
+        height: '100%',
         borderRadius: 2,
         border: '1px solid',
-        borderColor: 'grey.200'
+        borderColor: 'grey.200',
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
-        Controls
-      </Typography>
+      {/* Header with Title and Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Typography variant="h6" fontWeight={600} sx={{ px: 3, pt: 3, pb: 2 }}>
+          Data Exploration
+        </Typography>
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange}
+          variant="fullWidth"
+          sx={{ px: 2 }}
+        >
+          <Tab label="Overview" />
+          <Tab label="Visualizations" />
+          <Tab label="Details" />
+        </Tabs>
+      </Box>
 
-      {/* Time Range Section */}
-      {renderSection('Time Period', 'timeRange', (
-        <Box>
-          <TextField
-            label="Start Date"
-            type="date"
-            defaultValue="2023-01-01"
-            size="small"
-            fullWidth
-            sx={{ mb: 2 }}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="End Date"
-            type="date"
-            defaultValue="2023-12-31"
-            size="small"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-          />
+      {/* Main Content Area */}
+      <Box sx={{ p: 3, flex: 1 }}>
+        {/* Data Layers Section */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            Data Layers
+          </Typography>
+          
+          <Box sx={{ 
+            bgcolor: '#FFF9C4', // Light yellow background
+            borderRadius: 2,
+            mb: 1,
+            p: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TreeIcon size={20} color="#4CAF50" />
+              <Typography sx={{ ml: 1 }}>Trees (7)</Typography>
+            </Box>
+            <Switch 
+              checked={treesLayerEnabled}
+              onChange={() => setTreesLayerEnabled(!treesLayerEnabled)}
+              size="small"
+            />
+          </Box>
+          
+          <Box sx={{ 
+            bgcolor: '#FFF9C4', // Light yellow background
+            borderRadius: 2,
+            p: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <SensorIcon size={20} color="#2196F3" />
+              <Typography sx={{ ml: 1 }}>Air Quality Sensors (5)</Typography>
+            </Box>
+            <Switch 
+              checked={sensorsLayerEnabled}
+              onChange={() => setSensorsLayerEnabled(!sensorsLayerEnabled)}
+              size="small"
+            />
+          </Box>
         </Box>
-      ))}
 
-      {/* Variables Section */}
-      {renderSection('Variables', 'variables', (
-        <Stack>
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedVariables.temperature}
-                onChange={() => handleVariableChange('temperature')}
-                size="small"
-              />
-            }
-            label="Temperature (°C)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedVariables.precipitation}
-                onChange={() => handleVariableChange('precipitation')}
-                size="small"
-              />
-            }
-            label="Precipitation (mm)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedVariables.humidity}
-                onChange={() => handleVariableChange('humidity')}
-                size="small"
-              />
-            }
-            label="Humidity (%)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedVariables.windSpeed}
-                onChange={() => handleVariableChange('windSpeed')}
-                size="small"
-              />
-            }
-            label="Wind Speed (m/s)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedVariables.pressure}
-                onChange={() => handleVariableChange('pressure')}
-                size="small"
-              />
-            }
-            label="Pressure (hPa)"
-          />
-        </Stack>
-      ))}
+        {/* Campus Overview Section */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            Campus Overview
+          </Typography>
+          
+          <Box sx={{ pl: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Total Trees:
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1.5 }}>
+              7
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Species Diversity:
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1.5 }}>
+              6 different species
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Air Quality Sensors:
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1.5 }}>
+              5
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Average PM2.5:
+            </Typography>
+            <Typography variant="body1">
+              9.6 μg/m³
+            </Typography>
+          </Box>
+        </Box>
 
-      {/* Data Sources Section */}
-      {renderSection('Data Sources', 'dataSources', (
-        <Stack>
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.noaa}
-                onChange={() => handleDataSourceChange('noaa')}
-                size="small"
+        {/* How to Use Section */}
+        <Box>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+            How to Use
+          </Typography>
+          
+          <List dense disablePadding>
+            <ListItem sx={{ pb: 1, alignItems: 'flex-start' }}>
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <InfoCircleIcon size={16} color="#666666" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Click on map points to view detailed information."
+                primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
               />
-            }
-            label="NOAA Climate Data"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.nasa}
-                onChange={() => handleDataSourceChange('nasa')}
-                size="small"
+            </ListItem>
+            
+            <ListItem sx={{ pb: 1, alignItems: 'flex-start' }}>
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <InfoCircleIcon size={16} color="#666666" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Switch to Charts tab to visualize campus data patterns."
+                primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
               />
-            }
-            label="NASA Earth Observations"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.ecmwf}
-                onChange={() => handleDataSourceChange('ecmwf')}
-                size="small"
+            </ListItem>
+            
+            <ListItem sx={{ alignItems: 'flex-start' }}>
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <InfoCircleIcon size={16} color="#666666" />
+              </ListItemIcon>
+              <ListItemText 
+                primary="View Details tab for raw data listings."
+                primaryTypographyProps={{ variant: 'body2', color: 'text.secondary' }}
               />
-            }
-            label="ECMWF Climate Models"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.cmip6}
-                onChange={() => handleDataSourceChange('cmip6')}
-                size="small"
-              />
-            }
-            label="CMIP6 Climate Model Outputs"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.worldClim}
-                onChange={() => handleDataSourceChange('worldClim')}
-                size="small"
-              />
-            }
-            label="WorldClim"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={selectedDataSources.reanalysis}
-                onChange={() => handleDataSourceChange('reanalysis')}
-                size="small"
-              />
-            }
-            label="ERA5 Reanalysis"
-          />
-        </Stack>
-      ))}
-
-      <Box sx={{ mt: 3 }}>
-        <Button variant="contained" fullWidth color="primary">
-          Apply Filters
-        </Button>
+            </ListItem>
+          </List>
+        </Box>
       </Box>
     </Paper>
   );
