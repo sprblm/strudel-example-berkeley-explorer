@@ -32,7 +32,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   const [tabValue, setTabValue] = useState(0);
   const [treesLayerEnabled, setTreesLayerEnabled] = useState(true);
   const [sensorsLayerEnabled, setSensorsLayerEnabled] = useState(true);
-  const [dataType, setDataType] = useState<string[]>(["trees"]);
+  const [dataType, setDataType] = useState<string>("trees");
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -40,10 +40,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
   const handleDataTypeChange = (
     event: React.MouseEvent<HTMLElement>,
-    newDataTypes: string[],
+    newDataType: string,
   ) => {
-    if (newDataTypes.length) {
-      setDataType(newDataTypes);
+    if (newDataType !== null) {
+      setDataType(newDataType);
     }
   };
 
@@ -612,6 +612,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         <ToggleButtonGroup
           value={dataType}
           onChange={handleDataTypeChange}
+          exclusive
           aria-label="data type"
           sx={{ width: '100%' }}
         >
@@ -621,7 +622,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             sx={{ 
               flex: 1, 
               py: 1.5,
-              bgcolor: dataType.includes('trees') ? '#FFF9C4' : 'transparent',
+              bgcolor: dataType === 'trees' ? '#FFF9C4' : 'transparent',
               '&.Mui-selected': {
                 bgcolor: '#FFF9C4',
               }
@@ -636,7 +637,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             sx={{ 
               flex: 1,
               py: 1.5,
-              bgcolor: dataType.includes('airQuality') ? '#FFF9C4' : 'transparent',
+              bgcolor: dataType === 'airQuality' ? '#FFF9C4' : 'transparent',
               '&.Mui-selected': {
                 bgcolor: '#FFF9C4',
               }
@@ -649,7 +650,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       </Box>
 
       {/* Conditional Rendering Based on Selected Data Type */}
-      {dataType.includes('trees') 
+      {dataType === 'trees' 
         ? renderTreeVisualizationContent() 
         : renderAirQualityVisualizationContent()
       }
