@@ -63,7 +63,8 @@ import {
   Monitor,
   AlertTriangle,
   Leaf,
-  Cpu
+  Cpu,
+  MapPin
 } from 'lucide-react';
 
 /**
@@ -168,3 +169,11 @@ export const SensorIcon = createIcon(Cpu);
 export const AlertTriangleIcon = createIcon(AlertTriangle);
 // Add InfoCircle icon (alias of Info icon)
 export const InfoCircleIcon = createIcon(Info);
+// Add Location icon for map locations
+export const LocationIcon = createIcon(MapPin);
+// Add Compare icon for comparison feature
+export const CompareIcon = createIcon(BarChart2);
+// Add Overview icon for overview tab
+export const OverviewIcon = createIcon(Grid);
+// Add AirQuality icon for air quality tab
+export const AirQualityIcon = createIcon(Wind);
