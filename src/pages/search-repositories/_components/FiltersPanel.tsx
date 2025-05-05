@@ -1,324 +1,401 @@
-import { Box, Typography, Slider, Select, MenuItem, FormControlLabel, Switch, Checkbox, Paper, Divider, FormGroup, SelectChangeEvent } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import React, { useState, useEffect } from 'react';
-import { FilterIcon, SortAscIcon } from '../../../components/Icons';
-import { useFilters } from '../../../components/FilterContext';
-import { TaskflowPages, FilterFieldProps } from '../_config/taskflow.types';
-import { taskflow } from '../_config/taskflow.config';
-
-const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
-
-interface FilterCategories {
-  urbanTreeInventory: FilterFieldProps['filter'][];
-  airQuality: FilterFieldProps['filter'][];
-  spatial: FilterFieldProps['filter'][];
-  temporal: FilterFieldProps['filter'][];
-}
+import { 
+  Box, 
+  Typography, 
+  Slider, 
+  Select, 
+  MenuItem, 
+  TextField,
+  Paper, 
+  Button,
+  ButtonGroup
+} from '@mui/material';
+import React, { useState } from 'react';
+import { Forest, FilterAlt, LocationOn } from '@mui/icons-material';
 
 /**
- * Individual filter field component to render the appropriate input based on filter type
- */
-const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value: any) => void }> = ({ filter, onChange }) => {
-  const { field, label, type, options = [] } = filter;
-
-  // Add specific filter fields for urban tree inventory and air quality
-  if (field === 'tree-species') {
-    return (
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-        <Select
-          size="small"
-          fullWidth
-          value={options[0]?.value || ''}
-          onChange={(e: SelectChangeEvent) => onChange(field, e.target.value)}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-    );
-  }
-
-  if (field === 'air-quality-parameter') {
-    // Similar implementation for air quality parameter filter
-  }
-
-  if (type === 'range' && filter.min !== undefined && filter.max !== undefined) {
-    return (
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-        <Slider
-          min={filter.min}
-          max={filter.max}
-          step={filter.step || 1}
-          valueLabelDisplay="auto"
-          onChange={(_, value) => onChange(field, value)}
-          sx={{ 
-            width: '90%',
-            ml: 1
-          }}
-        />
-      </Box>
-    );
-  }
-
-  if (type === 'select') {
-    return (
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-        <Select
-          size="small"
-          fullWidth
-          onChange={(e) => onChange(field, e.target.value)}
-          sx={{ 
-            fontSize: '0.875rem',
-            '& .MuiSelect-select': {
-              padding: '0.5rem 1rem',
-            }
-          }}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-    );
-  }
-
-  if (type === 'toggle') {
-    return (
-      <Box sx={{ mb: 1 }}>
-        <FormControlLabel
-          control={<Switch size="small" />}
-          label={<Typography variant="body2">{label}</Typography>}
-          onChange={(e, checked) => onChange(field, checked)}
-        />
-      </Box>
-    );
-  }
-
-  if (type === 'checkbox') {
-    return (
-      <Box sx={{ mb: 0.5 }}>
-        <FormControlLabel
-          control={<Checkbox size="small" />}
-          label={<Typography variant="body2">{label}</Typography>}
-          onChange={(e, checked) => onChange(field, checked)}
-        />
-      </Box>
-    );
-  }
-
-  if (type === 'date-range') {
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-
-    const handleStartDateChange = (date: any) => {
-      setStartDate(date);
-      onChange(field, [date, endDate]);
-    };
-
-    const handleEndDateChange = (date: any) => {
-      setEndDate(date);
-      onChange(field, [startDate, date]);
-    };
-
-    return (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-          <DatePicker
-            label="Start Date"
-            value={startDate}
-            onChange={handleStartDateChange}
-            sx={{ mb: 1 }}
-          />
-          <DatePicker
-            label="End Date"
-            value={endDate}
-            onChange={handleEndDateChange}
-          />
-        </Box>
-      </LocalizationProvider>
-    );
-  }
-
-  // Default fallback for other types
-  return (
-    <Box sx={{ mb: 2 }}>
-      <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-      <Typography variant="caption" color="text.secondary">
-        Filter type "{type}" not supported
-      </Typography>
-    </Box>
-  );
-};
-
-/**
- * Filters panel component with modern styling
- * Includes data sources, formats, and other filtering options
+ * Filters panel component with tabbed interface for Trees, Air Quality, and Locations
  */
 const FiltersPanel: React.FC = () => {
-  const { dispatch, setFilter } = useFilters();
-  const [sortBy, setSortBy] = useState('relevance');
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({});
-
-  // Data sources based on configured repositories
-  const dataSources = taskflow.data.repositories.map(repo => ({
-    id: repo.id as string,
-    name: repo.name as string,
-    checked: false
-  }));
-
-  // Use filter fields from taskflow.config
-  const filters = pageConfig?.filters?.fields || [];
-
-  // Fetch data based on filter changes
-  useEffect(() => {
-    const applyFilters = () => {
-      try {
-        // Apply filters to the current context
-        Object.entries(filterValues).forEach(([field, value]) => {
-          if (value !== undefined && value !== null) {
-            // The setFilter function handles determining the appropriate operator based on value type
-            setFilter(field, value);
-          }
-        });
-      } catch (err) {
-        // Implement proper error handling instead of console.error
-        if (err instanceof Error) {
-          // Handle error appropriately, such as showing an error message to the user
-          dispatch({
-            type: 'SET_EXPANDED_GROUP',
-            payload: `Error applying filters: ${err.message}`
-          });
-        }
-      }
-    };
-
-    if (Object.keys(filterValues).length > 0) {
-      applyFilters();
-    }
-  }, [filterValues, dispatch, setFilter]);
-
-  // Handle filter changes
-  const handleFilterChange = (field: string, value: any) => {
-    setFilterValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  // State for active tab
+  const [activeTab, setActiveTab] = useState<number>(2); // Default to Locations tab
+  
+  // State for Trees filters
+  const [species, setSpecies] = useState('');
+  const [health, setHealth] = useState('Any');
+  const [minHeight, setMinHeight] = useState<number>(0);
+  const [maxHeight, setMaxHeight] = useState<number>(100);
+  
+  // State for Air Quality filters
+  const [dataSource, setDataSource] = useState('Any');
+  const [minPm25, setMinPm25] = useState<number>(0);
+  const [maxPm25, setMaxPm25] = useState<number>(50);
+  
+  // State for Locations filters
+  const [locationName, setLocationName] = useState('');
+  const [locationType, setLocationType] = useState('Any');
+  
+  const handleTabChange = (newValue: number) => {
+    setActiveTab(newValue);
   };
-
-  // Group filters by category based on Dataset interface
-  const filterCategories: FilterCategories = {
-    urbanTreeInventory: filters.filter((f: any) =>
-      ['species', 'dbh', 'healthCondition', 'observationDate'].includes(f.field)
-    ),
-    airQuality: filters.filter((f: any) =>
-      f.field === 'air-quality-parameter'
-    ),
-    spatial: filters.filter((f: any) =>
-      f.field === 'location'
-    ),
-    temporal: filters.filter((f: any) =>
-      f.field === 'time-period'
-    ),
-  };
+  
+  // Trees filter content
+  const renderTreesFilters = () => (
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Species
+        </Typography>
+        <TextField 
+          fullWidth
+          variant="outlined" 
+          size="small" 
+          placeholder="e.g. Oak, Redwood"
+          value={species}
+          onChange={(e) => setSpecies(e.target.value)}
+        />
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Health
+        </Typography>
+        <Select
+          fullWidth
+          size="small"
+          value={health}
+          onChange={(e) => setHealth(e.target.value as string)}
+          displayEmpty
+        >
+          <MenuItem value="Any">Any</MenuItem>
+          <MenuItem value="Good">Good</MenuItem>
+          <MenuItem value="Fair">Fair</MenuItem>
+          <MenuItem value="Poor">Poor</MenuItem>
+        </Select>
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Min Height (ft): {minHeight}
+        </Typography>
+        <Slider
+          value={minHeight}
+          onChange={(e, val) => setMinHeight(val as number)}
+          aria-labelledby="min-height-slider"
+          valueLabelDisplay="auto"
+          min={0}
+          max={100}
+          sx={{
+            color: '#4CAF50', // Green color for slider
+            '& .MuiSlider-thumb': {
+              borderRadius: '50%',
+              width: 16,
+              height: 16,
+              backgroundColor: '#fff',
+              border: '2px solid currentColor',
+            },
+            '& .MuiSlider-track': {
+              height: 6,
+              borderRadius: 3,
+            },
+            '& .MuiSlider-rail': {
+              height: 6,
+              borderRadius: 3,
+              opacity: 0.5,
+              backgroundColor: '#bfbfbf',
+            },
+          }}
+        />
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Max Height (ft): {maxHeight}
+        </Typography>
+        <Slider
+          value={maxHeight}
+          onChange={(e, val) => setMaxHeight(val as number)}
+          aria-labelledby="max-height-slider"
+          valueLabelDisplay="auto"
+          min={0}
+          max={100}
+          sx={{
+            color: '#4CAF50', // Green color for slider
+            '& .MuiSlider-thumb': {
+              borderRadius: '50%',
+              width: 16,
+              height: 16,
+              backgroundColor: '#fff',
+              border: '2px solid currentColor',
+            },
+            '& .MuiSlider-track': {
+              height: 6,
+              borderRadius: 3,
+            },
+            '& .MuiSlider-rail': {
+              height: 6,
+              borderRadius: 3,
+              opacity: 0.5,
+              backgroundColor: '#bfbfbf',
+            },
+          }}
+        />
+      </Box>
+      
+      <Button 
+        variant="contained" 
+        fullWidth
+        sx={{ 
+          mt: 1, 
+          bgcolor: '#4CAF50', 
+          '&:hover': { bgcolor: '#388E3C' },
+          textTransform: 'none',
+          py: 1.5
+        }}
+      >
+        Search Trees
+      </Button>
+    </Box>
+  );
+  
+  // Air Quality filter content
+  const renderAirQualityFilters = () => (
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Data Source
+        </Typography>
+        <Select
+          fullWidth
+          size="small"
+          value={dataSource}
+          onChange={(e) => setDataSource(e.target.value as string)}
+          displayEmpty
+        >
+          <MenuItem value="Any">Any</MenuItem>
+          <MenuItem value="Sensor A">Sensor A</MenuItem>
+          <MenuItem value="Sensor B">Sensor B</MenuItem>
+        </Select>
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Min PM2.5 (µg/m³): {minPm25}
+        </Typography>
+        <Slider
+          value={minPm25}
+          onChange={(e, val) => setMinPm25(val as number)}
+          aria-labelledby="min-pm25-slider"
+          valueLabelDisplay="auto"
+          min={0}
+          max={50}
+          sx={{
+            color: '#2196F3', // Blue color for slider
+            '& .MuiSlider-thumb': {
+              borderRadius: '50%',
+              width: 16,
+              height: 16,
+              backgroundColor: '#fff',
+              border: '2px solid currentColor',
+            },
+            '& .MuiSlider-track': {
+              height: 6,
+              borderRadius: 3,
+            },
+            '& .MuiSlider-rail': {
+              height: 6,
+              borderRadius: 3,
+              opacity: 0.5,
+              backgroundColor: '#bfbfbf',
+            },
+          }}
+        />
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Max PM2.5 (µg/m³): {maxPm25}
+        </Typography>
+        <Slider
+          value={maxPm25}
+          onChange={(e, val) => setMaxPm25(val as number)}
+          aria-labelledby="max-pm25-slider"
+          valueLabelDisplay="auto"
+          min={0}
+          max={50}
+          sx={{
+            color: '#4CAF50', // Green color for slider
+            '& .MuiSlider-thumb': {
+              borderRadius: '50%',
+              width: 16,
+              height: 16,
+              backgroundColor: '#fff',
+              border: '2px solid currentColor',
+            },
+            '& .MuiSlider-track': {
+              height: 6,
+              borderRadius: 3,
+            },
+            '& .MuiSlider-rail': {
+              height: 6,
+              borderRadius: 3,
+              opacity: 0.5,
+              backgroundColor: '#bfbfbf',
+            },
+          }}
+        />
+      </Box>
+      
+      <Button 
+        variant="contained" 
+        fullWidth
+        sx={{ 
+          mt: 1, 
+          bgcolor: '#4CAF50', 
+          '&:hover': { bgcolor: '#388E3C' },
+          textTransform: 'none',
+          py: 1.5
+        }}
+      >
+        Search Air Quality
+      </Button>
+    </Box>
+  );
+  
+  // Locations filter content
+  const renderLocationsFilters = () => (
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Name
+        </Typography>
+        <TextField 
+          fullWidth
+          variant="outlined" 
+          size="small" 
+          placeholder="e.g. Doe Library"
+          value={locationName}
+          onChange={(e) => setLocationName(e.target.value)}
+        />
+      </Box>
+      
+      <Box>
+        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+          Location Type
+        </Typography>
+        <Select
+          fullWidth
+          size="small"
+          value={locationType}
+          onChange={(e) => setLocationType(e.target.value as string)}
+          displayEmpty
+        >
+          <MenuItem value="Any">Any</MenuItem>
+          <MenuItem value="Building">Building</MenuItem>
+          <MenuItem value="Landmark">Landmark</MenuItem>
+          <MenuItem value="Open Space">Open Space</MenuItem>
+        </Select>
+      </Box>
+      
+      <Button 
+        variant="contained" 
+        fullWidth
+        sx={{ 
+          mt: 1, 
+          bgcolor: '#4CAF50', 
+          '&:hover': { bgcolor: '#388E3C' },
+          textTransform: 'none',
+          py: 1.5
+        }}
+      >
+        Search Locations
+      </Button>
+    </Box>
+  );
 
   return (
     <Paper 
-      elevation={0}
+      elevation={0} 
       sx={{ 
+        width: '100%',
         border: '1px solid',
         borderColor: 'grey.200',
         borderRadius: 2,
-        height: '100%',
-        overflow: 'auto'
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.paper',
+        overflow: 'hidden'
       }}
     >
-      {/* Header */}
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'grey.200' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterIcon size={18} />
-          <Typography variant="subtitle1" fontWeight={500}>
-            Filters
-          </Typography>
-        </Box>
-      </Box>
-
-      {/* Filter Content */}
       <Box sx={{ p: 2 }}>
-        {/* Data Sources Section */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500 }}>
-            Data Sources
-          </Typography>
-          <FormGroup>
-            {dataSources.map(source => (
-              <Box key={source.id}>
-                <FormControlLabel
-                  control={
-                    <Checkbox 
-                      checked={filterValues.source?.[source.id] || false}
-                      onChange={() => handleFilterChange('source', source.id)}
-                      size="small"
-                    />
-                  }
-                  label={<Typography variant="body2">{source.name}</Typography>}
-                />
-              </Box>
-            ))}
-          </FormGroup>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Advanced Filters from taskflow config */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500 }}>
-            Advanced Filters
-          </Typography>
-          
-          {(Object.keys(filterCategories) as (keyof FilterCategories)[])
-            .filter(category => filterCategories[category].length > 0)
-            .map((category) => (
-              <Box key={category} sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ 
-                  mb: 1,
-                  fontWeight: 500,
-                  color: 'text.secondary',
-                  textTransform: 'capitalize'
-                }}>
-                  {category}
-                </Typography>
-                {filterCategories[category].map((filter: any) => (
-                  <FilterField 
-                    key={filter.field} 
-                    filter={filter}
-                    onChange={handleFilterChange}
-                  />
-                ))}
-              </Box>
-            ))}
-        </Box>
-      </Box>
-
-      <Divider sx={{ my: 2 }} />
-
-      {/* Sort Section */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SortAscIcon size={16} />
-          Sort Results
+        <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
+          Search Filters
         </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Find specific trees, air quality data, or campus locations
+        </Typography>
+
+        {/* Button-style tabs */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+          <Button
+            variant="text"
+            startIcon={<Forest fontSize="small" />}
+            onClick={() => handleTabChange(0)}
+            sx={{
+              textTransform: 'none',
+              color: activeTab === 0 ? '#4CAF50' : 'text.primary',
+              border: activeTab === 0 ? '1px solid #4CAF50' : '1px solid transparent',
+              borderRadius: 1,
+              backgroundColor: activeTab === 0 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
+              '&:hover': {
+                backgroundColor: activeTab === 0 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Trees
+          </Button>
+          
+          <Button
+            variant="text"
+            startIcon={<FilterAlt fontSize="small" />}
+            onClick={() => handleTabChange(1)}
+            sx={{
+              textTransform: 'none',
+              color: activeTab === 1 ? '#4CAF50' : 'text.primary',
+              border: activeTab === 1 ? '1px solid #4CAF50' : '1px solid transparent',
+              borderRadius: 1,
+              backgroundColor: activeTab === 1 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
+              '&:hover': {
+                backgroundColor: activeTab === 1 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Air Quality
+          </Button>
+          
+          <Button
+            variant="text"
+            startIcon={<LocationOn fontSize="small" />}
+            onClick={() => handleTabChange(2)}
+            sx={{
+              textTransform: 'none',
+              color: activeTab === 2 ? '#4CAF50' : 'text.primary',
+              border: activeTab === 2 ? '1px solid #4CAF50' : '1px solid transparent',
+              borderRadius: 1,
+              backgroundColor: activeTab === 2 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
+              '&:hover': {
+                backgroundColor: activeTab === 2 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Locations
+          </Button>
+        </Box>
       </Box>
+
+      {/* Render content based on selected tab */}
+      {activeTab === 0 && renderTreesFilters()}
+      {activeTab === 1 && renderAirQualityFilters()}
+      {activeTab === 2 && renderLocationsFilters()}
     </Paper>
   );
 };

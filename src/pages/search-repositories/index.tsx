@@ -1,23 +1,20 @@
-import { Box, Stack, Divider, Container, Typography, Paper } from '@mui/material';
+import { Box, Container, Typography, Paper, Grid } from '@mui/material';
 import React, { useState } from 'react';
-import DataListPanel from './_components/DataListPanel';
 import FiltersPanel from './_components/FiltersPanel'; 
+import { FilterContextProvider } from '../../components/FilterContext';
+import { SearchIcon } from '../../components/Icons';
+import DataListPanel from './_components/DataListPanel';
 import { PreviewPanel } from './_components/PreviewPanel';
 import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
-import SearchInput from './_components/SearchInput';
 import { taskflow } from './_config/taskflow.config';
 import type { Dataset } from './_config/taskflow.types';
-import { FilterContextProvider } from '../../components/FilterContext';
 import { searchHelper } from '../../utils/searchHelper';
-import { SearchIcon } from '../../components/Icons';
 import { Button } from '../../components/Button';
 
 /**
  * The main explore page for the search-data-repositories Task Flow.
- * Displays a page header, search input, filters, and search results.
- * Redesigned to match the modern aesthetic while preserving functionality.
+ * Displays a page header, filters panel, map view, and search results.
  */
-
 interface TaskflowPages {
   index: {
     title: string;
@@ -43,29 +40,16 @@ const DatasetExplorer: React.FC = () => {
     setSearchResults(results);
   };
 
-  const fetchSuggestions = async () => {
-    const suggestions = await searchHelper.getSuggestions();
-    setSuggestions(suggestions);
-  };
-
   const handleClosePreview = () => {
     setPreviewItem(null);
   };
 
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
-  };
-
-  /**
-   * Content to render on the page for this component
-   */
   return (
     <FilterContextProvider>
       <Box sx={{ py: 4, backgroundColor: 'background.default', minHeight: '100vh' }}>
         <Container maxWidth="xl">
-          {/* Page header with title and search input */}
+          {/* Page header */}
           <Box sx={{ mb: 4 }}>
-            {/* Updated header style to match Monitor page */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <SearchIcon size={24} color="#3B82F6" />
               <Box>
@@ -77,81 +61,112 @@ const DatasetExplorer: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-            
-            <Paper 
-              elevation={0} 
-              sx={{ 
-                p: 2, 
-                display: 'flex', 
-                alignItems: 'center',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'grey.200'
-              }}
-            >
-              <Box sx={{ flexGrow: 1, mr: 2 }}>
-                <SearchInput
-                  onSearch={handleSearch}
-                  suggestions={suggestions}
-                  onInputChange={fetchSuggestions}
-                />
-              </Box>
-              <Button 
-                variant="contained"
-                onClick={() => handleSearch('')}
-                sx={{ px: 4 }}
-              >
-                Search
-              </Button>
-            </Paper>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            {/* Filters panel on the left */}
-            <Box sx={{ width: '240px', flexShrink: 0 }}>
+          <Grid container spacing={3}>
+            {/* Left column: Filters panel */}
+            <Grid item xs={12} md={3}>
               <FiltersPanel />
-            </Box>
+            </Grid>
 
-            {/* Main content area */}
-            <Box sx={{ flexGrow: 1 }}>
-              {/* Search history panel (collapsible) */}
-              {showHistory && (
-                <>
-                  <SearchHistoryPanel />
-                  <Divider sx={{ my: 3 }} />
-                </>
-              )}
-
-              {/* Toggle button for search history */}
-              <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                  variant="outlined" 
-                  color="secondary" 
-                  onClick={toggleHistory}
-                  size="small"
-                >
-                  {showHistory ? 'Hide History' : 'Show History'}
-                </Button>
-              </Box>
+            {/* Right column: Map and search results */}
+            <Grid item xs={12} md={9}>
+              {/* Map view */}
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  height: 400, 
+                  mb: 3, 
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  bgcolor: '#f0f7f7'
+                }}
+              >
+                {/* Map content */}
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: 10, 
+                  right: 10, 
+                  bgcolor: 'white',
+                  p: 1,
+                  borderRadius: 1,
+                  boxShadow: 1,
+                  zIndex: 10
+                }}>
+                  <Typography variant="caption">UC Berkeley Campus Map</Typography>
+                </Box>
+                
+                {/* Sample map markers */}
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: '30%', 
+                  left: '40%',
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  bgcolor: '#4CAF50',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  zIndex: 5
+                }}>
+                  T
+                </Box>
+                
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: '50%', 
+                  left: '60%',
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  bgcolor: '#2196F3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  zIndex: 5
+                }}>
+                  A
+                </Box>
+              </Paper>
 
               {/* Search results */}
-              <DataListPanel
-                previewItem={previewItem}
-                setPreviewItem={(item: Dataset | null) => setPreviewItem(item)}
-                searchResults={searchResults}
-              />
-            </Box>
-
-            {/* Preview panel (conditionally rendered) */}
-            {previewItem && (
-              <Box sx={{ width: '400px', flexShrink: 0 }}>
-                <PreviewPanel
-                  previewItem={previewItem}
-                  onClose={handleClosePreview}
-                />
-              </Box>
-            )}
-          </Box>
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'grey.200'
+                }}
+              >
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                  Search Results ({searchResults.length})
+                </Typography>
+                
+                {searchResults.length > 0 ? (
+                  <DataListPanel
+                    previewItem={previewItem}
+                    setPreviewItem={(item: Dataset | null) => setPreviewItem(item)}
+                    searchResults={searchResults}
+                  />
+                ) : (
+                  <Typography color="text.secondary">
+                    No datasets found matching your criteria. Try adjusting your search.
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
     </FilterContextProvider>

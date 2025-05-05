@@ -1,211 +1,256 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Paper, 
   Typography, 
   Button, 
   ButtonGroup, 
-  Divider,
   IconButton,
-  Tooltip
+  Tooltip,
+  Menu,
+  MenuItem,
+  Checkbox,
+  ListItemText
 } from '@mui/material';
-import Plot from 'react-plotly.js';
-import * as d3 from 'd3-fetch';
-import { ChevronLeft, DownloadIcon, FilterIcon } from '../../../components/Icons';
+import { ChevronLeft, DownloadIcon, LayersIcon, MapIcon } from '../../../components/Icons';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 
+// We'll define an interface for the component props
 interface VisualizationViewProps {
   activeChart: 'timeSeries' | 'map' | 'histogram' | 'distribution';
   onToggleControls: () => void;
   showControls: boolean;
+  dataType: string;
+  treesLayerEnabled: boolean;
+  sensorsLayerEnabled: boolean;
 }
+
+// Mock data for trees and sensors
+const MOCK_TREES = [
+  { id: 1, lat: 37.8716, lng: -122.2727, type: 'Coast Live Oak', condition: 'excellent' },
+  { id: 2, lat: 37.8710, lng: -122.2695, type: 'California Redwood', condition: 'good' },
+  { id: 3, lat: 37.8699, lng: -122.2735, type: 'American Elm', condition: 'fair' },
+  { id: 4, lat: 37.8730, lng: -122.2707, type: 'London Plane', condition: 'good' },
+  { id: 5, lat: 37.8705, lng: -122.2650, type: 'Monterey Pine', condition: 'fair' },
+  { id: 6, lat: 37.8692, lng: -122.2700, type: 'Coast Live Oak', condition: 'good' }
+];
+
+const MOCK_AIR_SENSORS = [
+  { id: 1, lat: 37.8712, lng: -122.2687, pm25: 8.3, official: true },
+  { id: 2, lat: 37.8720, lng: -122.2720, pm25: 10.1, official: true },
+  { id: 3, lat: 37.8695, lng: -122.2670, pm25: 7.8, official: true },
+  { id: 4, lat: 37.8702, lng: -122.2715, pm25: 12.3, official: false }
+];
 
 /**
  * Main visualization component for the explore data page
- * Uses Plotly.js for charts and visualizations
+ * Features an interactive map with tree and air quality data
  */
 export const VisualizationView: React.FC<VisualizationViewProps> = ({
   activeChart,
   onToggleControls,
-  showControls
+  showControls,
+  dataType,
+  treesLayerEnabled,
+  sensorsLayerEnabled
 }) => {
-  // Mock temperature data for demo - in a real app this would come from an API
-  const generateTemperatureData = () => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const baselineTemp = 15;
-    const amplitude = 15;
+  // State for layer visibility
+  const [visibleLayers, setVisibleLayers] = useState<string[]>([
+    treesLayerEnabled ? 'trees' : '',
+    sensorsLayerEnabled ? 'airQuality' : ''
+  ].filter(Boolean));
+  
+  // State for layers menu
+  const [layersMenuAnchorEl, setLayersMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const isLayersMenuOpen = Boolean(layersMenuAnchorEl);
+  
+  // Map initialization ref
+  const mapRef = React.useRef<any>(null);
+  const mapContainerRef = React.useRef<HTMLDivElement>(null);
+  const layersRef = React.useRef<any>(null);
+  
+  // Handle layer menu open/close
+  const handleLayersMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setLayersMenuAnchorEl(event.currentTarget);
+  };
+  
+  const handleLayersMenuClose = () => {
+    setLayersMenuAnchorEl(null);
+  };
+  
+  // Toggle visibility of a layer
+  const handleLayerToggle = (layer: string) => {
+    if (visibleLayers.includes(layer)) {
+      setVisibleLayers(visibleLayers.filter(l => l !== layer));
+    } else {
+      setVisibleLayers([...visibleLayers, layer]);
+    }
+  };
+  
+  // Create and initialize map when component mounts
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+      // Initialize map
+      const map = L.map(mapContainerRef.current).setView([37.8715, -122.2680], 15); // UC Berkeley coordinates
+      
+      // Add tile layer (OpenStreetMap)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Create layer groups
+      const treeLayer = L.layerGroup();
+      const sensorLayer = L.layerGroup();
+      
+      // Add tree markers
+      MOCK_TREES.forEach(tree => {
+        const marker = L.marker([tree.lat, tree.lng], {
+          icon: L.divIcon({
+            html: `<div style="background-color: #4CAF50; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">🌳</div>`,
+            className: '',
+            iconSize: [24, 24]
+          })
+        });
+        
+        marker.bindPopup(`
+          <div>
+            <h3>${tree.type}</h3>
+            <p>Condition: ${tree.condition}</p>
+          </div>
+        `);
+        
+        marker.addTo(treeLayer);
+      });
+      
+      // Add sensor markers
+      MOCK_AIR_SENSORS.forEach(sensor => {
+        const markerColor = sensor.pm25 > 10 ? '#e91e63' : '#2196F3';
+        
+        const customIcon = L.divIcon({
+          html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">📊</div>`,
+          className: '',
+          iconSize: [24, 24]
+        });
+        
+        const marker = L.marker([sensor.lat, sensor.lng], { icon: customIcon })
+          .bindPopup(`
+            <div>
+              <h3>Air Quality Sensor</h3>
+              <p>PM2.5: ${sensor.pm25} μg/m³</p>
+              <p>Status: ${sensor.official ? 'Official' : 'Student'}</p>
+            </div>
+          `);
+        
+        marker.addTo(sensorLayer);
+      });
+      
+      // Store references
+      mapRef.current = map;
+      layersRef.current = {
+        trees: treeLayer,
+        airQuality: sensorLayer
+      };
+      
+      // Initialize with both layers visible
+      treeLayer.addTo(map);
+      sensorLayer.addTo(map);
+    }
     
-    const temps = months.map((_, i) => {
-      // Create a sine wave pattern for temperature (higher in summer, lower in winter)
-      return baselineTemp + amplitude * Math.sin((i / 11) * Math.PI);
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    }
+  }, []);
+  
+  // Update visibleLayers when props change
+  useEffect(() => {
+    const newLayers = [
+      treesLayerEnabled ? 'trees' : '',
+      sensorsLayerEnabled ? 'airQuality' : ''
+    ].filter(Boolean) as string[];
+    
+    setVisibleLayers(newLayers);
+  }, [treesLayerEnabled, sensorsLayerEnabled]);
+  
+  // Update layer visibility when visibleLayers changes
+  useEffect(() => {
+    if (mapRef.current && layersRef.current) {
+      // Update tree layer visibility
+      if (visibleLayers.includes('trees')) {
+        layersRef.current.trees.addTo(mapRef.current);
+      } else {
+        layersRef.current.trees.remove();
+      }
+      
+      // Update air quality sensor layer visibility
+      if (visibleLayers.includes('airQuality')) {
+        layersRef.current.airQuality.addTo(mapRef.current);
+      } else {
+        layersRef.current.airQuality.remove();
+      }
+    }
+  }, [visibleLayers]);
+  
+  // Update map when dataType changes
+  useEffect(() => {
+    if (mapRef.current && layersRef.current) {
+      // Focus on relevant data based on selected data type
+      if (dataType === 'trees') {
+        // Ensure tree layer is visible (even if toggle is off)
+        layersRef.current.trees.addTo(mapRef.current);
+        // Find center point of tree data
+        const treeCenter = calculateCenter(MOCK_TREES);
+        mapRef.current.setView([treeCenter.lat, treeCenter.lng], 15);
+      } else if (dataType === 'airQuality') {
+        // Ensure sensor layer is visible (even if toggle is off)
+        layersRef.current.airQuality.addTo(mapRef.current);
+        // Find center point of sensor data
+        const sensorCenter = calculateCenter(MOCK_AIR_SENSORS);
+        mapRef.current.setView([sensorCenter.lat, sensorCenter.lng], 15);
+      }
+    }
+  }, [dataType]);
+  
+  // Helper function to calculate center point of a dataset
+  const calculateCenter = (data: any[]) => {
+    let sumLat = 0;
+    let sumLng = 0;
+    
+    data.forEach(item => {
+      sumLat += item.lat;
+      sumLng += item.lng;
     });
     
-    return { months, temps };
-  };
-  
-  const { months, temps } = generateTemperatureData();
-  
-  // Generate chart data for Plotly based on active chart type
-  const getChartData = () => {
-    switch (activeChart) {
-      case 'timeSeries':
-        return [{
-          x: months,
-          y: temps,
-          type: 'scatter',
-          mode: 'lines+markers',
-          marker: { color: '#1E88E5' },
-          line: { width: 3 },
-          name: 'Temperature (°C)'
-        }];
-      
-      case 'histogram':
-        return [{
-          x: temps,
-          type: 'histogram',
-          marker: { color: '#1E88E5' },
-          name: 'Temperature Distribution'
-        }];
-        
-      case 'distribution':
-        return [{
-          y: temps,
-          type: 'box',
-          marker: { color: '#1E88E5' },
-          name: 'Temperature Distribution'
-        }];
-        
-      case 'map':
-        // For map we would use a different approach, perhaps with leaflet
-        // But for demo purposes, we'll use a scatter plot
-        return [{
-          x: [-85, -80, -75, -70, -65],
-          y: [40, 35, 30, 45, 25],
-          type: 'scatter',
-          mode: 'markers',
-          marker: { 
-            color: temps,
-            colorscale: 'Viridis',
-            size: 15,
-            showscale: true,
-            colorbar: {
-              title: 'Temperature (°C)'
-            }
-          },
-          name: 'Geographic Distribution'
-        }];
-      
-      default:
-        return [{
-          x: months,
-          y: temps,
-          type: 'scatter',
-          mode: 'lines+markers',
-          marker: { color: '#1E88E5' },
-          name: 'Temperature (°C)'
-        }];
-    }
-  };
-  
-  // Get layout configuration for Plotly
-  const getChartLayout = () => {
-    const baseLayout = {
-      autosize: true,
-      height: 500,
-      margin: { l: 50, r: 30, t: 50, b: 50 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      font: {
-        family: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-      },
-      hovermode: 'closest'
+    return {
+      lat: sumLat / data.length,
+      lng: sumLng / data.length
     };
-    
-    switch (activeChart) {
-      case 'timeSeries':
-        return {
-          ...baseLayout,
-          title: 'Temperature Trends',
-          xaxis: { 
-            title: 'Month',
-            gridcolor: '#f0f0f0'
-          },
-          yaxis: { 
-            title: 'Temperature (°C)',
-            gridcolor: '#f0f0f0'
-          }
-        };
-        
-      case 'histogram':
-        return {
-          ...baseLayout,
-          title: 'Temperature Distribution',
-          xaxis: { 
-            title: 'Temperature (°C)',
-            gridcolor: '#f0f0f0' 
-          },
-          yaxis: { 
-            title: 'Frequency',
-            gridcolor: '#f0f0f0'
-          }
-        };
-        
-      case 'distribution':
-        return {
-          ...baseLayout,
-          title: 'Statistical Distribution',
-          yaxis: { 
-            title: 'Temperature (°C)',
-            gridcolor: '#f0f0f0'
-          }
-        };
-        
-      case 'map':
-        return {
-          ...baseLayout,
-          title: 'Geographic Distribution',
-          xaxis: { 
-            title: 'Longitude',
-            gridcolor: '#f0f0f0'
-          },
-          yaxis: { 
-            title: 'Latitude',
-            gridcolor: '#f0f0f0'
-          }
-        };
-        
-      default:
-        return baseLayout;
-    }
   };
-
+  
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        p: 0, 
-        height: '100%', 
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'grey.200',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
+    <Box sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column' 
+    }}>
       {/* Visualization Header */}
       <Box sx={{ 
-        p: 2, 
         display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        p: 2,
         borderBottom: '1px solid',
         borderColor: 'grey.200'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography variant="h6" fontWeight={600}>
-            Temperature Trends
+            Campus Explorer
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-            Monthly average temperature data
+            UC Berkeley Campus Map
           </Typography>
         </Box>
         
@@ -219,86 +264,52 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
                 borderColor: 'grey.300' 
               }}
             >
-              {showControls ? <ChevronLeft size={18} /> : <FilterIcon size={18} />}
+              {showControls ? <ChevronLeft size={18} /> : <MapIcon size={18} />}
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export data">
+          <Tooltip title="Layer controls">
             <IconButton 
               size="small"
+              onClick={handleLayersMenuOpen}
               sx={{ 
                 border: '1px solid',
                 borderColor: 'grey.300' 
               }}
             >
-              <DownloadIcon size={18} />
+              <LayersIcon size={18} />
             </IconButton>
           </Tooltip>
         </Box>
       </Box>
       
-      {/* Visualization Controls */}
-      <Box sx={{ 
-        p: 2, 
-        display: 'flex', 
-        alignItems: 'center',
-        gap: 2,
-        borderBottom: '1px solid',
-        borderColor: 'grey.200'
-      }}>
-        <ButtonGroup variant="outlined" size="small">
-          <Button 
-            color={activeChart === 'timeSeries' ? 'primary' : 'inherit'}
-            variant={activeChart === 'timeSeries' ? 'contained' : 'outlined'}
-          >
-            Time Series
-          </Button>
-          <Button 
-            color={activeChart === 'map' ? 'primary' : 'inherit'}
-            variant={activeChart === 'map' ? 'contained' : 'outlined'}
-          >
-            Map View
-          </Button>
-          <Button 
-            color={activeChart === 'histogram' ? 'primary' : 'inherit'}
-            variant={activeChart === 'histogram' ? 'contained' : 'outlined'}
-          >
-            Histogram
-          </Button>
-          <Button 
-            color={activeChart === 'distribution' ? 'primary' : 'inherit'}
-            variant={activeChart === 'distribution' ? 'contained' : 'outlined'}
-          >
-            Distribution
-          </Button>
-        </ButtonGroup>
-        
-        <Divider orientation="vertical" flexItem />
-        
-        <Button variant="outlined" size="small">
-          Export
-        </Button>
-      </Box>
+      {/* Map Container */}
+      <Box 
+        ref={mapContainerRef} 
+        sx={{ 
+          flex: 1,
+          position: 'relative'
+        }} 
+      />
       
-      {/* Visualization Content */}
-      <Box sx={{ 
-        flex: 1, 
-        p: 2, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center' 
-      }}>
-        <Plot
-          data={getChartData()}
-          layout={getChartLayout()}
-          style={{ width: '100%', height: '100%' }}
-          useResizeHandler={true}
-          config={{
-            responsive: true,
-            displaylogo: false,
-            modeBarButtonsToRemove: ['lasso2d', 'select2d', 'toggleSpikelines']
-          }}
-        />
-      </Box>
-    </Paper>
+      {/* Layers Menu */}
+      <Menu
+        anchorEl={layersMenuAnchorEl}
+        open={isLayersMenuOpen}
+        onClose={handleLayersMenuClose}
+        PaperProps={{
+          elevation: 2,
+          sx: { minWidth: 180 }
+        }}
+      >
+        <MenuItem onClick={() => handleLayerToggle('trees')}>
+          <Checkbox checked={visibleLayers.includes('trees')} />
+          <ListItemText primary="Trees" />
+        </MenuItem>
+        <MenuItem onClick={() => handleLayerToggle('airQuality')}>
+          <Checkbox checked={visibleLayers.includes('airQuality')} />
+          <ListItemText primary="Air Quality" />
+        </MenuItem>
+      </Menu>
+    </Box>
   );
 };
