@@ -32,8 +32,13 @@ const DatasetExplorer: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
 
+  const [datasets, setDatasets] = useState<Dataset[]>([
+    { id: '1', title: 'Tree Dataset 1', publication_date: '2023-01-01', summary: 'Summary 1', source: 'Source 1' },
+    { id: '2', title: 'Air Quality Dataset 2', publication_date: '2023-02-01', summary: 'Summary 2', source: 'Source 2' },
+    { id: '3', title: 'Tree Dataset 3', publication_date: '2023-03-01', summary: 'Summary 3', source: 'Source 3' },
+  ]);
+
   const handleSearch = async (searchText: string) => {
-    const datasets: Dataset[] = []; // TODO: Get actual datasets
     const results = await searchHelper.searchDatasets(searchText, datasets);
     setSearchResults(results);
   };

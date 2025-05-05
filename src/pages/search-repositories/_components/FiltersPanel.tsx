@@ -1,5 +1,8 @@
 import { Box, Typography, Slider, Select, MenuItem, FormControlLabel, Switch, Checkbox, Paper, Divider, FormGroup, SelectChangeEvent } from '@mui/material';
-import React, { useState, useEffect, ReactNode } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import React, { useState, useEffect } from 'react';
 import { FilterIcon, SortAscIcon } from '../../../components/Icons';
 import { useFilters } from '../../../components/FilterContext';
 import { TaskflowPages, FilterFieldProps } from '../_config/taskflow.types';
@@ -114,21 +117,36 @@ const FilterField: React.FC<FilterFieldProps & { onChange: (field: string, value
   }
 
   if (type === 'date-range') {
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    const handleStartDateChange = (date: any) => {
+      setStartDate(date);
+      onChange(field, [date, endDate]);
+    };
+
+    const handleEndDateChange = (date: any) => {
+      setEndDate(date);
+      onChange(field, [startDate, date]);
+    };
+
     return (
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-        {/* Implement date range picker here */}
-        <input
-          type="date"
-          onChange={(e) => onChange(field, e.target.value)}
-          placeholder="Start Date"
-        />
-        <input
-          type="date"
-          onChange={(e) => onChange(field, e.target.value)}
-          placeholder="End Date"
-        />
-      </Box>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
+          <DatePicker
+            label="Start Date"
+            value={startDate}
+            onChange={handleStartDateChange}
+            sx={{ mb: 1 }}
+          />
+          <DatePicker
+            label="End Date"
+            value={endDate}
+            onChange={handleEndDateChange}
+          />
+        </Box>
+      </LocalizationProvider>
     );
   }
 

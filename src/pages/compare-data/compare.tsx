@@ -13,25 +13,12 @@ const CompareDatasets: React.FC = () => {
   const [syncYAxes, setSyncYAxes] = useState(false);
 
   // Fetch actual tree data and air quality data
-  const treeData = {
-    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
-    y: [10, 20, 30, 40],
-    type: 'bar' as const,
-    name: 'Tree Inventory',
-  };
-
-  const airQualityData = {
-    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
-    y: [5, 10, 15, 20],
-    type: 'bar' as const,
-    name: 'Air Quality',
-  };
-    const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
-    
+  
+  const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
+  const generateMockData = (seed: number, type: 'tree' | 'air-quality') => {
     return {
       x: categories,
       y: categories.map((_, i) => {
-        // Create some mock data based on the seed and type
         return seed * (i + 1) * (type === 'tree' ? 10 : 5);
       }),
       type: 'bar' as const,
@@ -39,34 +26,11 @@ const CompareDatasets: React.FC = () => {
     };
   };
 
-  const treeData = {
-    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
-    y: [10, 20, 30, 40],
-    type: 'bar' as const,
-    name: 'Tree Inventory',
-  };
-
-  const airQualityData = {
-    x: ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
-    y: [5, 10, 15, 20],
-    type: 'bar' as const,
-    name: 'Air Quality',
-  };
+  const treeData = generateMockData(1, 'tree');
+  const airQualityData = generateMockData(0.5, 'air-quality');
 
   // Dataset information for urban tree inventory and air quality
   const datasets = [
-    {
-      id: 1,
-      title: 'Urban Tree Inventory',
-      source: 'Source: Local Government Data',
-      data: treeData,
-    },
-    {
-      id: 2,
-      title: 'Air Quality Measurements',
-      source: 'Source: Environmental Agency',
-      data: airQualityData,
-    },
     {
       id: 1,
       title: 'Urban Tree Inventory',

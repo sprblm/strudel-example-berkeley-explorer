@@ -8,7 +8,8 @@ interface TreeObservation {
   source: string;
   isBaseline: boolean;
   id: string;
-  // Add other relevant properties
+  photos?: string[];
+  notes?: string;
 }
 
 interface AQReading {

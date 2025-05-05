@@ -11,34 +11,7 @@ export interface ListConfig {
   staticParams?: Record<string, unknown>;
 }
 
-export interface Dataset {
-  id: string;
-  title: string;
-  publication_date: string;
-  start_date?: string;
-  end_date?: string;
-  citation: string;
-  doi: string;
-  summary: string;
-  source: string;
-  tags: string[];
-  category: string;
-  purpose?: string;
-  point_of_contact: string;
-  originator: string;
-  metadata_contact: string;
-  publisher: string;
-  distributor: string;
-  usgs_mission_area: string;
-  communities: Array<{ title: string; url: string }>;
-  associated_projects: Array<{ title: string; url: string }>;
-  attached_files: Array<{
-    file_id: number;
-    file_name: string;
-    file_size: string;
-    description: string;
-  }>;
-}
+// Remove the original Dataset interface definition
 
 export interface CardFields {
   titleField: string;
@@ -56,19 +29,23 @@ export interface DataListCardProps {
   category?: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
 }
 
+export interface Filter {
+  field: string;
+  label: string;
+  type: 'range' | 'select' | 'toggle' | 'checkbox' | 'date-range';
+  filterComponent?: string;
+  filterProps?: Record<string, unknown>;
+  operator?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: { value: string; label: string }[];
+}
+
+export type FilterType = 'range' | 'select' | 'toggle' | 'checkbox' | 'date-range';
+
 export interface FilterFieldProps {
-  filter: {
-    field: string;
-    label: string;
-    type: 'range' | 'select' | 'toggle' | 'checkbox' | 'date-range';
-    filterComponent?: string;
-    filterProps?: Record<string, unknown>;
-    operator?: string;
-    min?: number;
-    max?: number;
-    step?: number;
-    options?: { value: string; label: string }[];
-  };
+  filter: Filter;
 }
 
 export interface TaskflowPages {
@@ -88,4 +65,27 @@ export interface TaskflowConfig {
     repositories: { id: string; name: string; enabled: boolean }[];
   };
   pages: TaskflowPages;
+}
+
+export interface DataListPanelProps {
+  searchResults: Dataset[];
+  previewItem: Dataset | null;
+  setPreviewItem: (item: Dataset | null) => void;
+}
+
+export interface Dataset {
+  id: string;
+  type?: string;
+  species?: string;
+  location?: string;
+  parameter?: string;
+  value?: number;
+  distance?: number;
+  dbh?: number;
+  observationDate?: string;
+  title: string;
+  summary: string;
+  source: string;
+  attached_files?: { file_name: string; file_size: string }[];
+  publication_date: string;
 }
