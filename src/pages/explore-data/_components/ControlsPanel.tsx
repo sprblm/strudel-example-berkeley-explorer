@@ -174,8 +174,8 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     </>
   );
 
-  // Tree Visualizations
-  const renderTreeVisualizations = () => (
+  // Render Tree Visualization Content
+  const renderTreeVisualizationContent = () => (
     <>
       {/* Tree Species Distribution Chart */}
       <Box sx={{ mb: 3 }}>
@@ -358,49 +358,34 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     </>
   );
 
-  // Air Quality Visualizations
-  const renderAirQualityVisualizations = () => (
+  // Render Air Quality Visualization Content
+  const renderAirQualityVisualizationContent = () => (
     <>
-      {/* PM2.5 Daily Average */}
+      {/* PM2.5 Levels Chart */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          PM2.5 Daily Average
+          PM2.5 Levels
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Air quality readings over time
+          PM2.5 readings throughout the day
         </Typography>
         
-        {/* Line Chart Visualization */}
+        {/* Bar Chart Visualization */}
         <Box sx={{ height: 200, position: 'relative' }}>
           {/* Y-Axis Labels */}
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 10 }}>15</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>5</Typography>
-          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 190 }}>0</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 0 }}>16</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 50 }}>8</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>4</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 150 }}>0</Typography>
           
-          {/* X-Axis Labels */}
+          {/* Bars */}
           <Box sx={{ 
             display: 'flex', 
-            justifyContent: 'space-between',
-            width: 'calc(100% - 20px)',
-            position: 'absolute',
-            bottom: -20,
-            left: 20,
-          }}>
-            <Typography variant="caption">Mon</Typography>
-            <Typography variant="caption">Tue</Typography>
-            <Typography variant="caption">Wed</Typography>
-            <Typography variant="caption">Thu</Typography>
-            <Typography variant="caption">Fri</Typography>
-            <Typography variant="caption">Sat</Typography>
-            <Typography variant="caption">Sun</Typography>
-          </Box>
-          
-          {/* Line Chart */}
-          <Box sx={{ 
             height: '100%', 
             pl: 3, 
-            position: 'relative',
-            pr: 1
+            alignItems: 'flex-end',
+            pt: 2,
+            position: 'relative'
           }}>
             {/* Grid Lines */}
             <Box sx={{ 
@@ -419,7 +404,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               width: '100%', 
               height: '1px', 
               bgcolor: '#e0e0e0', 
-              top: 103,
+              top: 63,
               left: 0,
               borderStyle: 'dashed',
               borderWidth: '0 0 1px 0',
@@ -430,104 +415,185 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               width: '100%', 
               height: '1px', 
               bgcolor: '#e0e0e0', 
-              top: 193,
+              top: 113,
               left: 0,
               borderStyle: 'dashed',
               borderWidth: '0 0 1px 0',
               borderColor: '#ccc'
             }} />
-            
-            {/* Line Path */}
-            <Box
-              component="svg"
-              sx={{
-                width: '100%',
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 163,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+          
+            {/* PM2.5 Bars with varying heights */}
+            {[
+              { time: '10:30 AM', height: '40%' },
+              { time: '10:40 AM', height: '55%' },
+              { time: '11:00 AM', height: '35%' },
+              { time: '11:20 AM', height: '65%' },
+              { time: '11:30 AM', height: '50%' }
+            ].map((reading, index) => (
+              <Box key={index} sx={{ 
+                width: 26, 
                 height: '100%',
-                display: 'block',
-                position: 'relative'
-              }}
-              viewBox="0 0 280 200"
-              preserveAspectRatio="none"
-            >
-              <path
-                d="M20,80 L60,50 L100,90 L140,30 L180,70 L220,45 L260,60"
-                fill="none"
-                stroke="#2196F3"
-                strokeWidth="3"
-              />
-              {/* Data Points */}
-              <circle cx="20" cy="80" r="4" fill="#2196F3" />
-              <circle cx="60" cy="50" r="4" fill="#2196F3" />
-              <circle cx="100" cy="90" r="4" fill="#2196F3" />
-              <circle cx="140" cy="30" r="4" fill="#2196F3" />
-              <circle cx="180" cy="70" r="4" fill="#2196F3" />
-              <circle cx="220" cy="45" r="4" fill="#2196F3" />
-              <circle cx="260" cy="60" r="4" fill="#2196F3" />
-            </Box>
+                display: 'flex',
+                flexDirection: 'column', 
+                alignItems: 'center',
+                mx: 1.5
+              }}>
+                <Box sx={{ 
+                  width: '100%', 
+                  height: reading.height, 
+                  bgcolor: '#e91e63', 
+                  borderRadius: '2px 2px 0 0' 
+                }} />
+                <Typography variant="caption" sx={{ 
+                  mt: 1,
+                  fontSize: '9px',
+                  textAlign: 'center',
+                  width: 50
+                }}>
+                  {reading.time}
+                </Typography>
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>
 
-      {/* Air Quality Category Distribution */}
+      {/* Temperature vs. Ozone Chart */}
       <Box>
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
-          Air Quality Categories
+          Temperature vs. Ozone
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Distribution of AQI readings by category
+          Correlation between temperature and ozone levels
         </Typography>
         
-        {/* Horizontal Bar Chart */}
-        <Box sx={{ pl: 2, height: 200 }}>
-          {/* Good */}
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ width: 70 }}>Good</Typography>
-            <Box sx={{ 
-              height: 24, 
-              width: '70%', 
-              bgcolor: '#00E676',
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              pr: 1
-            }}>
-              <Typography variant="caption" color="white" fontWeight="bold">70%</Typography>
-            </Box>
-          </Box>
+        {/* Double Bar Chart */}
+        <Box sx={{ height: 220, position: 'relative' }}>
+          {/* Y-Axis Labels - Left (Temperature) */}
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 0 }}>20</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 50 }}>10</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 100 }}>5</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', left: 0, top: 150 }}>0</Typography>
           
-          {/* Moderate */}
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ width: 70 }}>Moderate</Typography>
-            <Box sx={{ 
-              height: 24, 
-              width: '20%', 
-              bgcolor: '#FFEB3B',
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              pr: 1
-            }}>
-              <Typography variant="caption" fontWeight="bold">20%</Typography>
-            </Box>
-          </Box>
+          {/* Y-Axis Labels - Right (Ozone) */}
+          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 0 }}>40</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 50 }}>20</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 100 }}>10</Typography>
+          <Typography variant="caption" sx={{ position: 'absolute', right: 0, top: 150 }}>0</Typography>
           
-          {/* Unhealthy for Sensitive Groups */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ width: 70 }}>Unhealthy</Typography>
+          {/* Bars */}
+          <Box sx={{ 
+            display: 'flex', 
+            height: '100%', 
+            px: 3, 
+            alignItems: 'flex-end',
+            pt: 2,
+            position: 'relative'
+          }}>
+            {/* Grid Lines */}
             <Box sx={{ 
-              height: 24, 
-              width: '10%', 
-              bgcolor: '#FF9800',
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              pr: 1
-            }}>
-              <Typography variant="caption" color="white" fontWeight="bold">10%</Typography>
-            </Box>
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 13,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 63,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 113,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              width: '100%', 
+              height: '1px', 
+              bgcolor: '#e0e0e0', 
+              top: 163,
+              left: 0,
+              borderStyle: 'dashed',
+              borderWidth: '0 0 1px 0',
+              borderColor: '#ccc'
+            }} />
+          
+            {/* Temperature & Ozone Bar Pairs */}
+            {[
+              { time: '10:35 AM', tempHeight: '60%', ozoneHeight: '45%' },
+              { time: '10:50 AM', tempHeight: '70%', ozoneHeight: '55%' },
+              { time: '11:15 AM', tempHeight: '65%', ozoneHeight: '40%' },
+              { time: '11:30 AM', tempHeight: '75%', ozoneHeight: '60%' }
+            ].map((reading, index) => (
+              <Box key={index} sx={{ 
+                width: 50, 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column', 
+                alignItems: 'center',
+                mx: 1
+              }}>
+                <Box sx={{ 
+                  width: '100%', 
+                  display: 'flex',
+                  height: '100%',
+                  alignItems: 'flex-end'
+                }}>
+                  {/* Temperature Bar */}
+                  <Box sx={{
+                    width: '45%',
+                    height: reading.tempHeight,
+                    bgcolor: '#2196F3',
+                    borderRadius: '2px 2px 0 0',
+                    mr: 0.5
+                  }} />
+                  
+                  {/* Ozone Bar */}
+                  <Box sx={{
+                    width: '45%',
+                    height: reading.ozoneHeight,
+                    bgcolor: '#FFC107',
+                    borderRadius: '2px 2px 0 0'
+                  }} />
+                </Box>
+                <Typography variant="caption" sx={{ 
+                  mt: 1,
+                  fontSize: '9px',
+                  textAlign: 'center'
+                }}>
+                  {reading.time}
+                </Typography>
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>
@@ -582,8 +648,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         </ToggleButtonGroup>
       </Box>
 
-      {/* Render different content based on selected data type */}
-      {dataType.includes('trees') ? renderTreeVisualizations() : renderAirQualityVisualizations()}
+      {/* Conditional Rendering Based on Selected Data Type */}
+      {dataType.includes('trees') 
+        ? renderTreeVisualizationContent() 
+        : renderAirQualityVisualizationContent()
+      }
     </>
   );
 
