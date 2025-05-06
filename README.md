@@ -1,4 +1,4 @@
-# Climate Data Analysis Platform
+# Berkeley Environmental Health Explorer 
 
 A comprehensive platform for analyzing climate data from various repositories and datasets.
 
