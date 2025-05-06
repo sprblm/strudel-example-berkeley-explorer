@@ -9,11 +9,64 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Switch,
+  Button,
   ToggleButton,
   ToggleButtonGroup
 } from '@mui/material';
-import { TreeIcon, SensorIcon, InfoCircleIcon } from '../../../components/Icons';
+import { styled } from '@mui/material/styles';
+import { TreeIcon, SensorIcon, AirQualityIcon, InfoCircleIcon } from '../../../components/Icons';
+
+const PillTabs = styled(Tabs)(({ theme }) => ({
+  background: '#F5F7FA',
+  borderRadius: 12,
+  minHeight: 0,
+  padding: 2,
+  '.MuiTabs-indicator': {
+    display: 'none',
+  },
+}));
+
+const PillTab = styled(Tab)(({ theme }) => ({
+  minHeight: 0,
+  minWidth: 0,
+  padding: '6px 20px',
+  borderRadius: 8,
+  fontWeight: 600,
+  fontSize: 16,
+  color: '#6B7280',
+  background: 'transparent',
+  marginRight: 8,
+  transition: 'background 0.2s, color 0.2s',
+  '&.Mui-selected': {
+    background: '#FFF',
+    color: '#111827',
+    boxShadow: '0 1px 2px rgba(16,30,54,0.06)',
+  },
+  '&:last-of-type': {
+    marginRight: 0,
+  },
+}));
+
+// Styled neutral outlined button for layer toggles
+const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected }) => ({
+  border: '1.5px solid',
+  borderColor: selected ? theme.palette.primary.main : theme.palette.grey[300],
+  background: selected ? theme.palette.action.selected : 'transparent',
+  color: selected ? theme.palette.primary.main : theme.palette.text.primary,
+  fontWeight: 500,
+  borderRadius: 8,
+  boxShadow: 'none',
+  textTransform: 'none',
+  minHeight: 40,
+  justifyContent: 'flex-start',
+  px: 2,
+  py: 1,
+  gap: 1,
+  '&:hover': {
+    borderColor: theme.palette.primary.main,
+    background: theme.palette.action.hover,
+  },
+}));
 
 interface ControlsPanelProps {
   activeChart: 'map' | 'timeSeries' | 'histogram' | 'distribution';
@@ -55,42 +108,25 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         </Typography>
         
         <Box sx={{ 
-          bgcolor: '#FFF9C4', // Light yellow background
-          borderRadius: 2,
-          mb: 1,
-          p: 2,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          gap: 2,
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <TreeIcon size={20} color="#4CAF50" />
-            <Typography sx={{ ml: 1 }}>Trees (7)</Typography>
-          </Box>
-          <Switch 
-            checked={treesLayerEnabled}
-            onChange={() => setTreesLayerEnabled(!treesLayerEnabled)}
-            size="small"
-          />
-        </Box>
-        
-        <Box sx={{ 
-          bgcolor: '#FFF9C4', // Light yellow background
-          borderRadius: 2,
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <SensorIcon size={20} color="#2196F3" />
-            <Typography sx={{ ml: 1 }}>Air Quality Sensors (5)</Typography>
-          </Box>
-          <Switch 
-            checked={sensorsLayerEnabled}
-            onChange={() => setSensorsLayerEnabled(!sensorsLayerEnabled)}
-            size="small"
-          />
+          <LayerButton
+            startIcon={<TreeIcon size={20} />}
+            selected={treesLayerEnabled}
+            variant="outlined"
+            onClick={() => setTreesLayerEnabled(!treesLayerEnabled)}
+          >
+            Trees
+          </LayerButton>
+          <LayerButton
+            startIcon={<AirQualityIcon size={20} />}
+            selected={sensorsLayerEnabled}
+            variant="outlined"
+            onClick={() => setSensorsLayerEnabled(!sensorsLayerEnabled)}
+          >
+            Air Quality
+          </LayerButton>
         </Box>
       </Box>
 
@@ -487,25 +523,17 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         overflow: 'auto'
       }}
     >
-      <Tabs 
+      <PillTabs 
         value={tabValue} 
         onChange={handleTabChange}
         sx={{ 
           mb: 3,
-          '.MuiTab-root': {
-            minWidth: 'auto',
-            px: 2,
-            py: 1,
-            minHeight: 'auto',
-            textTransform: 'none',
-            fontWeight: 500
-          }
         }}
       >
-        <Tab label="Overview" />
-        <Tab label="Charts" />
-        <Tab label="Details" />
-      </Tabs>
+        <PillTab label="Overview" />
+        <PillTab label="Charts" />
+        <PillTab label="Details" />
+      </PillTabs>
 
       {/* Data Type Selection - Only show in Charts tab */}
       {tabValue === 1 && (
