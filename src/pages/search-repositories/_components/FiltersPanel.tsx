@@ -10,11 +10,32 @@ import {
   ButtonGroup
 } from '@mui/material';
 import React, { useState } from 'react';
-import { Forest, FilterAlt, LocationOn } from '@mui/icons-material';
+import { TreeIcon, AirQualityIcon, LocationIcon } from '../../../components/Icons';
+import { styled } from '@mui/material/styles';
 
 /**
  * Filters panel component with tabbed interface for Trees, Air Quality, and Locations
  */
+const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected }) => ({
+  border: '1.5px solid',
+  borderColor: selected ? theme.palette.primary.main : theme.palette.grey[300],
+  background: selected ? theme.palette.action.selected : 'transparent',
+  color: selected ? theme.palette.primary.main : theme.palette.text.primary,
+  fontWeight: 500,
+  borderRadius: 8,
+  boxShadow: 'none',
+  textTransform: 'none',
+  minHeight: 40,
+  justifyContent: 'flex-start',
+  px: 2,
+  py: 1,
+  gap: 1,
+  '&:hover': {
+    borderColor: theme.palette.primary.main,
+    background: theme.palette.action.hover,
+  },
+}));
+
 const FiltersPanel: React.FC = () => {
   // State for active tab
   const [activeTab, setActiveTab] = useState<number>(2); // Default to Locations tab
@@ -334,61 +355,32 @@ const FiltersPanel: React.FC = () => {
           Find specific trees, air quality data, or campus locations
         </Typography>
 
-        {/* Button-style tabs */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-          <Button
-            variant="text"
-            startIcon={<Forest fontSize="small" />}
+        {/* Button-style tabs - replaced with LayerButton for visual match */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+          <LayerButton
+            startIcon={<TreeIcon size={20} />}
+            selected={activeTab === 0}
+            variant="outlined"
             onClick={() => handleTabChange(0)}
-            sx={{
-              textTransform: 'none',
-              color: activeTab === 0 ? '#4CAF50' : 'text.primary',
-              border: activeTab === 0 ? '1px solid #4CAF50' : '1px solid transparent',
-              borderRadius: 1,
-              backgroundColor: activeTab === 0 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
-              '&:hover': {
-                backgroundColor: activeTab === 0 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
-              }
-            }}
           >
             Trees
-          </Button>
-          
-          <Button
-            variant="text"
-            startIcon={<FilterAlt fontSize="small" />}
+          </LayerButton>
+          <LayerButton
+            startIcon={<AirQualityIcon size={20} />}
+            selected={activeTab === 1}
+            variant="outlined"
             onClick={() => handleTabChange(1)}
-            sx={{
-              textTransform: 'none',
-              color: activeTab === 1 ? '#4CAF50' : 'text.primary',
-              border: activeTab === 1 ? '1px solid #4CAF50' : '1px solid transparent',
-              borderRadius: 1,
-              backgroundColor: activeTab === 1 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
-              '&:hover': {
-                backgroundColor: activeTab === 1 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
-              }
-            }}
           >
             Air Quality
-          </Button>
-          
-          <Button
-            variant="text"
-            startIcon={<LocationOn fontSize="small" />}
+          </LayerButton>
+          <LayerButton
+            startIcon={<LocationIcon size={20} />}
+            selected={activeTab === 2}
+            variant="outlined"
             onClick={() => handleTabChange(2)}
-            sx={{
-              textTransform: 'none',
-              color: activeTab === 2 ? '#4CAF50' : 'text.primary',
-              border: activeTab === 2 ? '1px solid #4CAF50' : '1px solid transparent',
-              borderRadius: 1,
-              backgroundColor: activeTab === 2 ? 'rgba(76, 175, 80, 0.04)' : 'transparent',
-              '&:hover': {
-                backgroundColor: activeTab === 2 ? 'rgba(76, 175, 80, 0.08)' : 'rgba(0, 0, 0, 0.04)'
-              }
-            }}
           >
-            Locations
-          </Button>
+            Location
+          </LayerButton>
         </Box>
       </Box>
 
