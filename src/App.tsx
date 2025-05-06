@@ -9,7 +9,7 @@ import ExploreData from './pages/explore-data';
 import CompareData from './pages/compare-data';
 import ContributePage from './pages/contribute';
 import { HomePage } from './pages/home/index';
-import { AboutPage } from './pages/about/index';
+import AboutPage from './pages/about/index';
 
 /**
  * Main App component that sets up routing and global layout
