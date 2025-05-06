@@ -11,10 +11,12 @@ import {
   ListItemText,
   Button,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { TreeIcon, SensorIcon, AirQualityIcon, InfoCircleIcon } from '../../../components/Icons';
+import { TreeIcon, SensorIcon, AirQualityIcon, InfoCircleIcon, ChevronLeft, ChevronRight } from '../../../components/Icons';
+import Plot from 'react-plotly.js';
 
 const PillTabs = styled(Tabs)(({ theme }) => ({
   background: '#F5F7FA',
@@ -93,10 +95,21 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   setSensorsLayerEnabled
 }) => {
   const [tabValue, setTabValue] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  if (collapsed) {
+    return (
+      <Paper elevation={1} sx={{ p: 1, height: '100%', minWidth: 48, maxWidth: 48, display: 'flex', flexDirection: 'column', borderRadius: 3, alignItems: 'center', justifyContent: 'flex-start' }}>
+        <IconButton aria-label="Expand panel" onClick={() => setCollapsed(false)} size="small" sx={{ mt: 1 }}>
+          <ChevronRight size={24} />
+        </IconButton>
+      </Paper>
+    );
+  }
 
   // Overview Tab Content
   const renderOverviewTab = () => (
@@ -419,199 +432,230 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     </>
   );
   
+  // Render Air Quality Visualization Content
+  const renderAirQualityVisualizationContent = () => (
+    <>
+      {/* PM2.5 Levels Chart */}
+      <Box sx={{ mb: 3 }}>
+        <Paper elevation={2} sx={{ p: 2 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
+            PM2.5 Levels
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            PM2.5 readings throughout the day
+          </Typography>
+          <Plot
+            data={[{
+              x: ['10:30 AM', '10:35 AM', '10:40 AM', '10:45 AM', '11:30 AM'],
+              y: [8, 11, 8, 14, 9],
+              type: 'bar',
+              marker: { color: '#FF4081' },
+              width: 0.6,
+            }]}
+            layout={{
+              height: 180,
+              margin: { l: 32, r: 8, t: 8, b: 32 },
+              xaxis: { tickfont: { size: 12 } },
+              yaxis: { range: [0, 16], tickfont: { size: 12 } },
+              showlegend: false,
+              plot_bgcolor: '#fff',
+              paper_bgcolor: '#fff',
+            }}
+            config={{ displayModeBar: false }}
+            style={{ width: '100%' }}
+          />
+        </Paper>
+      </Box>
+      {/* Temperature vs. Ozone Chart */}
+      <Box sx={{ mb: 3 }}>
+        <Paper elevation={2} sx={{ p: 2 }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
+            Temperature vs. Ozone
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Correlation between temperature and ozone levels
+          </Typography>
+          <Plot
+            data={[
+              {
+                x: ['10:35 AM', '10:40 AM', '11:30 AM'],
+                y: [18, 19, 17],
+                type: 'bar',
+                name: 'Temperature',
+                marker: { color: '#FFD600' },
+                yaxis: 'y1',
+                width: 0.3,
+              },
+              {
+                x: ['10:35 AM', '10:40 AM', '11:30 AM'],
+                y: [40, 38, 36],
+                type: 'bar',
+                name: 'Ozone',
+                marker: { color: '#00B8D9' },
+                yaxis: 'y2',
+                width: 0.3,
+              }
+            ]}
+            layout={{
+              height: 180,
+              margin: { l: 32, r: 40, t: 8, b: 32 },
+              xaxis: { tickfont: { size: 12 } },
+              yaxis: { title: '', range: [0, 20], tickfont: { size: 12 } },
+              yaxis2: {
+                title: '',
+                overlaying: 'y',
+                side: 'right',
+                range: [0, 44],
+                tickfont: { size: 12 },
+              },
+              barmode: 'group',
+              showlegend: false,
+              plot_bgcolor: '#fff',
+              paper_bgcolor: '#fff',
+            }}
+            config={{ displayModeBar: false }}
+            style={{ width: '100%' }}
+          />
+        </Paper>
+      </Box>
+    </>
+  );
+  
   // Details Tab Content
   const renderDetailsTab = () => (
-    <Box>
-      <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-        Raw Data
-      </Typography>
-      
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        View detailed data for all campus elements.
-      </Typography>
-      
-      {/* Data Table Placeholder */}
-      <Box sx={{ 
-        border: '1px solid',
-        borderColor: 'grey.300',
-        borderRadius: 1,
-        p: 2,
-        mb: 3
-      }}>
-        <Typography variant="body2" fontWeight={500}>
-          Trees Data
+    <>
+      {/* Data Type Section */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>
+          Raw Data
         </Typography>
-        
-        <Box component="table" sx={{ width: '100%', mt: 1, borderCollapse: 'collapse' }}>
-          <Box component="thead">
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.300' }}>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>ID</Box>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Species</Box>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Height</Box>
-            </Box>
-          </Box>
-          <Box component="tbody">
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T001</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Oak</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>15m</Box>
-            </Box>
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T002</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Maple</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>12m</Box>
-            </Box>
-            <Box component="tr">
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>T003</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Pine</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>18m</Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-      
-      <Box sx={{ 
-        border: '1px solid',
-        borderColor: 'grey.300',
-        borderRadius: 1,
-        p: 2
-      }}>
-        <Typography variant="body2" fontWeight={500}>
-          Sensor Data
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Select data type to view
         </Typography>
-        
-        <Box component="table" sx={{ width: '100%', mt: 1, borderCollapse: 'collapse' }}>
-          <Box component="thead">
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.300' }}>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>ID</Box>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Type</Box>
-              <Box component="th" sx={{ py: 1, textAlign: 'left', fontSize: 13 }}>Value</Box>
+        <DataTypeButtonGroup dataType={dataType} setDataType={setDataType} />
+      </Paper>
+      {/* Details List */}
+      {dataType === 'airQuality' ? (
+        // Air Quality Details Cards
+        [
+          {
+            time: '5/1/2024, 10:30:00 AM', status: 'official', PM25: '8.3 µg/m³', PM10: '15.2 µg/m³', Ozone: '32 ppb', Temp: '18.5°C', Humidity: '65%'
+          },
+          {
+            time: '5/1/2024, 10:35:00 AM', status: 'official', PM25: '10.1 µg/m³', PM10: '18.7 µg/m³', Ozone: '35 ppb', Temp: '19.2°C', Humidity: '62%'
+          },
+          {
+            time: '5/1/2024, 10:40:00 AM', status: 'official', PM25: '7.8 µg/m³', PM10: '14.5 µg/m³', Ozone: '29 ppb', Temp: '18.8°C', Humidity: '64%'
+          },
+          {
+            time: '5/1/2024, 11:15:00 AM', status: 'student', PM25: '12.3 µg/m³', PM10: '22.1 µg/m³', Ozone: '37 ppb', Temp: '19.9°C', Humidity: '60%'
+          }
+        ].map((item, idx) => (
+          <Paper key={idx} elevation={0} sx={{ p: 2, mb: 2, border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>{item.time}</Typography>
+              <Box sx={{
+                px: 1.5, py: 0.2, borderRadius: 2, fontSize: 13, fontWeight: 600,
+                bgcolor: item.status === 'official' ? '#E6F4FF' : '#FFF8E1',
+                color: item.status === 'official' ? '#1976D2' : '#B28704',
+                border: item.status === 'official' ? '1px solid #90CAF9' : '1px solid #FFE082',
+                ml: 1
+              }}>{item.status}</Box>
             </Box>
-          </Box>
-          <Box component="tbody">
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S001</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>PM2.5</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>8.2 μg/m³</Box>
+            <Box sx={{ pl: 1 }}>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>PM2.5: <b>{item.PM25}</b></Typography>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>PM10: <b>{item.PM10}</b></Typography>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>Ozone: <b>{item.Ozone}</b></Typography>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>Temperature: <b>{item.Temp}</b></Typography>
+              <Typography fontSize={14}>Humidity: <b>{item.Humidity}</b></Typography>
             </Box>
-            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'grey.100' }}>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S002</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>CO2</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>412 ppm</Box>
+          </Paper>
+        ))
+      ) : (
+        // Trees Details Cards
+        [
+          { species: 'Coast Live Oak', height: '45 ft', dbh: '24"', date: '2024-03-15', health: 'excellent' },
+          { species: 'California Redwood', height: '80 ft', dbh: '36"', date: '2024-03-10', health: 'good' },
+          { species: 'American Elm', height: '35 ft', dbh: '18"', date: '2024-02-28', health: 'fair' },
+          { species: 'London Plane', height: '40 ft', dbh: '20"', date: '2024-03-05', health: 'good' },
+          { species: 'Monterey Pine', height: '55 ft', dbh: '22"', date: '2024-02-20', health: 'fair' },
+          { species: 'Coast Live Oak', height: '52 ft', dbh: '20"', date: '2024-02-10', health: 'excellent' }
+        ].map((item, idx) => (
+          <Paper key={idx} elevation={0} sx={{ p: 2, mb: 2, border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>{item.species}</Typography>
+              <Box sx={{
+                px: 1.5, py: 0.2, borderRadius: 2, fontSize: 13, fontWeight: 600,
+                bgcolor: item.health === 'excellent' ? '#E6F9EC' : item.health === 'good' ? '#F3FDEB' : '#FFF8E1',
+                color: item.health === 'excellent' ? '#06B66A' : item.health === 'good' ? '#7CB342' : '#B28704',
+                border: item.health === 'excellent' ? '1px solid #B2F2D7' : item.health === 'good' ? '1px solid #DCE775' : '1px solid #FFE082',
+                ml: 1
+              }}>{item.health}</Box>
             </Box>
-            <Box component="tr">
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>S003</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>Temp</Box>
-              <Box component="td" sx={{ py: 1, fontSize: 13 }}>22.5°C</Box>
+            <Box sx={{ pl: 1 }}>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>Height: <b>{item.height}</b></Typography>
+              <Typography fontSize={14} sx={{ mb: 0.5 }}>DBH: <b>{item.dbh}</b></Typography>
+              <Typography fontSize={14}>Date: <b>{item.date}</b></Typography>
             </Box>
-          </Box>
-        </Box>
-      </Box>
+          </Paper>
+        ))
+      )}
+    </>
+  );
+
+  // Data Type Button Group for Charts tab
+  const DataTypeButtonGroup = ({ dataType, setDataType }) => (
+    <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+      <LayerButton
+        startIcon={<TreeIcon size={20} />}
+        selected={dataType === 'trees'}
+        variant="outlined"
+        onClick={() => setDataType('trees')}
+      >
+        Trees
+      </LayerButton>
+      <LayerButton
+        startIcon={<AirQualityIcon size={20} />}
+        selected={dataType === 'airQuality'}
+        variant="outlined"
+        onClick={() => setDataType('airQuality')}
+      >
+        Air Quality
+      </LayerButton>
     </Box>
   );
 
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        width: 320, 
-        height: '100%',
-        p: 3,
-        border: '1px solid',
-        borderColor: 'grey.200',
-        borderRadius: 2,
-        overflow: 'auto'
-      }}
-    >
-      <PillTabs 
-        value={tabValue} 
-        onChange={handleTabChange}
-        sx={{ 
-          mb: 3,
-        }}
-      >
-        <PillTab label="Overview" />
-        <PillTab label="Charts" />
-        <PillTab label="Details" />
+    <Paper elevation={1} sx={{ p: 3, height: '100%', minWidth: 320, maxWidth: 400, display: 'flex', flexDirection: 'column', borderRadius: 3, position: 'relative' }}>
+      <IconButton aria-label="Collapse panel" onClick={() => setCollapsed(true)} size="small" sx={{ position: 'absolute', top: 12, right: 12 }}>
+        <ChevronLeft size={24} />
+      </IconButton>
+      <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        Data Exploration
+        <Box component="span" sx={{ ml: 'auto' }}>{/* Place for icon if needed */}</Box>
+      </Typography>
+      <PillTabs value={tabValue} onChange={handleTabChange} variant="standard" sx={{ mb: 3 }}>
+        <PillTab disableRipple label="Overview" />
+        <PillTab disableRipple label="Charts" />
+        <PillTab disableRipple label="Details" />
       </PillTabs>
-
-      {/* Data Type Selection - Only show in Charts tab */}
-      {tabValue === 1 && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-            Data Type
-          </Typography>
-          
-          <ToggleButtonGroup
-            value={dataType}
-            exclusive
-            onChange={(e, newValue) => newValue && setDataType(newValue)}
-            aria-label="data type"
-            size="small"
-            sx={{ 
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 1,
-              width: '100%',
-              '.MuiToggleButton-root': {
-                textTransform: 'none',
-                py: 1
-              }
-            }}
-          >
-            <ToggleButton value="trees">
-              Trees
-            </ToggleButton>
-            <ToggleButton value="airQuality">
-              Air Quality
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-      )}
-
-      {/* Chart Type Selection - Only show in Charts tab */}
-      {tabValue === 1 && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-            Chart Type
-          </Typography>
-          
-          <ToggleButtonGroup
-            value={activeChart}
-            exclusive
-            onChange={(e, newValue) => newValue && setActiveChart(newValue)}
-            aria-label="chart type"
-            size="small"
-            sx={{ 
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 1,
-              width: '100%',
-              '.MuiToggleButton-root': {
-                textTransform: 'none',
-                py: 1
-              }
-            }}
-          >
-            <ToggleButton value="map">
-              Map View
-            </ToggleButton>
-            <ToggleButton value="timeSeries">
-              Time Series
-            </ToggleButton>
-            <ToggleButton value="histogram">
-              Histogram
-            </ToggleButton>
-            <ToggleButton value="distribution">
-              Distribution
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-      )}
-
-      {tabValue === 0 && renderOverviewTab()}
-      {tabValue === 1 && renderTreeVisualizationContent()}
-      {tabValue === 2 && renderDetailsTab()}
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
+        {tabValue === 0 && renderOverviewTab()}
+        {tabValue === 1 && (
+          <>
+            {/* Data Layers Header */}
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+              Data Layers
+            </Typography>
+            <DataTypeButtonGroup dataType={dataType} setDataType={setDataType} />
+            {/* Charts for Trees */}
+            {dataType === 'trees' && renderTreeVisualizationContent()}
+            {/* Charts for Air Quality */}
+            {dataType === 'airQuality' && renderAirQualityVisualizationContent()}
+          </>
+        )}
+        {tabValue === 2 && renderDetailsTab()}
+      </Box>
     </Paper>
   );
 };
