@@ -7,8 +7,8 @@ const AboutPage: React.FC = () => {
     <Box sx={{ py: 4 }}>
       <Container maxWidth="lg">
         <PageHeader 
-          pageTitle="Berkeley Campus & Community Canopy-Air Quality Hub"
-          description="A collaborative platform for UC Berkeley students to explore and contribute to air quality data"
+          pageTitle="Berkeley Environmental Health Explorer"
+          description="A collaborative platform for Berkeley students to explore and contribute to air quality data"
         />
         
         <Box sx={{ mt: 4 }}>
@@ -16,8 +16,8 @@ const AboutPage: React.FC = () => {
             <Grid item xs={12} md={8}>
               <Paper sx={{ p: 3, mb: 4 }}>
                 <Typography variant="h5" component="h2" gutterBottom>
-                  The Berkeley Campus & Community Canopy-Air Quality Hub (BCCAC) is a web application designed primarily for
-                  UC Berkeley students. It enables them to discover, explore, compare, and contribute data related to tree inventory
+                  The Berkeley Environmental Health Explorer (BCCAC) is a web application designed primarily for
+                  Berkeley students. It enables them to discover, explore, compare, and contribute data related to tree inventory
                   and air quality specifically on and around the Berkeley campus.
                 </Typography>
                 

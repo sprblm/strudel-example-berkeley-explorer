@@ -87,7 +87,7 @@ const HomePage: React.FC = () => {
         <Container maxWidth="lg">
           <Stack spacing={2} sx={{ textAlign: 'center' }}>
             <Typography variant="h3" component="h1" fontWeight="bold">
-              Berkeley Campus & Community Canopy-Air Quality Hub
+              Berkeley Environmental Health Explorer
             </Typography>
             <Typography variant="h6" sx={{ maxWidth: '800px', mx: 'auto', mt: 2 }}>
               Explore, learn about, and contribute to tree inventory and air quality data on the UC Berkeley campus.
@@ -268,8 +268,8 @@ const HomePage: React.FC = () => {
                 About the Project
               </Typography>
               <Typography variant="body1" paragraph>
-                The Berkeley Campus & Community Canopy-Air Quality Hub (BCCAQH) is a web application 
-                designed for UC Berkeley students to discover, explore, compare, and contribute to 
+                The Berkeley Environmental Health Explorer is a web application 
+                designed for Berkeley students to discover, explore, compare, and contribute to 
                 environmental data on campus.
               </Typography>
               <Typography variant="body1" paragraph>

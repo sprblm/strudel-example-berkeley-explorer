@@ -24,7 +24,7 @@ import CampusDataMap from '../../components/CampusDataMap';
 /**
  * HomePage Component
  * 
- * Main landing page for the Berkeley Campus & Community Canopy-Air Quality Hub
+ * Main landing page for the Berkeley Environmental Health Explorer
  * Displays a hero section, interactive map, feature cards, and about sections
  */
 export const HomePage = () => {
@@ -94,13 +94,14 @@ export const HomePage = () => {
         sx={{ 
           background: 'linear-gradient(to bottom, #1e3a8a, #3b82f6)',
           color: 'white', 
-          py: 6 
+          py: 6,
+          textAlign: 'center', // Ensure all content is centered
         }}
       >
         <Container maxWidth="lg">
-          <Stack spacing={2} sx={{ textAlign: 'center' }}>
+          <Stack spacing={2} alignItems="center">
             <Typography variant="h3" component="h1" fontWeight="bold">
-              Berkeley Campus & Community Canopy-Air Quality Hub
+              Berkeley Environmental Health Explorer
             </Typography>
             <Typography variant="h6" sx={{ maxWidth: '800px', mx: 'auto', mt: 2 }}>
               Explore, learn about, and contribute to tree inventory and air quality data on the UC Berkeley campus.
@@ -140,70 +141,6 @@ export const HomePage = () => {
         </Container>
       </Box>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ my: 6 }}>
-        <Typography variant="h4" component="h2" sx={{ textAlign: 'center', mb: 4 }}>
-          Explore Our Features
-        </Typography>
-        
-        <Grid container spacing={4}>
-          {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card 
-                sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  transition: 'transform 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)'
-                  },
-                  border: '1px solid',
-                  borderColor: 'grey.200',
-                  borderRadius: 2,
-                }}
-              >
-                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      mb: 2,
-                    }}
-                  >
-                    <Box sx={{ color: feature.color }}>
-                      {feature.icon}
-                    </Box>
-                    <Typography variant="h6" component="h3" sx={{ ml: 1 }}>
-                      {feature.title}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" sx={{ mb: 2, flexGrow: 1 }}>
-                    {feature.description}
-                  </Typography>
-                  <RouterLink to={feature.path} style={{ textDecoration: 'none' }}>
-                    <MuiButton
-                      variant="contained"
-                      color="primary"
-                      sx={{ 
-                        bgcolor: '#4caf50',
-                        '&:hover': {
-                          bgcolor: '#388e3c',
-                        },
-                      }}
-                    >
-                      Get Started
-                    </MuiButton>
-                  </RouterLink>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-
       {/* About Section */}
       <Box sx={{ bgcolor: '#f5f7fa', py: 6 }}>
         <Container maxWidth="lg">
@@ -213,8 +150,8 @@ export const HomePage = () => {
                 About the Project
               </Typography>
               <Typography variant="body1" paragraph>
-                The Berkeley Campus & Community Canopy-Air Quality Hub (BCCAQH) is a web application 
-                designed for UC Berkeley students to discover, explore, compare, and contribute to 
+                The Berkeley Environmental Health Explorer is a web application 
+                designed for Berkeley students to discover, explore, compare, and contribute to 
                 environmental data on campus.
               </Typography>
               <Typography variant="body1" paragraph>

@@ -44,7 +44,7 @@ const App = () => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Climate Data Analysis Platform {new Date().getFullYear()}
+          Berkeley Environmental Health Explorer  {new Date().getFullYear()}
         </Typography>
         <Button 
           variant="text" 
