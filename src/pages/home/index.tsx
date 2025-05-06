@@ -8,6 +8,7 @@ import {
   Stack,
   Card,
   CardContent,
+  Button as MuiButton
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { 
@@ -17,11 +18,8 @@ import {
   UploadIcon,
   CheckCircleIcon,
 } from '../../components/Icons';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ParkIcon from '@mui/icons-material/Park';
-import AirIcon from '@mui/icons-material/Air';
 
-import { Button } from '../../components/Button';
+import CampusDataMap from '../../components/CampusDataMap';
 
 /**
  * HomePage Component
@@ -120,92 +118,25 @@ export const HomePage = () => {
               borderRadius: 2, 
               overflow: 'hidden',
               position: 'relative',
-              height: '300px',
+              height: '400px',
               mb: 1,
             }}
           >
-            {/* Mock map with markers */}
-            <Box 
-              sx={{ 
-                height: '100%', 
-                width: '100%', 
-                bgcolor: '#e8f5e9',
-                position: 'relative',
-                p: 2,
-              }}
-            >
-              {/* Map elements */}
-              <Box sx={{ position: 'absolute', right: 20, top: 20, zIndex: 10 }}>
-                <Paper elevation={2} sx={{ p: 1, borderRadius: 1 }}>
-                  <Stack spacing={1}>
-                    <Typography variant="subtitle2" fontWeight="bold">Layers</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ParkIcon fontSize="small" sx={{ color: '#4caf50' }} />
-                      <Typography variant="body2">Trees</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <AirIcon fontSize="small" sx={{ color: '#f44336' }} />
-                      <Typography variant="body2">Air Quality</Typography>
-                    </Box>
-                  </Stack>
-                </Paper>
-              </Box>
-              
-              {/* Tree markers */}
-              <Box sx={{ position: 'absolute', top: '30%', left: '15%' }}>
-                <Box sx={{ bgcolor: '#4caf50', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">T</Typography>
-                </Box>
-              </Box>
-              
-              <Box sx={{ position: 'absolute', top: '50%', left: '25%' }}>
-                <Box sx={{ bgcolor: '#4caf50', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">T</Typography>
-                </Box>
-              </Box>
-              
-              <Box sx={{ position: 'absolute', top: '70%', left: '20%' }}>
-                <Box sx={{ bgcolor: '#4caf50', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">T</Typography>
-                </Box>
-              </Box>
-              
-              {/* Air quality markers */}
-              <Box sx={{ position: 'absolute', top: '25%', left: '60%' }}>
-                <Box sx={{ bgcolor: '#2196f3', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">A</Typography>
-                </Box>
-              </Box>
-              
-              <Box sx={{ position: 'absolute', top: '40%', right: '30%' }}>
-                <Box sx={{ bgcolor: '#f44336', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">A</Typography>
-                </Box>
-              </Box>
-              
-              <Box sx={{ position: 'absolute', top: '60%', right: '40%' }}>
-                <Box sx={{ bgcolor: '#2196f3', color: 'white', borderRadius: '50%', width: 24, height: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="caption">A</Typography>
-                </Box>
-              </Box>
-              
-              {/* Location pin */}
-              <Box sx={{ position: 'absolute', top: '45%', left: '45%' }}>
-                <LocationOnIcon fontSize="medium" sx={{ color: '#1e3a8a' }} />
-              </Box>
-              
-              {/* Building outlines */}
-              <Box sx={{ position: 'absolute', top: '20%', left: '40%', width: '100px', height: '60px', bgcolor: 'rgba(144, 202, 249, 0.5)', border: '1px solid #90caf9' }} />
-              <Box sx={{ position: 'absolute', top: '40%', left: '55%', width: '80px', height: '40px', bgcolor: 'rgba(144, 202, 249, 0.5)', border: '1px solid #90caf9' }} />
-              <Box sx={{ position: 'absolute', top: '60%', left: '45%', width: '90px', height: '50px', bgcolor: 'rgba(144, 202, 249, 0.5)', border: '1px solid #90caf9' }} />
-            </Box>
+            {/* Interactive Campus Map */}
+            <CampusDataMap height="100%" showControls={true} />
           </Paper>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right' }}>
-            UC Berkeley Campus Map
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 1 }}>
-            Interactive map of Berkeley campus showing tree and air quality data
-          </Typography>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <MuiButton 
+              component={RouterLink} 
+              to="/explore-data" 
+              variant="contained" 
+              color="primary"
+              startIcon={<LineChartIcon size={16} />}
+            >
+              Explore Full Map
+            </MuiButton>
+          </Box>
         </Container>
       </Box>
 
@@ -253,7 +184,7 @@ export const HomePage = () => {
                     {feature.description}
                   </Typography>
                   <RouterLink to={feature.path} style={{ textDecoration: 'none' }}>
-                    <Button
+                    <MuiButton
                       variant="contained"
                       color="primary"
                       sx={{ 
@@ -264,7 +195,7 @@ export const HomePage = () => {
                       }}
                     >
                       Get Started
-                    </Button>
+                    </MuiButton>
                   </RouterLink>
                 </CardContent>
               </Card>
@@ -290,7 +221,7 @@ export const HomePage = () => {
                 Built with STRUDEL Kit, it integrates key scientific data flows into a cohesive educational 
                 experience, turning the campus into a living laboratory.
               </Typography>
-              <Button 
+              <MuiButton 
                 variant="outlined" 
                 color="primary"
                 sx={{ 
@@ -303,7 +234,7 @@ export const HomePage = () => {
                 }}
               >
                 Learn More
-              </Button>
+              </MuiButton>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>

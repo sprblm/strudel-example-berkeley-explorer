@@ -10,6 +10,7 @@ import { taskflow } from './_config/taskflow.config';
 import type { Dataset } from './_config/taskflow.types';
 import { searchHelper } from '../../utils/searchHelper';
 import { Button } from '../../components/Button';
+import CampusDataMap from '../../components/CampusDataMap';
 
 /**
  * The main explore page for the search-data-repositories Task Flow.
@@ -44,6 +45,18 @@ const DatasetExplorer: React.FC = () => {
     setPreviewItem(null);
   };
 
+  // Handle map point click
+  const handleMapPointClick = (point: any) => {
+    // Find dataset related to this point
+    const relatedDataset = datasets.find(dataset => 
+      dataset.title.toLowerCase().includes(point.type === 'tree' ? 'tree' : 'air')
+    );
+    
+    if (relatedDataset) {
+      setPreviewItem(relatedDataset);
+    }
+  };
+
   return (
     <FilterContextProvider>
       <Box sx={{ py: 4, backgroundColor: 'background.default', minHeight: '100vh' }}>
@@ -71,7 +84,7 @@ const DatasetExplorer: React.FC = () => {
 
             {/* Right column: Map and search results */}
             <Grid item xs={12} md={9}>
-              {/* Map view */}
+              {/* Interactive Map */}
               <Paper 
                 elevation={0} 
                 sx={{ 
@@ -81,62 +94,13 @@ const DatasetExplorer: React.FC = () => {
                   border: '1px solid',
                   borderColor: 'grey.200',
                   position: 'relative',
-                  overflow: 'hidden',
-                  bgcolor: '#f0f7f7'
+                  overflow: 'hidden'
                 }}
               >
-                {/* Map content */}
-                <Box sx={{ 
-                  position: 'absolute', 
-                  top: 10, 
-                  right: 10, 
-                  bgcolor: 'white',
-                  p: 1,
-                  borderRadius: 1,
-                  boxShadow: 1,
-                  zIndex: 10
-                }}>
-                  <Typography variant="caption">UC Berkeley Campus Map</Typography>
-                </Box>
-                
-                {/* Sample map markers */}
-                <Box sx={{ 
-                  position: 'absolute', 
-                  top: '30%', 
-                  left: '40%',
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  bgcolor: '#4CAF50',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: 12,
-                  zIndex: 5
-                }}>
-                  T
-                </Box>
-                
-                <Box sx={{ 
-                  position: 'absolute', 
-                  top: '50%', 
-                  left: '60%',
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  bgcolor: '#2196F3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: 12,
-                  zIndex: 5
-                }}>
-                  A
-                </Box>
+                <CampusDataMap 
+                  height="100%" 
+                  onPointClick={handleMapPointClick}
+                />
               </Paper>
 
               {/* Search results */}

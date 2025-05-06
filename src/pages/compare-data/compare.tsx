@@ -6,6 +6,7 @@ import ComparisonTabs, { TabType } from './_components/ComparisonTabs';
 import OverviewContent from './_components/OverviewContent';
 import TreesContent from './_components/TreesContent';
 import AirQualityContent from './_components/AirQualityContent';
+import LocationMap from '../../components/LocationMap';
 
 /**
  * Compare Datasets page
@@ -70,22 +71,9 @@ const CompareDatasets: React.FC = () => {
         {description}
       </Typography>
       
-      {/* Map placeholder */}
-      <Box 
-        sx={{ 
-          mt: 2,
-          height: 150,
-          bgcolor: '#f5f8fa',
-          borderRadius: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <MapIcon size={24} color="#3B82F6" />
-        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-          UC Berkeley Campus Map
-        </Typography>
+      {/* Interactive Location Map */}
+      <Box sx={{ mt: 2 }}>
+        <LocationMap location={location} height={150} />
       </Box>
     </Paper>
   );
