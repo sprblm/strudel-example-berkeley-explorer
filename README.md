@@ -4,30 +4,30 @@ A modern web platform for exploring and analyzing environmental and climate data
 
 ## Features
 
-- **Campus Data Map**: Interactive map showing trees, air quality sensors, and environmental factors.
-- **Compare Data**: Visualize and compare tree diversity, air quality, and other factors between locations.
-- **Search & Explore**: Find and filter datasets by type, source, and environmental category.
-- **User-Contributed Data**: Support for uploading and exploring community datasets.
-- **Multiple Visualization Options**: Tables, cards, charts, and geographic maps (Plotly, Leaflet, MUI).
+- **Interactive Campus Map**: Visualizes Berkeley's tree inventory, air quality sensors, and overlays environmental data points on a dynamic map.
+- **Environmental Data Comparison**: Compare air quality, tree diversity, and other environmental factors between campus locations.
+- **Data Search & Filtering**: Quickly search, filter, and explore available datasets by property, category, or source.
+- **Robust Error Handling**: Gracefully handles missing or incomplete data files and provides user-friendly notifications/fallbacks.
+- **Static Data Loading**: Loads all data directly from static JSON/GeoJSON/CSV files for speed and reliability—no backend required.
+- **User-Contributed Datasets**: Supports community-uploaded datasets for extensibility and collaboration.
 
-## Data Sources & Approach
+## Data Sources & Static Data Approach
 
-- **Berkeley Tree Inventory (GeoJSON, 2013)**: Static dataset of campus trees.
-- **AirNow API (Historical Air Quality)**: Data fetched via Python script, pre-compiled into JSON for frontend use.
-- **User/Community Data**: CSV/JSON files contributed by users.
+- **Berkeley City Tree Inventory (GeoJSON, 2013)**: Official tree census data for the UC Berkeley campus and city.
+- **AirNow API (Historical Air Quality)**: Hourly/daily air quality data for Berkeley, pre-fetched and stored as JSON using a Python script.
+- **User-Contributed/Community Data**: Additional datasets in CSV or JSON format, uploaded or curated by users.
 
-**Static Data Workflow:**
-- No backend API. All data is pre-processed and stored as static JSON/CSV files in the `public/data/` directory.
-- The frontend loads these files directly for fast and scalable data access.
+> **Note:** All data is pre-compiled and placed in the `public/data/` directory. The frontend loads these files directly—no backend or live API calls are required at runtime.
 
 ## Technology Stack
 
-- **React** (w/ TypeScript)
-- **Material UI (MUI)** for UI components
-- **Vite** for rapid development
-- **Plotly.js** and **react-plotly.js** for charts
-- **Leaflet** for maps
-- **Custom Types** for strong type safety
+- **React** (with TypeScript) — UI and application logic
+- **Vite** — Fast development/build tool
+- **Material UI (MUI)** — Component library and styling
+- **Plotly.js** & **react-plotly.js** — Data visualization (charts, radar plots)
+- **Leaflet** — Interactive mapping
+- **Custom TypeScript Types** — Enforced type safety for all data and UI structures
+- **Python** (for data pre-processing only; not part of the deployed frontend)
 
 ## Getting Started
 
