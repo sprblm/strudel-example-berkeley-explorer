@@ -604,7 +604,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   );
 
   // Data Type Button Group for Charts tab
-  const DataTypeButtonGroup = ({ dataType, setDataType }) => (
+  const DataTypeButtonGroup = ({ dataType, setDataType }: { dataType: string, setDataType: (type: string) => void }) => (
     <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
       <LayerButton
         startIcon={<TreeIcon size={20} />}

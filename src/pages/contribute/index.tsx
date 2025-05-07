@@ -27,7 +27,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ButtonGroup
+  ButtonGroup,
+  CircularProgress
 } from '@mui/material';
 import { 
   UploadIcon, 
@@ -46,6 +47,7 @@ import AirIcon from '@mui/icons-material/Air';
 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
+import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 /**
  * Contribute page component
@@ -69,6 +71,7 @@ const ContributeData: React.FC = () => {
   const [humidity, setHumidity] = useState<number>(65);
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
   
   // Map refs
   const mapRef = useRef<any>(null);
@@ -76,23 +79,71 @@ const ContributeData: React.FC = () => {
   const markerRef = useRef<any>(null);
   const layersRef = useRef<any>(null);
 
-  // Mock data for existing trees and air quality sensors
-  const MOCK_TREES = [
-    { id: 1, lat: 37.8716, lng: -122.2727, type: 'Coast Live Oak', condition: 'excellent' },
-    { id: 2, lat: 37.8710, lng: -122.2695, type: 'California Redwood', condition: 'good' },
-    { id: 3, lat: 37.8699, lng: -122.2735, type: 'American Elm', condition: 'fair' },
-    { id: 4, lat: 37.8730, lng: -122.2707, type: 'London Plane', condition: 'good' },
-  ];
+  // State for real data
+  const [treeData, setTreeData] = useState<any>(null);
+  const [airQualityData, setAirQualityData] = useState<AirQualityObservation[]>([]);
+  const [treeSpeciesList, setTreeSpeciesList] = useState<string[]>([]);
 
-  const MOCK_AIR_SENSORS = [
-    { id: 1, lat: 37.8712, lng: -122.2687, pm25: 8.3, official: true },
-    { id: 2, lat: 37.8720, lng: -122.2720, pm25: 10.1, official: true },
-    { id: 3, lat: 37.8695, lng: -122.2670, pm25: 7.8, official: true },
-  ];
-
-  // Initialize map when component mounts
+  // Load real environmental data
   useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        // Load tree data
+        const treeResponse = await fetch('/data/processed/berkeley_trees_processed.json');
+        if (!treeResponse.ok) throw new Error('Failed to fetch tree data');
+        const treeData = await treeResponse.json();
+        setTreeData(treeData);
+        
+        // Extract unique tree species for dropdown
+        const species = new Set<string>();
+        treeData.features.forEach((tree: any) => {
+          if (tree.properties?.SPECIES) {
+            species.add(tree.properties.SPECIES);
+          }
+        });
+        setTreeSpeciesList(Array.from(species).sort());
+        
+        // Load air quality data
+        const airResponse = await fetch('/data/airnow/airnow_94720_400days.json');
+        if (!airResponse.ok) throw new Error('Failed to fetch air quality data');
+        const airData: AirQualityObservation[] = await airResponse.json();
+        setAirQualityData(airData);
+      } catch (error) {
+        console.error('Error loading environmental data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
+
+  // Function to get AQI color based on value
+  const getAqiColor = (aqi: number): string => {
+    if (aqi <= 50) return '#00E400'; // Good
+    if (aqi <= 100) return '#FFFF00'; // Moderate
+    if (aqi <= 150) return '#FF7E00'; // Unhealthy for Sensitive Groups
+    if (aqi <= 200) return '#FF0000'; // Unhealthy
+    if (aqi <= 300) return '#99004C'; // Very Unhealthy
+    return '#7E0023'; // Hazardous
+  };
+
+  // Function to get color based on tree condition
+  const getTreeColor = (condition: string): string => {
+    switch (condition?.toLowerCase()) {
+      case 'good': return '#4CAF50';
+      case 'fair': return '#FFC107';
+      case 'poor': return '#FF9800';
+      case 'dead': return '#795548';
+      case 'critical': return '#F44336';
+      default: return '#4CAF50';
+    }
+  };
+
+  // Initialize map when component mounts and data is loaded
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current && !loading && treeData && airQualityData.length > 0) {
       // Initialize map centered on UC Berkeley
       const map = L.map(mapContainerRef.current).setView([37.8715, -122.2680], 15);
       
@@ -105,29 +156,46 @@ const ContributeData: React.FC = () => {
       const treeLayer = L.layerGroup();
       const sensorLayer = L.layerGroup();
       
-      // Add tree markers
-      MOCK_TREES.forEach(tree => {
-        const marker = L.marker([tree.lat, tree.lng], {
+      // Add tree markers - limit to 100 for performance
+      const treesToShow = treeData.features.slice(0, 100);
+      treesToShow.forEach((tree: any) => {
+        const lat = tree.geometry.coordinates[1];
+        const lng = tree.geometry.coordinates[0];
+        const species = tree.properties.SPECIES || 'Unknown Species';
+        const condition = tree.properties.CONDITION || 'Unknown';
+        const treeColor = getTreeColor(condition);
+        
+        const marker = L.marker([lat, lng], {
           icon: L.divIcon({
-            html: `<div style="background-color: #4CAF50; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">🌳</div>`,
+            html: `<div style="background-color: ${treeColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">🌳</div>`,
             className: '',
             iconSize: [24, 24]
           })
         });
         
         marker.bindPopup(`
-          <div>
-            <h3>${tree.type}</h3>
-            <p>Condition: ${tree.condition}</p>
+          <div style="max-width: 200px;">
+            <h3>${species}</h3>
+            <p>Condition: ${condition}</p>
+            ${tree.properties.DBHMAX ? `<p>Diameter: ${tree.properties.DBHMAX} inches</p>` : ''}
+            ${tree.properties.HEIGHT ? `<p>Height: ${tree.properties.HEIGHT} feet</p>` : ''}
           </div>
         `);
         
         marker.addTo(treeLayer);
       });
       
-      // Add sensor markers
-      MOCK_AIR_SENSORS.forEach(sensor => {
-        const markerColor = sensor.pm25 > 10 ? '#e91e63' : '#2196F3';
+      // Add air quality sensor markers - use most recent readings
+      const latestAirData = airQualityData
+        .sort((a, b) => new Date(b.DateObserved).getTime() - new Date(a.DateObserved).getTime())
+        .slice(0, 10);
+      
+      // Create air quality markers with slight position offsets for visualization
+      latestAirData.forEach((reading, index) => {
+        // Use Berkeley coordinates with slight offsets
+        const lat = 37.8715 + (Math.random() * 0.01 - 0.005);
+        const lng = -122.2680 + (Math.random() * 0.01 - 0.005);
+        const markerColor = getAqiColor(reading.AQI);
         
         const customIcon = L.divIcon({
           html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">📊</div>`,
@@ -135,12 +203,13 @@ const ContributeData: React.FC = () => {
           iconSize: [24, 24]
         });
         
-        const marker = L.marker([sensor.lat, sensor.lng], { icon: customIcon })
+        const marker = L.marker([lat, lng], { icon: customIcon })
           .bindPopup(`
-            <div>
-              <h3>Air Quality Sensor</h3>
-              <p>PM2.5: ${sensor.pm25} μg/m³</p>
-              <p>Status: ${sensor.official ? 'Official' : 'Community'}</p>
+            <div style="max-width: 200px;">
+              <h3>${reading.ParameterName} Sensor</h3>
+              <p>AQI: ${reading.AQI} (${reading.Category.Name})</p>
+              <p>Date: ${reading.DateObserved}</p>
+              <p>Status: Official AirNow Reading</p>
             </div>
           `);
         
@@ -478,15 +547,31 @@ const ContributeData: React.FC = () => {
                   <Typography variant="subtitle1" fontWeight={500} gutterBottom>
                     Tree Species
                   </Typography>
-                  <TextField
-                    fullWidth
-                    placeholder="e.g. Coast Live Oak"
-                    value={species}
-                    onChange={(e) => setSpecies(e.target.value)}
-                    error={!!errors.species}
-                    helperText={errors.species || "Enter the full scientific or common name"}
-                    size="small"
-                  />
+                  <FormControl fullWidth error={!!errors.species} size="small">
+                    <Select
+                      value={species}
+                      onChange={(e) => setSpecies(e.target.value)}
+                      displayEmpty
+                      renderValue={(selected) => selected ? selected : 'Select a tree species'}
+                    >
+                      {loading ? (
+                        <MenuItem disabled>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <CircularProgress size={20} sx={{ mr: 1 }} />
+                            <Typography>Loading species...</Typography>
+                          </Box>
+                        </MenuItem>
+                      ) : (
+                        <>
+                          {treeSpeciesList.map((speciesName) => (
+                            <MenuItem key={speciesName} value={speciesName}>{speciesName}</MenuItem>
+                          ))}
+                          <MenuItem value="Other">Other (specify in notes)</MenuItem>
+                        </>
+                      )}
+                    </Select>
+                    <FormHelperText>{errors.species || "Select from Berkeley's tree inventory"}</FormHelperText>
+                  </FormControl>
                 </Box>
               )}
               

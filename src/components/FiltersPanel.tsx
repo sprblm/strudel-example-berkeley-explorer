@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Stack, StackProps, Typography } from '@mui/material';
 import React from 'react';
-import { Filter, FilterType } from '../pages/search-repositories/_config/taskflow.types';
+import { Filter } from '../pages/search-repositories/_config/taskflow.types';
 
 interface FiltersProps extends StackProps {
   filters?: Filter[];

@@ -6,14 +6,14 @@ import {
   setFilteredData,
 } from './actions';
 import {
-  DataCard,
   DataFilter,
   FilterConfig,
 } from '../../../types/filters.types';
+import { CardFields } from '../../../types/card.types';
 import { filterData } from '../../../utils/filters.utils';
 
 export interface SearchDataRepositoriesState {
-  cardFields: DataCard;
+  cardFields: CardFields;
   columns: any[];
   count?: number;
   data?: any[];
@@ -37,7 +37,7 @@ export interface SearchDataRepositoriesState {
 interface SearchDataRepositoriesProviderProps
   extends Partial<SearchDataRepositoriesState> {
   activeFilters?: DataFilter[];
-  cardFields?: DataCard;
+  cardFields?: CardFields;
   columns?: any[];
   tablePage?: number;
   tablePageSize?: number;
@@ -56,8 +56,16 @@ const initialState: SearchDataRepositoriesState = {
   data: [],
   cardFields: {
     title: '',
+    source: '',
+    quality: '',
+    thumbnail: '',
     content: '',
-    tags: '',
+    temporal_coverage: '',
+    spatial_coverage: '',
+    resolution: '',
+    variables: '',
+    citation: '',
+    download_url: ''
   },
   columns: [],
   filters: [],

@@ -78,7 +78,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
       environmentalFactorsData[locationA].noiseLevel
     ],
     theta: categories,
-    fill: 'toself',
+    fill: 'toself' as 'toself',
     name: locationA,
     line: {
       color: '#3B82F6'
@@ -97,7 +97,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
       environmentalFactorsData[locationB].noiseLevel
     ],
     theta: categories,
-    fill: 'toself',
+    fill: 'toself' as 'toself',
     name: locationB,
     line: {
       color: '#F59E0B'

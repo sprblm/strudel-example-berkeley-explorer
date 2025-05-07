@@ -1,55 +1,94 @@
-import { Box, Container, Typography, Paper, Grid } from '@mui/material';
-import React, { useState } from 'react';
+import { Box, Container, Typography, Paper, Grid, CircularProgress } from '@mui/material';
+import { useState, useEffect } from 'react';
 import FiltersPanel from './_components/FiltersPanel'; 
 import { FilterContextProvider } from '../../components/FilterContext';
 import { SearchIcon } from '../../components/Icons';
 import DataListPanel from './_components/DataListPanel';
-import { PreviewPanel } from './_components/PreviewPanel';
-import { SearchHistoryPanel } from './_components/SearchHistoryPanel';
-import { taskflow } from './_config/taskflow.config';
-import type { Dataset } from './_config/taskflow.types';
-import { searchHelper } from '../../utils/searchHelper';
-import { Button } from '../../components/Button';
+import type { Dataset } from '../../types/dataset.types';
 import CampusDataMap from '../../components/CampusDataMap';
+import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 /**
  * The main explore page for the search-data-repositories Task Flow.
  * Displays a page header, filters panel, map view, and search results.
  */
-interface TaskflowPages {
-  index: {
-    title: string;
-    description: string;
-  };
-}
 
 const DatasetExplorer: React.FC = () => {
   const [previewItem, setPreviewItem] = useState<Dataset | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<Dataset[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const pageConfig = (taskflow.pages as unknown as TaskflowPages)?.index;
+  const [loading, setLoading] = useState(true);
 
-  const [datasets, setDatasets] = useState<Dataset[]>([
-    { id: '1', title: 'Tree Dataset 1', publication_date: '2023-01-01', summary: 'Summary 1', source: 'Source 1' },
-    { id: '2', title: 'Air Quality Dataset 2', publication_date: '2023-02-01', summary: 'Summary 2', source: 'Source 2' },
-    { id: '3', title: 'Tree Dataset 3', publication_date: '2023-03-01', summary: 'Summary 3', source: 'Source 3' },
-  ]);
+  // State for real datasets
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  
+  // Load real environmental data
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        // Load tree data
+        const treeResponse = await fetch('/data/processed/berkeley_trees_processed.json');
+        if (!treeResponse.ok) throw new Error('Failed to fetch tree data');
+        const treeData = await treeResponse.json();
+        
+        // Load air quality data
+        const airResponse = await fetch('/data/airnow/airnow_94720_400days.json');
+        if (!airResponse.ok) throw new Error('Failed to fetch air quality data');
+        const airData: AirQualityObservation[] = await airResponse.json();
+        
+        // Create dataset entries from the real data
+        const treeDataset: Dataset = {
+          id: 'berkeley-trees',
+          title: 'Berkeley Tree Inventory',
+          publication_date: '2013-01-01',
+          summary: `Complete inventory of ${treeData.features.length.toLocaleString()} trees in Berkeley, including species, condition, and location data.`,
+          source: 'City of Berkeley',
+          details: {
+            type: 'tree',
+            count: treeData.features.length,
+            format: 'GeoJSON',
+            fields: ['SPECIES', 'CONDITION', 'DBHMAX', 'HEIGHT']
+          }
+        };
+        
+        // Group air quality data by parameter
+        const pm25Data = airData.filter(d => d.ParameterName === 'PM2.5');
+        const ozoneData = airData.filter(d => d.ParameterName === 'OZONE');
+        
+        const airQualityDataset: Dataset = {
+          id: 'airnow-berkeley',
+          title: 'Berkeley Air Quality Measurements',
+          publication_date: new Date().toISOString().split('T')[0],
+          summary: `Air quality measurements for Berkeley area, including ${pm25Data.length} PM2.5 readings and ${ozoneData.length} Ozone readings.`,
+          source: 'AirNow API',
+          details: {
+            type: 'air',
+            parameters: ['PM2.5', 'OZONE'],
+            timespan: '400 days',
+            format: 'JSON'
+          }
+        };
+        
+        setDatasets([treeDataset, airQualityDataset]);
+        setSearchResults([treeDataset, airQualityDataset]); // Show all datasets by default
+      } catch (error) {
+        // Handle error silently or use a custom error handling utility
+        setSearchResults([]); // Reset results on error
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
 
-  const handleSearch = async (searchText: string) => {
-    const results = await searchHelper.searchDatasets(searchText, datasets);
-    setSearchResults(results);
-  };
 
-  const handleClosePreview = () => {
-    setPreviewItem(null);
-  };
 
   // Handle map point click
   const handleMapPointClick = (point: any) => {
-    // Find dataset related to this point
+    // Find dataset related to this point type
     const relatedDataset = datasets.find(dataset => 
-      dataset.title.toLowerCase().includes(point.type === 'tree' ? 'tree' : 'air')
+      dataset.details?.type === point.type
     );
     
     if (relatedDataset) {
@@ -113,11 +152,18 @@ const DatasetExplorer: React.FC = () => {
                   borderColor: 'grey.200'
                 }}
               >
-                <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                  Search Results ({searchResults.length})
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="h6" fontWeight={600}>
+                    Environmental Datasets ({searchResults.length})
+                  </Typography>
+                  {loading && <CircularProgress size={24} />}
+                </Box>
                 
-                {searchResults.length > 0 ? (
+                {loading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress size={40} />
+                  </Box>
+                ) : searchResults.length > 0 ? (
                   <DataListPanel
                     previewItem={previewItem}
                     setPreviewItem={(item: Dataset | null) => setPreviewItem(item)}

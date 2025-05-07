@@ -54,14 +54,14 @@ export const CardView: React.FC<CardViewProps> = ({
   
   // Get fields for tags
   const tagFields = columns
-    .filter(col => col.type !== 'number' && col.field !== titleField && col.field !== subtitleField)
-    .map(col => col.field)
+    .filter((col: any) => col.type !== 'number' && col.field !== titleField && col.field !== subtitleField)
+    .map((col: any) => col.field)
     .slice(0, 2); // Limit to 2 tag fields
 
   // Get numeric fields for details
   const numericFields = columns
-    .filter(col => col.type === 'number')
-    .map(col => ({
+    .filter((col: any) => col.type === 'number')
+    .map((col: any) => ({
       field: col.field,
       label: col.headerName,
       units: col.units
@@ -101,12 +101,12 @@ export const CardView: React.FC<CardViewProps> = ({
                 </CardMedia>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h6" component="div" noWrap>
-                    {item[titleField]}
+                    {String(item[titleField] || '')}
                   </Typography>
                   
                   {subtitleField && (
                     <Typography variant="body2" color="text.secondary" gutterBottom noWrap>
-                      {item[subtitleField]}
+                      {String(item[subtitleField] || '')}
                     </Typography>
                   )}
                   
@@ -114,7 +114,7 @@ export const CardView: React.FC<CardViewProps> = ({
                     <Box sx={{ my: 1 }}>
                       {numericFields.slice(0, 3).map((field, idx) => (
                         <Typography key={idx} variant="body2" component="div">
-                          <strong>{field.label}:</strong> {item[field.field] !== undefined ? item[field.field] : 'N/A'}
+                          <strong>{field.label}:</strong> {item[field.field] !== undefined ? String(item[field.field]) : 'N/A'}
                           {field.units ? ` ${field.units}` : ''}
                         </Typography>
                       ))}
@@ -127,10 +127,10 @@ export const CardView: React.FC<CardViewProps> = ({
                         item[field] && (
                           <Chip 
                             key={idx} 
-                            label={item[field]} 
+                            label={String(item[field])} 
                             size="small" 
-                            color={idx === 0 ? "primary" : "secondary"}
-                            variant="outlined"
+                            variant="outlined" 
+                            sx={{ mb: 1 }}
                           />
                         )
                       ))}

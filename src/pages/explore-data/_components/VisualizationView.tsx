@@ -6,8 +6,10 @@ import {
   Tooltip,
   Menu,
   MenuItem,
+  ListItemText,
   Checkbox,
-  ListItemText
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { ChevronLeft, LayersIcon, MapIcon } from '../../../components/Icons';
 import L from 'leaflet';
@@ -47,8 +49,10 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
 }) => {
   const [mapRef, setMapRef] = useState<L.Map | null>(null);
   const [layersRef, setLayersRef] = useState<{trees: L.LayerGroup, airQuality: L.LayerGroup} | null>(null);
-  const [treeData, setTreeData] = useState<TreeObservation[]>([]);
+  const [treeData, setTreeData] = useState<any>(null); // Changed to any to handle GeoJSON format
   const [airQualityData, setAirQualityData] = useState<AirQualityObservation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Using refs for map and layers to avoid reference issues in useEffect
   const mapRefInstance = useRef<L.Map | null>(null);
@@ -57,13 +61,16 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
   // Load Berkeley tree data and air quality data
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         // Fetch tree data
         const treeResponse = await fetch('/data/processed/berkeley_trees_processed.json');
         if (!treeResponse.ok) {
           throw new Error(`Failed to fetch tree data: ${treeResponse.status}`);
         }
-        const treeDataResult: TreeObservation[] = await treeResponse.json();
+        const treeDataResult = await treeResponse.json();
+        console.log('Tree data loaded:', treeDataResult);
         setTreeData(treeDataResult);
         
         // Fetch air quality data
@@ -72,9 +79,15 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
           throw new Error(`Failed to fetch air quality data: ${airQualityResponse.status}`);
         }
         const airQualityDataResult: AirQualityObservation[] = await airQualityResponse.json();
+        console.log('Air quality data loaded:', airQualityDataResult.length, 'records');
         setAirQualityData(airQualityDataResult);
       } catch (error) {
         console.error('Error loading data:', error);
+        setError(error instanceof Error ? error.message : 'Failed to load data');
+      } finally {
+        // Even if there's an error, we'll set loading to false after a short delay
+        // This ensures the UI doesn't get stuck in a loading state
+        setTimeout(() => setLoading(false), 500);
       }
     };
     
@@ -83,12 +96,14 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
 
   // Function to get color based on tree health
   const getTreeColor = (health: string) => {
-    switch(health) {
-      case 'Excellent': return '#2e7d32'; // dark green
-      case 'Good': return '#4caf50'; // green
-      case 'Fair': return '#ff9800'; // orange
-      case 'Poor': return '#f44336'; // red
-      default: return '#9e9e9e'; // gray for unknown
+    if (!health) return '#9E9E9E';
+    
+    switch (health.toLowerCase()) {
+      case 'good': return '#4CAF50';
+      case 'fair': return '#FFC107';
+      case 'poor': return '#F44336';
+      case 'dead': return '#795548';
+      default: return '#9E9E9E';
     }
   };
 
@@ -139,7 +154,7 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
   // Create and initialize map when component mounts and data is loaded
   useEffect(() => {
     // Make sure the container is fully available with proper dimensions
-    if (!mapContainerRef.current || mapRefInstance.current || !treeData.length) {
+    if (!mapContainerRef.current || mapRefInstance.current || loading || !treeData) {
       return; // Exit early if conditions aren't met
     }
     
@@ -164,7 +179,7 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
       const sensorLayer = L.layerGroup();
       
       // Get most recent air quality data for each parameter
-      const latestAQData = {};
+      const latestAQData: Record<string, AirQualityObservation> = {};
       
       // Group by parameter and find the most recent for each
       airQualityData.forEach(reading => {
@@ -178,7 +193,7 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
       // Add air quality sensor markers with real data
       AIR_SENSOR_LOCATIONS.forEach(sensor => {
         // Get the most recent PM2.5 data or default to moderate if not available
-        const pm25Data = latestAQData['PM2.5'] || { AQI: 51, Category: { Name: 'Moderate' } };
+        const pm25Data = latestAQData['PM2.5'] || { AQI: 51, Category: { Name: 'Moderate' }, DateObserved: new Date().toISOString() };
         
         // Color based on AQI category
         let markerColor = '#2196F3'; // Default blue
@@ -209,32 +224,53 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
         marker.addTo(sensorLayer);
       });
       
-      // Add tree markers
-      treeData.forEach(tree => {
-        if (!tree.location || tree.location.length < 2) return;
-        
-        const treeColor = getTreeColor(tree.healthCondition);
-        
-        const customIcon = L.divIcon({
-          html: `<div style="background-color: ${treeColor}; width: 8px; height: 8px; border-radius: 50%; border: 1px solid white;"></div>`,
-          className: '',
-          iconSize: [8, 8]
-        });
-        
-        // Tree location is stored as [longitude, latitude]
-        const marker = L.marker([tree.location[1], tree.location[0]], { icon: customIcon })
-          .bindPopup(`
-            <div>
-              <h3>${tree.species}</h3>
-              <p>Health: ${tree.healthCondition}</p>
-              <p>Diameter: ${tree.dbh} inches</p>
-              ${tree.height ? `<p>Height: ${tree.height} ft</p>` : ''}
-              ${tree.notes ? `<p>Notes: ${tree.notes}</p>` : ''}
-            </div>
-          `);
-        
-        marker.addTo(treeLayer);
-      });
+      // Add tree markers - limit to 200 trees for performance
+      if (treeData && treeData.features) {
+        try {
+          // Get a sample of trees (first 200) for better performance
+          const treeSample = treeData.features.slice(0, 200);
+          console.log(`Adding ${treeSample.length} tree markers out of ${treeData.features.length} total`);
+          
+          treeSample.forEach((tree: any) => {
+            if (!tree.geometry || !tree.geometry.coordinates) {
+              console.warn('Tree missing geometry or coordinates', tree);
+              return;
+            }
+            
+            const coordinates = tree.geometry.coordinates;
+            const properties = tree.properties || {};
+            
+            // Get tree color based on condition
+            const condition = properties.CONDITION || 'Unknown';
+            const treeColor = getTreeColor(condition);
+            
+            const customIcon = L.divIcon({
+              html: `<div style="background-color: ${treeColor}; width: 8px; height: 8px; border-radius: 50%; border: 1px solid white;"></div>`,
+              className: '',
+              iconSize: [8, 8]
+            });
+            
+            try {
+              // GeoJSON uses [longitude, latitude] format
+              const marker = L.marker([coordinates[1], coordinates[0]], { icon: customIcon })
+                .bindPopup(`
+                  <div>
+                    <h3>${properties.SPECIES || 'Unknown Species'}</h3>
+                    <p>Condition: ${condition}</p>
+                    ${properties.DBHMAX ? `<p>Diameter: ${properties.DBHMAX} inches</p>` : ''}
+                    ${properties.HEIGHT ? `<p>Height: ${properties.HEIGHT} ft</p>` : ''}
+                  </div>
+                `);
+              
+              marker.addTo(treeLayer);
+            } catch (err) {
+              console.warn('Error adding tree marker:', err, coordinates);
+            }
+          });
+        } catch (err) {
+          console.error('Error processing tree data:', err);
+        }
+      }
       
       // Store references
       mapRefInstance.current = map;
@@ -299,16 +335,9 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
         layers.trees.addTo(map);
         
         // Find center point of tree data
-        if (treeData && treeData.length > 0) {
-          const validTrees = treeData.filter(tree => tree.location && tree.location.length > 1);
-          
-          if (validTrees.length > 0) {
-            const treeCenter = calculateCenter(validTrees.map(tree => ({
-              lat: tree.location[1],
-              lng: tree.location[0]
-            })));
-            map.setView([treeCenter.lat, treeCenter.lng], 15);
-          }
+        if (treeData && treeData.features && treeData.features.length > 0) {
+          // Default Berkeley center
+          map.setView([37.8715, -122.2680], 15);
         }
       } else if (dataType === 'airQuality') {
         // Ensure sensor layer is visible (even if toggle is off)
@@ -345,6 +374,7 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
           <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
             UC Berkeley Campus Map
           </Typography>
+          {loading && <CircularProgress size={16} sx={{ ml: 2 }} />}
         </Box>
         
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -375,37 +405,66 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
         </Box>
       </Box>
       
-      {/* Map Container */}
-      <Box 
-        ref={mapContainerRef} 
-        sx={{ 
-          flex: 1,
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          minHeight: '500px' // Ensure minimum height for the map container
-        }} 
-      />
+      {/* Error message */}
+      {error && (
+        <Alert severity="error" sx={{ m: 2 }}>
+          {error}
+        </Alert>
+      )}
       
-      {/* Layers Menu */}
-      <Menu
-        anchorEl={layersMenuAnchorEl}
-        open={isLayersMenuOpen}
-        onClose={handleLayersMenuClose}
-        PaperProps={{
-          elevation: 2,
-          sx: { minWidth: 180 }
-        }}
-      >
-        <MenuItem onClick={() => handleLayerToggle('trees')}>
-          <Checkbox checked={visibleLayers.includes('trees')} />
-          <ListItemText primary="Trees" />
-        </MenuItem>
-        <MenuItem onClick={() => handleLayerToggle('airQuality')}>
-          <Checkbox checked={visibleLayers.includes('airQuality')} />
-          <ListItemText primary="Air Quality" />
-        </MenuItem>
-      </Menu>
-    </Box>
-  );
+      {/* Loading indicator */}
+      {loading ? (
+        <Box 
+          sx={{ 
+            flex: 1,
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexDirection: 'column',
+            minHeight: '500px'
+          }}
+        >
+          <CircularProgress size={40} />
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Loading environmental data...
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+            Processing {treeData?.features?.length > 0 ? treeData.features.length.toLocaleString() : '...'} trees
+          </Typography>
+        </Box>
+      ) : (
+        /* Map Container */
+        <Box 
+          ref={mapContainerRef} 
+          sx={{ 
+            flex: 1,
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            minHeight: '500px' // Ensure minimum height for the map container
+          }} 
+        />
+      )}
+    
+    {/* Layers Menu */}
+    <Menu
+      anchorEl={layersMenuAnchorEl}
+      open={isLayersMenuOpen}
+      onClose={handleLayersMenuClose}
+      PaperProps={{
+        elevation: 2,
+        sx: { minWidth: 180 }
+      }}
+    >
+      <MenuItem onClick={() => handleLayerToggle('trees')}>
+        <Checkbox checked={visibleLayers.includes('trees')} />
+        <ListItemText primary="Trees" secondary={`${treeData?.features ? '(200 of ' + treeData.features.length.toLocaleString() + ')' : ''}`} />
+      </MenuItem>
+      <MenuItem onClick={() => handleLayerToggle('airQuality')}>
+        <Checkbox checked={visibleLayers.includes('airQuality')} />
+        <ListItemText primary="Air Quality Sensors" />
+      </MenuItem>
+    </Menu>
+  </Box>
+);
 };

@@ -380,7 +380,7 @@ const RunComputationPage: React.FC = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ClockIcon size={18} sx={{ color: 'primary.main', mr: 1 }} />
+                  <ClockIcon style={{ color: '#1976d2', marginRight: '8px', width: '18px', height: '18px' }} />
                   <Typography variant="h6" component="h2" fontWeight={500}>
                     Active Jobs
                   </Typography>
@@ -423,7 +423,7 @@ const RunComputationPage: React.FC = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ServerIcon size={18} sx={{ color: 'primary.main', mr: 1 }} />
+                  <ServerIcon style={{ color: '#1976d2', marginRight: '8px', width: '18px', height: '18px' }} />
                   <Typography variant="h6" component="h2" fontWeight={500}>
                     System Status
                   </Typography>
