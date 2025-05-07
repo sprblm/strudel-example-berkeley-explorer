@@ -3,6 +3,10 @@
  * This file defines the structure and types for the taskflow configuration
  * used across the search data repositories application
  */
+import { Dataset as DatasetType } from '../../../types/dataset.types';
+
+// Re-export the Dataset type to maintain compatibility
+export type Dataset = DatasetType;
 
 export interface ListConfig {
   source: string;
@@ -10,8 +14,6 @@ export interface ListConfig {
   queryMode: 'server' | 'client';
   staticParams?: Record<string, unknown>;
 }
-
-// Remove the original Dataset interface definition
 
 export interface CardFields {
   titleField: string;
@@ -71,21 +73,4 @@ export interface DataListPanelProps {
   searchResults: Dataset[];
   previewItem: Dataset | null;
   setPreviewItem: (item: Dataset | null) => void;
-}
-
-export interface Dataset {
-  id: string;
-  type?: string;
-  species?: string;
-  location?: string;
-  parameter?: string;
-  value?: number;
-  distance?: number;
-  dbh?: number;
-  observationDate?: string;
-  title: string;
-  summary: string;
-  source: string;
-  attached_files?: { file_name: string; file_size: string }[];
-  publication_date: string;
 }
