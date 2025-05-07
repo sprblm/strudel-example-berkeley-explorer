@@ -1,0 +1,47 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.2680, 37.8715]
+      },
+      "properties": {
+        "OBJECTID": 1,
+        "SPECIES": "Coast Live Oak",
+        "CONDITION": "Good",
+        "DBHMAX": 24,
+        "HEIGHT": 35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.2685, 37.8710]
+      },
+      "properties": {
+        "OBJECTID": 2,
+        "SPECIES": "London Plane",
+        "CONDITION": "Fair",
+        "DBHMAX": 18,
+        "HEIGHT": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.2675, 37.8720]
+      },
+      "properties": {
+        "OBJECTID": 3,
+        "SPECIES": "Redwood",
+        "CONDITION": "Good",
+        "DBHMAX": 36,
+        "HEIGHT": 60
+      }
+    }
+  ]
+}
