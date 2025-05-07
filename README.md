@@ -1,64 +1,80 @@
-# Berkeley Environmental Health Explorer 
+# Berkeley Environmental Health Explorer (BEHE)
 
-A comprehensive platform for analyzing climate data from various repositories and datasets.
+A modern web platform for exploring and analyzing environmental and climate data on the UC Berkeley campus and beyond.
 
 ## Features
 
-1. **Search Data Repositories**: Find climate datasets from multiple sources with filtering options
-2. **Explore Data**: Visualize and analyze climate data through interactive tables, charts, and maps
-3. **Multiple Visualization Options**: View data as tables, cards, charts, or geographic maps
+- **Campus Data Map**: Interactive map showing trees, air quality sensors, and environmental factors.
+- **Compare Data**: Visualize and compare tree diversity, air quality, and other factors between locations.
+- **Search & Explore**: Find and filter datasets by type, source, and environmental category.
+- **User-Contributed Data**: Support for uploading and exploring community datasets.
+- **Multiple Visualization Options**: Tables, cards, charts, and geographic maps (Plotly, Leaflet, MUI).
 
-## Data Sources
+## Data Sources & Approach
 
-This platform provides access to climate data from various sources:
+- **Berkeley Tree Inventory (GeoJSON, 2013)**: Static dataset of campus trees.
+- **AirNow API (Historical Air Quality)**: Data fetched via Python script, pre-compiled into JSON for frontend use.
+- **User/Community Data**: CSV/JSON files contributed by users.
 
-1. **WorldClim** - Global climate data for current conditions, future projections, and past climate
-2. **NOAA** - National Oceanic and Atmospheric Administration climate datasets
-3. **NASA** - Earth observation and climate data from NASA
-4. **ERA5** - ECMWF Reanalysis v5 climate data
-5. **User-contributed** - Community-contributed climate datasets
+**Static Data Workflow:**
+- No backend API. All data is pre-processed and stored as static JSON/CSV files in the `public/data/` directory.
+- The frontend loads these files directly for fast and scalable data access.
 
 ## Technology Stack
 
-1. **Strudel Kit** - A framework for building scientific web applications
-2. **React** - For building the user interface
-3. **Material UI** - For component styling and layout
-4. **TypeScript** - For type-safe code
+- **React** (w/ TypeScript)
+- **Material UI (MUI)** for UI components
+- **Vite** for rapid development
+- **Plotly.js** and **react-plotly.js** for charts
+- **Leaflet** for maps
+- **Custom Types** for strong type safety
 
 ## Getting Started
 
 ### Prerequisites
+- Node.js (v18+ recommended)
+- npm or yarn
 
-1. Node.js (v14 or higher)
-2. npm or yarn
-
-### Installation
-
+### Installation & Development
 1. Clone the repository:
-
-```bash
-git clone https://github.com/oilsinwater/ueh-platform.git
-cd ueh-platform
-```
-
+   ```bash
+   git clone https://github.com/oilsinwater/ueh-platform.git
+   cd ueh-platform
+   ```
 2. Install dependencies:
-
-```bash
-npm install
-```
-
+   ```bash
+   npm install
+   ```
 3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
-```bash
-npm run dev
-```
-
-4. Open your browser and navigate to `http://localhost:5173`
+### Data Files
+- Place static data files in `public/data/` (e.g., `public/data/airnow/`, `public/data/processed/`).
+- To update air quality data, run the provided Python script and copy the resulting JSON into the appropriate directory.
 
 ## Project Structure
 
 - `/src` - Source code
-  - `/components` - Reusable UI components
+  - `/components` - Shared and reusable UI components (maps, charts, panels)
+  - `/pages` - Page-level React components (Home, Explore, Compare, etc.)
+  - `/services/data-sources` - Data adapters for static files
+  - `/types` - TypeScript types and interfaces
+- `/public/data/` - Static JSON and CSV data files
+
+## Contributing
+
+Contributions are welcome! Please open issues or pull requests for bug fixes, features, or data improvements.
+
+## License
+
+MIT License
+
+---
+
+**Contact:** [Project Maintainer](mailto:your-email@berkeley.edu)
   - `/pages` - Application pages
   - `/services` - API and data services
   - `/utils` - Utility functions
