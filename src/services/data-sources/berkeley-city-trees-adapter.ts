@@ -6,11 +6,15 @@ interface BerkeleyCityTreesFeature {
     coordinates: number[];
   };
   properties: {
-    SPP_NAME?: string;
-    COMMON_NAM?: string;
-    DBH: number;
-    CONDITION: string;
-    // Add other relevant properties
+    SPECIES?: string;
+    Common_Nam?: string;
+    ITREE?: string;
+    DBH_IN?: number;
+    CONDITION?: string;
+    HEIGHT_FT?: number;
+    SPREAD_FT?: number;
+    LOCATION?: string;
+    NOTE?: string;
   };
 }
 
@@ -19,15 +23,25 @@ class BerkeleyCityTreesAdapter {
     const treeObservations: TreeObservation[] = [];
 
     geoJSON.features.forEach((feature: BerkeleyCityTreesFeature) => {
+      // Skip planting sites (no actual tree)
+      if (feature.properties.SPECIES === 'Planting Site') {
+        return;
+      }
+
       const treeObservation: TreeObservation = {
         location: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-        species: feature.properties.SPP_NAME || feature.properties.COMMON_NAM || 'Unknown',
-        dbh: feature.properties.DBH,
-        healthCondition: this.standardizeHealthCondition(feature.properties.CONDITION),
+        species: feature.properties.SPECIES || feature.properties.Common_Nam || 'Unknown',
+        dbh: feature.properties.DBH_IN || 0,
+        healthCondition: this.standardizeHealthCondition(feature.properties.CONDITION || ''),
         observationDate: '2013-04-30',
         source: 'UCB Geodata Library (2013 Inventory)',
         isBaseline: true,
         id: `baseline-tree-${treeObservations.length + 1}`,
+        // Add additional properties
+        height: feature.properties.HEIGHT_FT,
+        spread: feature.properties.SPREAD_FT,
+        location_type: feature.properties.LOCATION,
+        notes: feature.properties.NOTE
       };
 
       treeObservations.push(treeObservation);
@@ -37,8 +51,17 @@ class BerkeleyCityTreesAdapter {
   }
 
   private standardizeHealthCondition(condition: string): string {
-    // Implement logic to standardize health condition
-    return condition; // For now, just return the condition as is
+    if (!condition || condition === 'NA') return 'Unknown';
+    
+    // The condition appears to be a numeric rating (0-100)
+    // Could map to categories like Poor (0-25), Fair (26-50), Good (51-75), Excellent (76-100)
+    const conditionNum = parseInt(condition, 10);
+    if (isNaN(conditionNum)) return condition;
+    
+    if (conditionNum <= 25) return 'Poor';
+    if (conditionNum <= 50) return 'Fair';
+    if (conditionNum <= 75) return 'Good';
+    return 'Excellent';
   }
 }
 

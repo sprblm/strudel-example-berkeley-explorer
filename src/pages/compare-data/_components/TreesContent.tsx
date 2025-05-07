@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import Plot from 'react-plotly.js';
+import { PieData, Layout, Config } from 'plotly.js';
 
 interface TreesContentProps {
   locationA: string;
@@ -36,24 +37,24 @@ const TreesContent: React.FC<TreesContentProps> = ({
   };
 
   // Prepare data for tree species pie charts
-  const locationAPieData = {
-    type: 'pie' as const,
+  const locationAPieData: Partial<PieData> = {
+    type: 'pie',
     labels: Object.keys(treeSpeciesData[locationA]),
     values: Object.values(treeSpeciesData[locationA]),
     textinfo: 'label+percent',
-    textposition: 'outside',
+    textposition: 'outside' as 'outside',
     automargin: true,
     marker: {
       colors: ['#4CAF50', '#2196F3', '#9C27B0', '#F44336']
     }
   };
 
-  const locationBPieData = {
-    type: 'pie' as const,
+  const locationBPieData: Partial<PieData> = {
+    type: 'pie',
     labels: Object.keys(treeSpeciesData[locationB]),
     values: Object.values(treeSpeciesData[locationB]),
     textinfo: 'label+percent',
-    textposition: 'outside',
+    textposition: 'outside' as 'outside',
     automargin: true,
     marker: {
       colors: ['#4CAF50', '#2196F3', '#F44336']
@@ -67,7 +68,7 @@ const TreesContent: React.FC<TreesContentProps> = ({
     type: 'bar' as const,
     name: 'Avg. Height (ft)',
     marker: {
-      color: '#4CAF50'
+      color: '#4CAF50' as string
     }
   };
 
@@ -111,10 +112,10 @@ const TreesContent: React.FC<TreesContentProps> = ({
                       },
                       height: 200,
                       width: 200
-                    }}
+                    } as Partial<Layout>}
                     style={{ width: '100%', height: '100%' }}
                     useResizeHandler={true}
-                    config={{ responsive: true }}
+                    config={{ responsive: true } as Partial<Config>}
                   />
                 </Box>
               </Grid>
@@ -135,10 +136,10 @@ const TreesContent: React.FC<TreesContentProps> = ({
                       },
                       height: 200,
                       width: 200
-                    }}
+                    } as Partial<Layout>}
                     style={{ width: '100%', height: '100%' }}
                     useResizeHandler={true}
-                    config={{ responsive: true }}
+                    config={{ responsive: true } as Partial<Config>}
                   />
                 </Box>
               </Grid>
@@ -184,10 +185,10 @@ const TreesContent: React.FC<TreesContentProps> = ({
                     b: 100
                   },
                   autosize: true
-                }}
+                } as Partial<Layout>}
                 style={{ width: '100%', height: '100%' }}
                 useResizeHandler={true}
-                config={{ responsive: true }}
+                config={{ responsive: true } as Partial<Config>}
               />
             </Box>
           </Paper>

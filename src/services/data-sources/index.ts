@@ -5,6 +5,8 @@ import { CMIP6Adapter } from './cmip6-adapter';
 import { ERA5Adapter } from './era5-adapter';
 import { UserContributedAdapter } from './user-contributed-adapter';
 import { DataSourceAdapter, HttpClientConfig } from './types';
+import { UrbanTreeInventoryAdapter } from './urban-tree-inventory-adapter';
+import { AirQualityAdapter } from './air-quality-adapter';
 
 /**
  * Factory function to create all data source adapters
@@ -37,9 +39,17 @@ export function createAllDataSources(params: Partial<HttpClientConfig> = {}): Da
 export function createDataSource(sourceId: string, params: Partial<HttpClientConfig> = {}): DataSourceAdapter | undefined {
   switch (sourceId.toLowerCase()) {
     case 'urban-tree-inventory':
-      return new UrbanTreeInventoryAdapter(params);
+      return new UrbanTreeInventoryAdapter({
+        baseUrl: params.baseUrl || '',
+        headers: params.headers,
+        timeout: params.timeout
+      });
     case 'air-quality':
-      return new AirQualityAdapter(params);
+      return new AirQualityAdapter({
+        baseUrl: params.baseUrl || '',
+        headers: params.headers,
+        timeout: params.timeout
+      });
     // Add cases for other data sources if necessary
     case 'noaa':
       return new NOAAAdapter({

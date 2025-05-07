@@ -1,5 +1,6 @@
 import { DataFilter, FilterConfig } from '../types/filters.types';
-import * as d3 from 'd3-fetch';
+import * as d3Fetch from 'd3-fetch';
+import * as d3Dsv from 'd3-dsv';
 import { createDataSource } from '../services/data-sources';
 import { SearchOptions } from '../services/data-sources/types';
 
@@ -73,7 +74,7 @@ export const buildParamsString = (
           toParamArrayString(
             filter.field,
             filter.value,
-            filterConfig.paramTypeOptions.separator
+            filterConfig.paramTypeOptions?.separator || ','
           )
         );
         break;
@@ -87,8 +88,8 @@ export const buildParamsString = (
           toParamMinMax(
             filter.field,
             filter.value,
-            filterConfig.paramTypeOptions.minParam,
-            filterConfig.paramTypeOptions.maxParam
+            filterConfig.paramTypeOptions?.minParam || `min_${filterConfig.field}`,
+            filterConfig.paramTypeOptions?.maxParam || `max_${filterConfig.field}`
           )
         );
         break;
@@ -120,11 +121,11 @@ export const createFilterParams = (
       case 'minmax':
         if (
           Array.isArray(filter.value) &&
-          options.minParam &&
-          options.maxParam
+          options?.minParam &&
+          options?.maxParam
         ) {
-          params.append(options.minParam, filter.value[0].toString());
-          params.append(options.maxParam, filter.value[1].toString());
+          params.append(options?.minParam || `min_${filter.field}`, filter.value[0].toString());
+          params.append(options?.maxParam || `max_${filter.field}`, filter.value[1].toString());
         }
         break;
       case 'repeated':
@@ -278,17 +279,17 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
       if (signal) {
         const response = await fetch(dataSourcePath, { signal });
         const text = await response.text();
-        data = d3.csvParse(text);
+        data = d3Dsv.csvParse(text);
       } else {
-        data = await d3.csv(dataSourcePath);
+        data = await d3Fetch.csv(dataSourcePath);
       }
     } else if (fileExtension === 'tsv') {
       if (signal) {
         const response = await fetch(dataSourcePath, { signal });
         const text = await response.text();
-        data = d3.tsvParse(text);
+        data = d3Dsv.tsvParse(text);
       } else {
-        data = await d3.tsv(dataSourcePath);
+        data = await d3Fetch.tsv(dataSourcePath);
       }
     } else if (fileExtension === 'json' || isExternal) {
       console.log(`fetchData: Fetching JSON from ${dataSourcePath}`);
@@ -319,7 +320,7 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
     return data;
   } catch (error) {
     // Don't throw if it's an abort error
-    if (error.name === 'AbortError') {
+    if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError') {
       console.log('Fetch request was cancelled');
       return null;
     }

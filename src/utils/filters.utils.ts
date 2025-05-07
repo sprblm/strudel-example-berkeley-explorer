@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+// Removed unused dayjs import
 import { DataFilter, FilterConfig } from '../types/filters.types';
 
 export const filterBySearchText = <T extends Record<string, unknown>>(

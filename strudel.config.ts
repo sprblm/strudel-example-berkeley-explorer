@@ -20,6 +20,10 @@ export const config = {
         path: '/compare-data',
       },
       {
+        label: 'Berkeley Trees',
+        path: '/berkeley-trees',
+      },
+      {
         label: 'Run Models',
         path: '/run-computation',
       },

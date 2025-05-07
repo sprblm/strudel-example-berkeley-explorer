@@ -10,6 +10,10 @@ interface TreeObservation {
   id: string;
   photos?: string[];
   notes?: string;
+  // Additional properties for Berkeley trees
+  height?: number;
+  spread?: number;
+  location_type?: string;
 }
 
 interface AQReading {
