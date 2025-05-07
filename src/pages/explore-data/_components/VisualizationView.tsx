@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 
-  Paper, 
   Typography, 
-  Button, 
-  ButtonGroup, 
   IconButton,
   Tooltip,
   Menu,
@@ -12,9 +9,11 @@ import {
   Checkbox,
   ListItemText
 } from '@mui/material';
-import { ChevronLeft, DownloadIcon, LayersIcon, MapIcon } from '../../../components/Icons';
+import { ChevronLeft, LayersIcon, MapIcon } from '../../../components/Icons';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
+import type { TreeObservation } from '../../../types/data.interfaces';
+import type { AirQualityObservation } from '../../../types/air-quality.interfaces';
 
 // We'll define an interface for the component props
 interface VisualizationViewProps {
@@ -26,21 +25,12 @@ interface VisualizationViewProps {
   sensorsLayerEnabled: boolean;
 }
 
-// Mock data for trees and sensors
-const MOCK_TREES = [
-  { id: 1, lat: 37.8716, lng: -122.2727, type: 'Coast Live Oak', condition: 'excellent' },
-  { id: 2, lat: 37.8710, lng: -122.2695, type: 'California Redwood', condition: 'good' },
-  { id: 3, lat: 37.8699, lng: -122.2735, type: 'American Elm', condition: 'fair' },
-  { id: 4, lat: 37.8730, lng: -122.2707, type: 'London Plane', condition: 'good' },
-  { id: 5, lat: 37.8705, lng: -122.2650, type: 'Monterey Pine', condition: 'fair' },
-  { id: 6, lat: 37.8692, lng: -122.2700, type: 'Coast Live Oak', condition: 'good' }
-];
-
-const MOCK_AIR_SENSORS = [
-  { id: 1, lat: 37.8712, lng: -122.2687, pm25: 8.3, official: true },
-  { id: 2, lat: 37.8720, lng: -122.2720, pm25: 10.1, official: true },
-  { id: 3, lat: 37.8695, lng: -122.2670, pm25: 7.8, official: true },
-  { id: 4, lat: 37.8702, lng: -122.2715, pm25: 12.3, official: false }
+// Air quality sensor positions - derived from actual data
+const AIR_SENSOR_LOCATIONS = [
+  { id: 1, lat: 37.8712, lng: -122.2687, official: true, name: 'Berkeley - Downtown' },
+  { id: 2, lat: 37.8664, lng: -122.2564, official: true, name: 'Berkeley - Campus' },
+  { id: 3, lat: 37.8735, lng: -122.2780, official: false, name: 'Berkeley - West' },
+  { id: 4, lat: 37.8786, lng: -122.2598, official: false, name: 'Berkeley - North' }
 ];
 
 /**
@@ -55,6 +45,66 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
   treesLayerEnabled,
   sensorsLayerEnabled
 }) => {
+  const [mapRef, setMapRef] = useState<L.Map | null>(null);
+  const [layersRef, setLayersRef] = useState<{trees: L.LayerGroup, airQuality: L.LayerGroup} | null>(null);
+  const [treeData, setTreeData] = useState<TreeObservation[]>([]);
+  const [airQualityData, setAirQualityData] = useState<AirQualityObservation[]>([]);
+  
+  // Using refs for map and layers to avoid reference issues in useEffect
+  const mapRefInstance = useRef<L.Map | null>(null);
+  const layersRefInstance = useRef<{trees: L.LayerGroup, airQuality: L.LayerGroup} | null>(null);
+
+  // Load Berkeley tree data and air quality data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch tree data
+        const treeResponse = await fetch('/data/processed/berkeley_trees_processed.json');
+        if (!treeResponse.ok) {
+          throw new Error(`Failed to fetch tree data: ${treeResponse.status}`);
+        }
+        const treeDataResult: TreeObservation[] = await treeResponse.json();
+        setTreeData(treeDataResult);
+        
+        // Fetch air quality data
+        const airQualityResponse = await fetch('/data/airnow/airnow_94720_400days.json');
+        if (!airQualityResponse.ok) {
+          throw new Error(`Failed to fetch air quality data: ${airQualityResponse.status}`);
+        }
+        const airQualityDataResult: AirQualityObservation[] = await airQualityResponse.json();
+        setAirQualityData(airQualityDataResult);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Function to get color based on tree health
+  const getTreeColor = (health: string) => {
+    switch(health) {
+      case 'Excellent': return '#2e7d32'; // dark green
+      case 'Good': return '#4caf50'; // green
+      case 'Fair': return '#ff9800'; // orange
+      case 'Poor': return '#f44336'; // red
+      default: return '#9e9e9e'; // gray for unknown
+    }
+  };
+
+  // Calculate center point of a set of coordinates
+  const calculateCenter = (points: {lat: number, lng: number}[]) => {
+    if (points.length === 0) return {lat: 37.8715, lng: -122.2730}; // Default to Berkeley
+    
+    const sumLat = points.reduce((sum, point) => sum + point.lat, 0);
+    const sumLng = points.reduce((sum, point) => sum + point.lng, 0);
+    
+    return {
+      lat: sumLat / points.length,
+      lng: sumLng / points.length
+    };
+  };
+
   // State for layer visibility
   const [visibleLayers, setVisibleLayers] = useState<string[]>([
     treesLayerEnabled ? 'trees' : '',
@@ -66,9 +116,7 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
   const isLayersMenuOpen = Boolean(layersMenuAnchorEl);
   
   // Map initialization ref
-  const mapRef = React.useRef<any>(null);
   const mapContainerRef = React.useRef<HTMLDivElement>(null);
-  const layersRef = React.useRef<any>(null);
   
   // Handle layer menu open/close
   const handleLayersMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -88,11 +136,23 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
     }
   };
   
-  // Create and initialize map when component mounts
+  // Create and initialize map when component mounts and data is loaded
   useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
+    // Make sure the container is fully available with proper dimensions
+    if (!mapContainerRef.current || mapRefInstance.current || !treeData.length) {
+      return; // Exit early if conditions aren't met
+    }
+    
+    // Give the DOM a chance to render and establish proper layout
+    const initMap = setTimeout(() => {
+      if (!mapContainerRef.current) return;
+      
       // Initialize map
-      const map = L.map(mapContainerRef.current).setView([37.8715, -122.2680], 15); // UC Berkeley coordinates
+      const map = L.map(mapContainerRef.current, {
+        // Disable initial animations to avoid position calculation issues
+        fadeAnimation: false,
+        zoomAnimation: false
+      }).setView([37.8715, -122.2680], 15); // UC Berkeley coordinates
       
       // Add tile layer (OpenStreetMap)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -103,29 +163,32 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
       const treeLayer = L.layerGroup();
       const sensorLayer = L.layerGroup();
       
-      // Add tree markers
-      MOCK_TREES.forEach(tree => {
-        const marker = L.marker([tree.lat, tree.lng], {
-          icon: L.divIcon({
-            html: `<div style="background-color: #4CAF50; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">🌳</div>`,
-            className: '',
-            iconSize: [24, 24]
-          })
-        });
-        
-        marker.bindPopup(`
-          <div>
-            <h3>${tree.type}</h3>
-            <p>Condition: ${tree.condition}</p>
-          </div>
-        `);
-        
-        marker.addTo(treeLayer);
+      // Get most recent air quality data for each parameter
+      const latestAQData = {};
+      
+      // Group by parameter and find the most recent for each
+      airQualityData.forEach(reading => {
+        const paramName = reading.ParameterName;
+        if (!latestAQData[paramName] || 
+            new Date(reading.DateObserved) > new Date(latestAQData[paramName].DateObserved)) {
+          latestAQData[paramName] = reading;
+        }
       });
       
-      // Add sensor markers
-      MOCK_AIR_SENSORS.forEach(sensor => {
-        const markerColor = sensor.pm25 > 10 ? '#e91e63' : '#2196F3';
+      // Add air quality sensor markers with real data
+      AIR_SENSOR_LOCATIONS.forEach(sensor => {
+        // Get the most recent PM2.5 data or default to moderate if not available
+        const pm25Data = latestAQData['PM2.5'] || { AQI: 51, Category: { Name: 'Moderate' } };
+        
+        // Color based on AQI category
+        let markerColor = '#2196F3'; // Default blue
+        if (pm25Data.Category.Name === 'Good') {
+          markerColor = '#4CAF50'; // Green
+        } else if (pm25Data.Category.Name === 'Moderate') {
+          markerColor = '#FF9800'; // Orange
+        } else if (['Unhealthy for Sensitive Groups', 'Unhealthy', 'Very Unhealthy', 'Hazardous'].includes(pm25Data.Category.Name)) {
+          markerColor = '#F44336'; // Red
+        }
         
         const customIcon = L.divIcon({
           html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">📊</div>`,
@@ -136,100 +199,130 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
         const marker = L.marker([sensor.lat, sensor.lng], { icon: customIcon })
           .bindPopup(`
             <div>
-              <h3>Air Quality Sensor</h3>
-              <p>PM2.5: ${sensor.pm25} μg/m³</p>
-              <p>Status: ${sensor.official ? 'Official' : 'Student'}</p>
+              <h3>${sensor.name}</h3>
+              <p>PM2.5 AQI: ${pm25Data.AQI} (${pm25Data.Category.Name})</p>
+              <p>Date: ${pm25Data.DateObserved}</p>
+              <p>Status: ${sensor.official ? 'Official Monitor' : 'Local Monitor'}</p>
             </div>
           `);
         
         marker.addTo(sensorLayer);
       });
       
+      // Add tree markers
+      treeData.forEach(tree => {
+        if (!tree.location || tree.location.length < 2) return;
+        
+        const treeColor = getTreeColor(tree.healthCondition);
+        
+        const customIcon = L.divIcon({
+          html: `<div style="background-color: ${treeColor}; width: 8px; height: 8px; border-radius: 50%; border: 1px solid white;"></div>`,
+          className: '',
+          iconSize: [8, 8]
+        });
+        
+        // Tree location is stored as [longitude, latitude]
+        const marker = L.marker([tree.location[1], tree.location[0]], { icon: customIcon })
+          .bindPopup(`
+            <div>
+              <h3>${tree.species}</h3>
+              <p>Health: ${tree.healthCondition}</p>
+              <p>Diameter: ${tree.dbh} inches</p>
+              ${tree.height ? `<p>Height: ${tree.height} ft</p>` : ''}
+              ${tree.notes ? `<p>Notes: ${tree.notes}</p>` : ''}
+            </div>
+          `);
+        
+        marker.addTo(treeLayer);
+      });
+      
       // Store references
-      mapRef.current = map;
-      layersRef.current = {
+      mapRefInstance.current = map;
+      setMapRef(map);
+      
+      layersRefInstance.current = {
         trees: treeLayer,
         airQuality: sensorLayer
       };
+      setLayersRef({
+        trees: treeLayer,
+        airQuality: sensorLayer
+      });
       
       // Initialize with both layers visible
       treeLayer.addTo(map);
       sensorLayer.addTo(map);
-    }
+    }, 100); // Add a small delay (100ms) to ensure the container is ready
     
+    // Clear timeout to avoid memory leaks
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
+      clearTimeout(initMap);
+      if (mapRefInstance.current) {
+        mapRefInstance.current.remove();
+        mapRefInstance.current = null;
+        setMapRef(null);
       }
-    }
-  }, []);
-  
-  // Update visibleLayers when props change
-  useEffect(() => {
-    const newLayers = [
-      treesLayerEnabled ? 'trees' : '',
-      sensorsLayerEnabled ? 'airQuality' : ''
-    ].filter(Boolean) as string[];
-    
-    setVisibleLayers(newLayers);
-  }, [treesLayerEnabled, sensorsLayerEnabled]);
-  
+    };
+  }, [treeData, airQualityData]);
+
   // Update layer visibility when visibleLayers changes
   useEffect(() => {
-    if (mapRef.current && layersRef.current) {
+    const map = mapRefInstance.current;
+    const layers = layersRefInstance.current;
+    
+    if (map && layers) {
       // Update tree layer visibility
       if (visibleLayers.includes('trees')) {
-        layersRef.current.trees.addTo(mapRef.current);
+        layers.trees.addTo(map);
       } else {
-        layersRef.current.trees.remove();
+        layers.trees.removeFrom(map);
       }
       
       // Update air quality sensor layer visibility
       if (visibleLayers.includes('airQuality')) {
-        layersRef.current.airQuality.addTo(mapRef.current);
+        layers.airQuality.addTo(map);
       } else {
-        layersRef.current.airQuality.remove();
+        layers.airQuality.removeFrom(map);
       }
     }
   }, [visibleLayers]);
-  
+
   // Update map when dataType changes
   useEffect(() => {
-    if (mapRef.current && layersRef.current) {
-      // Focus on relevant data based on selected data type
+    const map = mapRefInstance.current;
+    const layers = layersRefInstance.current;
+    
+    if (map && layers) {
+      // Update map center when dataType changes
       if (dataType === 'trees') {
         // Ensure tree layer is visible (even if toggle is off)
-        layersRef.current.trees.addTo(mapRef.current);
+        layers.trees.addTo(map);
+        
         // Find center point of tree data
-        const treeCenter = calculateCenter(MOCK_TREES);
-        mapRef.current.setView([treeCenter.lat, treeCenter.lng], 15);
+        if (treeData && treeData.length > 0) {
+          const validTrees = treeData.filter(tree => tree.location && tree.location.length > 1);
+          
+          if (validTrees.length > 0) {
+            const treeCenter = calculateCenter(validTrees.map(tree => ({
+              lat: tree.location[1],
+              lng: tree.location[0]
+            })));
+            map.setView([treeCenter.lat, treeCenter.lng], 15);
+          }
+        }
       } else if (dataType === 'airQuality') {
         // Ensure sensor layer is visible (even if toggle is off)
-        layersRef.current.airQuality.addTo(mapRef.current);
-        // Find center point of sensor data
-        const sensorCenter = calculateCenter(MOCK_AIR_SENSORS);
-        mapRef.current.setView([sensorCenter.lat, sensorCenter.lng], 15);
+        layers.airQuality.addTo(map);
+        
+        const sensorCenter = calculateCenter(AIR_SENSOR_LOCATIONS.map(sensor => ({
+          lat: sensor.lat,
+          lng: sensor.lng
+        })));
+        map.setView([sensorCenter.lat, sensorCenter.lng], 15);
       }
     }
-  }, [dataType]);
-  
-  // Helper function to calculate center point of a dataset
-  const calculateCenter = (data: any[]) => {
-    let sumLat = 0;
-    let sumLng = 0;
-    
-    data.forEach(item => {
-      sumLat += item.lat;
-      sumLng += item.lng;
-    });
-    
-    return {
-      lat: sumLat / data.length,
-      lng: sumLng / data.length
-    };
-  };
-  
+  }, [dataType, treeData]);
+
   return (
     <Box sx={{ 
       height: '100%', 
@@ -287,7 +380,10 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
         ref={mapContainerRef} 
         sx={{ 
           flex: 1,
-          position: 'relative'
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          minHeight: '500px' // Ensure minimum height for the map container
         }} 
       />
       
