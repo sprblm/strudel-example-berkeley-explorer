@@ -13,11 +13,25 @@ export type Path =
   | `/explore-data`
   | `/explore-data/:id`
   | `/home`
+  | `/monitor`
+  | `/monitor-activities`
+  | `/monitor-activities/calendar`
+  | `/monitor-activities/detail`
+  | `/run-computation`
+  | `/run-computation/:id/data-inputs`
+  | `/run-computation/:id/results`
+  | `/run-computation/:id/running`
+  | `/run-computation/:id/settings`
+  | `/run-computation/RunComputation`
   | `/search-repositories`
   | `/search-repositories/:id`;
 
 export type Params = {
   '/explore-data/:id': { id: string };
+  '/run-computation/:id/data-inputs': { id: string };
+  '/run-computation/:id/results': { id: string };
+  '/run-computation/:id/running': { id: string };
+  '/run-computation/:id/settings': { id: string };
   '/search-repositories/:id': { id: string };
 };
 
