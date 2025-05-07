@@ -68,7 +68,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
   const categories = ['Tree Diversity', 'Temperature', 'Air Quality', 'Shade Coverage', 'Plant Diversity', 'Noise Level'];
   
   const locationARadarData = {
-    type: 'scatterpolar' as const,
+    type: 'scatterpolar',
     r: [
       environmentalFactorsData[locationA].treeDiversity,
       environmentalFactorsData[locationA].temperature,
@@ -78,7 +78,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
       environmentalFactorsData[locationA].noiseLevel
     ],
     theta: categories,
-    fill: 'toself' as 'toself',
+    fill: 'toself',
     name: locationA,
     line: {
       color: '#3B82F6'
@@ -87,7 +87,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
   };
 
   const locationBRadarData = {
-    type: 'scatterpolar' as const,
+    type: 'scatterpolar',
     r: [
       environmentalFactorsData[locationB].treeDiversity,
       environmentalFactorsData[locationB].temperature,
@@ -97,7 +97,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
       environmentalFactorsData[locationB].noiseLevel
     ],
     theta: categories,
-    fill: 'toself' as 'toself',
+    fill: 'toself',
     name: locationB,
     line: {
       color: '#F59E0B'

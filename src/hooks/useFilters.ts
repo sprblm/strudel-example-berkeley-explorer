@@ -32,7 +32,7 @@ export const useFilters = (initialData: any[] = [], initialFilters: DataFilter[]
     data = filterBySearchText(data, searchText);
 
     // Apply data filters
-    data = filterByDataFilters(data, filters, filterConfigs);
+    data = filterByDataFilters(data, filters || [], filterConfigs);
 
     setFilteredData(data);
   }, [allData, filters, filterConfigs, searchText]);

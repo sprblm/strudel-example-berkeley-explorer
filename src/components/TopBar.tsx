@@ -43,7 +43,7 @@ export const TopBar: React.FC = () => {
               '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' }
             }}
           >
-            CDAP
+          BEHE
           </Button>
         </Box>
 
