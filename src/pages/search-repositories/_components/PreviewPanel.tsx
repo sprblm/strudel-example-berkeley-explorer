@@ -17,10 +17,23 @@ import DownloadIcon from '@mui/icons-material/Download';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ShareIcon from '@mui/icons-material/Share';
 import { Link as RouterLink } from 'react-router-dom';
-import { LabelValueTable } from '../../../components/LabelValueTable';
 import { DataGrid } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { taskflow } from '../_config/taskflow.config';
+
+export interface Dataset {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  publication_date: string;
+  details?: {
+    type: string;
+    count: number;
+    format: string;
+    fields: string[];
+  };
+}
 
 /**
  * Placeholder columns for attached files table
@@ -89,7 +102,29 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   previewItem,
   onClose,
 }) => {
-  const cardFields = taskflow.pages.index.cardFields;
+  // Get the cardFields from taskflow config
+  const taskflowCardFields = taskflow.pages.index.cardFields;
+  
+  // Create a safer way to access dataset properties
+  const getDatasetProperty = <T extends unknown>(item: any, key: string, defaultValue: T = '' as unknown as T): T => {
+    if (!item || typeof key !== 'string') return defaultValue;
+    return (item[key] as T) || defaultValue;
+  };
+  
+  // Create a mapping object for field names
+  const fieldMapping = {
+    title: taskflowCardFields.titleField || 'title',
+    source: 'source',
+    quality: 'quality',
+    thumbnail: 'thumbnail',
+    content: taskflowCardFields.contentField || 'summary',
+    temporal_coverage: 'temporal_coverage',
+    spatial_coverage: 'spatial_coverage',
+    resolution: 'resolution',
+    variables: 'variables',
+    citation: 'citation',
+    download_url: 'download_url'
+  };
 
   // Content to render on the page for this component
   return (
@@ -111,7 +146,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 to={`./${previewItem.id}`}
                 underline="hover"
               >
-                {previewItem[cardFields.title]}
+                {getDatasetProperty<string>(previewItem, fieldMapping.title)}
               </Link>
             </Typography>
             <IconButton size="small" onClick={onClose}>
@@ -121,20 +156,20 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           
           {/* Source and Quality */}
           <Stack direction="row" spacing={2} alignItems="center">
-            {previewItem[cardFields.source] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.source) && (
               <Chip 
-                label={previewItem[cardFields.source]} 
+                label={getDatasetProperty<string>(previewItem, fieldMapping.source)} 
                 color="primary" 
                 variant="outlined" 
                 size="small"
               />
             )}
             
-            {previewItem[cardFields.quality] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.quality) && (
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography variant="body2" color="text.secondary">Quality:</Typography>
                 <Rating 
-                  value={previewItem[cardFields.quality]} 
+                  value={parseInt(getDatasetProperty<string>(previewItem, fieldMapping.quality, '0'))} 
                   readOnly 
                   size="small"
                   precision={0.5}
@@ -145,7 +180,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         </Stack>
 
         {/* Dataset Thumbnail/Map */}
-        {previewItem[cardFields.thumbnail] && (
+        {getDatasetProperty<string>(previewItem, fieldMapping.thumbnail) && (
           <Box
             sx={{
               height: '200px',
@@ -156,20 +191,20 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           >
             <Box
               component="img"
-              src={previewItem[cardFields.thumbnail]} 
-              alt={previewItem[cardFields.title]} 
+              src={getDatasetProperty<string>(previewItem, fieldMapping.thumbnail)} 
+              alt={getDatasetProperty<string>(previewItem, fieldMapping.title)} 
               sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </Box>
         )}
         
         {/* Summary */}
-        {previewItem[cardFields.content] && (
+        {getDatasetProperty<string>(previewItem, fieldMapping.content) && (
           <Box>
             <Typography variant="h6" gutterBottom>
               Summary
             </Typography>
-            <Typography>{previewItem[cardFields.content]}</Typography>
+            <Typography>{getDatasetProperty<string>(previewItem, fieldMapping.content)}</Typography>
           </Box>
         )}
         
@@ -183,66 +218,66 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           
           <Grid container spacing={2}>
             {/* Temporal Coverage */}
-            {previewItem[cardFields.temporal_coverage] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.temporal_coverage) && (
               <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Time Period
                 </Typography>
                 <Typography>
-                  {previewItem[cardFields.temporal_coverage]}
+                  {getDatasetProperty<string>(previewItem, fieldMapping.temporal_coverage)}
                 </Typography>
               </Grid>
             )}
             
             {/* Spatial Coverage */}
-            {previewItem[cardFields.spatial_coverage] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.spatial_coverage) && (
               <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Geographic Region
                 </Typography>
                 <Typography>
-                  {previewItem[cardFields.spatial_coverage]}
+                  {getDatasetProperty<string>(previewItem, fieldMapping.spatial_coverage)}
                 </Typography>
               </Grid>
             )}
             
             {/* Resolution */}
-            {previewItem[cardFields.resolution] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.resolution) && (
               <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Resolution
                 </Typography>
                 <Typography>
-                  {previewItem[cardFields.resolution]}
+                  {getDatasetProperty<string>(previewItem, fieldMapping.resolution)}
                 </Typography>
               </Grid>
             )}
             
             {/* Variables */}
-            {previewItem[cardFields.variables] && (
+            {getDatasetProperty<string[]>(previewItem, fieldMapping.variables, []) && (
               <Grid item xs={12}>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                   Climate Variables
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {Array.isArray(previewItem[cardFields.variables]) ? 
-                    previewItem[cardFields.variables].map((variable: string, index: number) => (
+                  {Array.isArray(getDatasetProperty<string[]>(previewItem, fieldMapping.variables, [])) ? 
+                    getDatasetProperty<string[]>(previewItem, fieldMapping.variables, []).map((variable: string, index: number) => (
                       <Chip key={index} label={variable} size="small" />
                     )) : 
-                    <Typography>{previewItem[cardFields.variables]}</Typography>
+                    <Typography>{getDatasetProperty<string>(previewItem, fieldMapping.variables)}</Typography>
                   }
                 </Box>
               </Grid>
             )}
             
             {/* Citation */}
-            {previewItem[cardFields.citation] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.citation) && (
               <Grid item xs={12}>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                   Citation
                 </Typography>
                 <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                  {previewItem[cardFields.citation]}
+                  {getDatasetProperty<string>(previewItem, fieldMapping.citation)}
                 </Typography>
               </Grid>
             )}
@@ -286,12 +321,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
               Share
             </Button>
             
-            {previewItem[cardFields.download_url] && (
+            {getDatasetProperty<string>(previewItem, fieldMapping.download_url) && (
               <Button
                 variant="contained"
                 color="primary"
                 startIcon={<DownloadIcon />}
-                href={previewItem[cardFields.download_url]}
+                href={getDatasetProperty<string>(previewItem, fieldMapping.download_url)}
                 target="_blank"
               >
                 Download

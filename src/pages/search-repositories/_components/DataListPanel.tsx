@@ -1,17 +1,60 @@
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { ArrowRightIcon } from '../../../components/Icons';
 import { Button } from '../../../components/Button';
-import { DataListPanelProps } from '../_config/taskflow.types';
+import { DataListPanelProps, Dataset } from '../_config/taskflow.types';
+import { useState, useEffect } from 'react';
 
 /**
  * Display search results in a clean, modern format
  * Shows dataset title, description, and metadata
  */
 const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListPanelProps) => {
-  // Format downloads for display
-  const formatDownloads = (downloads?: number): string => {
-    if (!downloads) return '0';
-    return downloads.toLocaleString();
+  const [sortBy, setSortBy] = useState('relevance');
+  const [sortedResults, setSortedResults] = useState(searchResults);
+
+  // Update sorted results when searchResults or sortBy changes
+  useEffect(() => {
+    let results = [...searchResults];
+    switch (sortBy) {
+      case 'distance':
+        // Assuming dataset has a distance property or we can calculate it
+        results.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+        break;
+      case 'species':
+        results.sort((a, b) => (a.species || '').localeCompare(b.species || ''));
+        break;
+      case 'dbh':
+        results.sort((a, b) => (a.dbh || 0) - (b.dbh || 0));
+        break;
+      case 'date':
+        results.sort((a, b) => new Date(a.observationDate || '').getTime() - new Date(b.observationDate || '').getTime());
+        break;
+      default:
+        // Relevance or other default sorting
+        break;
+    }
+    setSortedResults(results);
+  }, [searchResults, sortBy]);
+
+  const handleSortChange = (event: SelectChangeEvent) => {
+    setSortBy(event.target.value as string);
+  };
+
+  const formatDownloads = (count: number): string => {
+    if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}K`;
+    }
+    return count.toString();
+  };
+
+  // Format data for urban tree inventory and air quality datasets
+  const formatData = (data: Dataset): string => {
+    if (data.type === 'urban-tree-inventory') {
+      return `Tree Species: ${data.species}, Location: ${data.location}`;
+    } else if (data.type === 'air-quality') {
+      return `Air Quality Parameter: ${data.parameter}, Value: ${data.value}`;
+    }
+    return 'Unknown dataset type';
   };
 
   if (!searchResults || searchResults.length === 0) {
@@ -46,16 +89,32 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
         }}
       >
         <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'grey.200' }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
-            Search Results
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
+              Search Results
+            </Typography>
+            <Box sx={{ minWidth: 120 }}>
+              <Select
+                value={sortBy}
+                onChange={handleSortChange}
+                size="small"
+                sx={{ fontSize: '0.875rem' }}
+              >
+                <MenuItem value="relevance">Relevance</MenuItem>
+                <MenuItem value="distance">Distance</MenuItem>
+                <MenuItem value="species">Species (A-Z)</MenuItem>
+                <MenuItem value="dbh">DBH (Smallest-Largest)</MenuItem>
+                <MenuItem value="date">Date (Oldest-Newest)</MenuItem>
+              </Select>
+            </Box>
+          </Box>
           <Typography variant="body2" color="text.secondary">
-            Showing {searchResults.length} results
+            Showing {sortedResults.length} results
           </Typography>
         </Box>
 
         <Box>
-          {searchResults.map((dataset, index) => (
+          {sortedResults.map((dataset, index) => (
             <Box 
               key={dataset.id} 
               sx={{ 

@@ -23,10 +23,25 @@ export const ChartView: React.FC<ChartViewProps> = ({
   
   const { isPending, isError, data, error } = useListQuery({
     activeFilters,
-    dataSource: taskflow.data.list.source,
+    dataSource: 'urban-tree-inventory',
     filterConfigs,
-    queryMode: taskflow.data.list.queryMode,
-    staticParams: taskflow.data.list.staticParams,
+    queryMode: 'client',
+    staticParams: { /* Add static params if necessary */ },
+    offset: 0,
+    page: 1,
+    pageSize: 100,
+  });
+
+  // Add similar useListQuery for air quality data
+  const { isPending: isPendingAirQuality, isError: isErrorAirQuality, data: airQualityData, error: airQualityError } = useListQuery({
+    activeFilters,
+    dataSource: 'air-quality',
+    filterConfigs,
+    queryMode: 'client',
+    staticParams: { /* Add static params if necessary */ },
+    offset: 0,
+    page: 1,
+    pageSize: 100,
   });
 
   if (isPending) {
@@ -46,11 +61,35 @@ export const ChartView: React.FC<ChartViewProps> = ({
   }
 
   // Filter the data based on active filters and search term
-  const filteredData = filterData(data, activeFilters, filterConfigs, searchTerm);
+  const filteredTreeData = filterData(data, activeFilters, filterConfigs, searchTerm);
+  const filteredAirQualityData = filterData(airQualityData, activeFilters, filterConfigs, searchTerm);
+
+  // Create charts for urban tree inventory and air quality data
+  const treeChartData = {
+    x: filteredTreeData.map((item: any) => item.species),
+    y: filteredTreeData.map((item: any) => item.count),
+    type: 'bar' as const,
+    name: 'Tree Species Count',
+  };
+
+  const airQualityChartData = {
+    x: filteredAirQualityData.map((item: any) => item.parameter),
+    y: filteredAirQualityData.map((item: any) => item.value),
+    type: 'bar' as const,
+    name: 'Air Quality Parameter Values',
+  };
+
+  return (
+    <Plot
+      data={[treeChartData, airQualityChartData]}
+      layout={{ barmode: 'group' }}
+      // Add other Plotly configurations
+    />
+  );
 
   // Extract columns for potential chart axes
   const columns = taskflow.pages.index.tableColumns;
-  const numericColumns = columns.filter(col => col.type === 'number');
+  const numericColumns = columns.filter((col: any) => col.type === 'number');
   
   // If we don't have numeric columns, show a message
   if (numericColumns.length === 0) {
@@ -66,14 +105,14 @@ export const ChartView: React.FC<ChartViewProps> = ({
   const yAxisField = numericColumns[1]?.field || (numericColumns[0]?.field !== columns[0].field ? columns[0].field : columns[1].field);
   
   // Get a categorical field for grouping if available
-  const categoricalColumns = columns.filter(col => col.type !== 'number');
+  const categoricalColumns = columns.filter((col: any) => col.type !== 'number');
   const groupField = categoricalColumns[0]?.field;
 
   // Prepare data for scatter plot
   const scatterData = {
-    x: filteredData.map(item => item[xAxisField]),
-    y: filteredData.map(item => item[yAxisField]),
-    text: filteredData.map(item => item[columns[0].field]),
+    x: filteredTreeData.map((item: any) => item[xAxisField]),
+    y: filteredTreeData.map((item: any) => item[yAxisField]),
+    text: filteredTreeData.map((item: any) => item[columns[0].field]),
     mode: 'markers',
     type: 'scatter',
     marker: {
@@ -89,14 +128,14 @@ export const ChartView: React.FC<ChartViewProps> = ({
   
   if (groupField) {
     // Get unique categories
-    const categories = [...new Set(filteredData.map(item => item[groupField]))];
+    const categories = [...new Set(filteredTreeData.map((item: any) => item[groupField]))];
     
     // Create a bar for each category
     barData = categories.map(category => {
-      const categoryData = filteredData.filter(item => item[groupField] === category);
+      const categoryData = filteredTreeData.filter((item: any) => item[groupField] === category);
       return {
-        x: categoryData.map(item => item[xAxisField]),
-        y: categoryData.map(item => item[yAxisField]),
+        x: categoryData.map((item: any) => item[xAxisField]),
+        y: categoryData.map((item: any) => item[yAxisField]),
         type: 'bar',
         name: category as string,
       };
@@ -104,8 +143,8 @@ export const ChartView: React.FC<ChartViewProps> = ({
   } else {
     // Simple bar chart without grouping
     barData = [{
-      x: filteredData.slice(0, 20).map(item => item[columns[0].field]),
-      y: filteredData.slice(0, 20).map(item => item[yAxisField]),
+      x: filteredTreeData.slice(0, 20).map((item: any) => item[columns[0].field]),
+      y: filteredTreeData.slice(0, 20).map((item: any) => item[yAxisField]),
       type: 'bar',
       name: yAxisField,
     }];
@@ -113,7 +152,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
 
   // Prepare data for histogram
   const histogramData = {
-    x: filteredData.map(item => item[xAxisField]),
+    x: filteredTreeData.map((item: any) => item[xAxisField]),
     type: 'histogram',
     name: xAxisField,
   };
@@ -125,7 +164,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
       // For 2D data (heatmaps, etc.)
       return;
     }
-    setPreviewItem(filteredData[pointIndex]);
+    setPreviewItem(filteredTreeData[pointIndex]);
   };
 
   return (
@@ -138,7 +177,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
             </Typography>
             <Box sx={{ height: 400 }}>
               <Plot
-                data={[scatterData]}
+                data={[scatterData as Plotly.Data]}
                 layout={{
                   title: `${yAxisField} vs ${xAxisField}`,
                   xaxis: { title: xAxisField },
@@ -185,7 +224,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
             </Typography>
             <Box sx={{ height: 400 }}>
               <Plot
-                data={[histogramData]}
+                data={[histogramData as Plotly.Data]}
                 layout={{
                   title: `Distribution of ${xAxisField}`,
                   xaxis: { title: xAxisField },

@@ -2,7 +2,7 @@
  * Configures global options and content.
  */
 export const config = {
-  title: 'Climate Data Analysis Platform',
+  title: 'Berkeley Environmental Health Explorer ',
   navbar: {
     title: 'Climate Data Platform',
     logo: 'strudel-logo-icon.png',
@@ -20,6 +20,10 @@ export const config = {
         path: '/compare-data',
       },
       {
+        label: 'Berkeley Trees',
+        path: '/berkeley-trees',
+      },
+      {
         label: 'Run Models',
         path: '/run-computation',
       },
@@ -30,7 +34,7 @@ export const config = {
     ],
   },
   footer: {
-    info: 'Climate Data Analysis Platform - A comprehensive tool for climate researchers to search, explore, compare, and analyze climate data.',
+    info: 'Berkeley Environmental Health Explorer  - A comprehensive tool for climate researchers to search, explore, compare, and analyze climate data.',
     image: 'strudel-logo-header.png',
     links: [
       {

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { InputBase, Box, Popper, Paper, List, ListItem, ClickAwayListener } from '@mui/material';
 import { SearchIcon } from '../../../components/Icons';
 

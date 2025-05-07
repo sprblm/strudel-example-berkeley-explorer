@@ -76,7 +76,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
                 <Slider
-                  value={value}
+                  value={Array.isArray(value) ? value : [options.min, options.max]}
                   onChange={(_, newValue) => handleRangeFilterChange(field, newValue as number[])}
                   valueLabelDisplay="auto"
                   min={options.min}
@@ -104,8 +104,8 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
                 <Typography gutterBottom>{label}</Typography>
                 <FormControl fullWidth size="small">
                   <Select
-                    value={activeFilters[field] || ''}
-                    onChange={(e) => handleSelectFilterChange(field, e.target.value)}
+                    value={activeFilters[field]?.toString() || ''}
+                    onChange={(e) => handleSelectFilterChange(field, e.target.value as string)}
                     displayEmpty
                   >
                     <MenuItem value="">

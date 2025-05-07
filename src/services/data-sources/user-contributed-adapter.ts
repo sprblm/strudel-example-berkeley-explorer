@@ -11,7 +11,7 @@ export class UserContributedAdapter {
   public name = 'User-Contributed Datasets';
   public homepageUrl = '#'; // Placeholder - would point to the repository submission page
   public logoUrl = '/images/user-contributed-logo.png'; // Placeholder - would be a custom logo
-  public description = 'Browse datasets contributed by users of the Climate Data Analysis Platform. These datasets may include research-specific climate data, regionally-focused datasets, and specialized climate indicators not available in other repositories.';
+  public description = 'Browse datasets contributed by users of the Berkeley Environmental Health Explorer . These datasets may include research-specific climate data, regionally-focused datasets, and specialized climate indicators not available in other repositories.';
 
   // Constructor that accepts HttpClientConfig parameters
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

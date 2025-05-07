@@ -61,7 +61,10 @@ import {
   PlayCircle as PlayCircleLucide,
   Server as ServerLucide,
   Monitor,
-  AlertTriangle
+  AlertTriangle,
+  Leaf,
+  Cpu,
+  MapPin
 } from 'lucide-react';
 
 /**
@@ -160,5 +163,17 @@ export const PlayCircle = createIcon(PlayCircleLucide);
 export const Server = createIcon(ServerLucide);
 // Add Monitor icon for monitoring section
 export const MonitorIcon = createIcon(Monitor);
+export const TreeIcon = createIcon(Leaf);
+export const SensorIcon = createIcon(Cpu);
 // Add AlertTriangle icon for warning states
 export const AlertTriangleIcon = createIcon(AlertTriangle);
+// Add InfoCircle icon (alias of Info icon)
+export const InfoCircleIcon = createIcon(Info);
+// Add Location icon for map locations
+export const LocationIcon = createIcon(MapPin);
+// Add Compare icon for comparison feature
+export const CompareIcon = createIcon(BarChart2);
+// Add Overview icon for overview tab
+export const OverviewIcon = createIcon(Grid);
+// Add AirQuality icon for air quality tab
+export const AirQualityIcon = createIcon(Wind);

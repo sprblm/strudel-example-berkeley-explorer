@@ -1,4 +1,4 @@
-# Climate Data Analysis Platform
+# Berkeley Environmental Health Explorer 
 
 A comprehensive platform for analyzing climate data from various repositories and datasets.
 
@@ -37,23 +37,23 @@ This platform provides access to climate data from various sources:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/oilsinwater/climate-study.git
-cd climate-study
+git clone https://github.com/oilsinwater/ueh-platform.git
+cd ueh-platform
 ```
 
-1. Install dependencies:
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-1. Start the development server:
+3. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-1. Open your browser and navigate to `http://localhost:5173`
+4. Open your browser and navigate to `http://localhost:5173`
 
 ## Project Structure
 

@@ -3,8 +3,7 @@ import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
   GlobeIcon, 
-  HelpCircleIcon, 
-  SettingsIcon,
+  InfoIcon, 
   HomeIcon,
   UploadIcon,
   PlayCircle,
@@ -44,7 +43,7 @@ export const TopBar: React.FC = () => {
               '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' }
             }}
           >
-            CDAP
+          BEHE
           </Button>
         </Box>
 
@@ -120,21 +119,14 @@ export const TopBar: React.FC = () => {
 
         {/* Right side buttons */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title="Help">
+          <Tooltip title="About">
             <IconButton 
+              component={Link}
+              to="/about"
               size="small"
               sx={{ mr: 1 }}
             >
-              <HelpCircleIcon size={20} />
-            </IconButton>
-          </Tooltip>
-          
-          <Tooltip title="Settings">
-            <IconButton 
-              size="small"
-              sx={{ mr: 1 }}
-            >
-              <SettingsIcon size={20} />
+              <InfoIcon size={20} />
             </IconButton>
           </Tooltip>
         </Box>

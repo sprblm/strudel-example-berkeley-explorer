@@ -62,7 +62,7 @@ const DatasetDetail: React.FC = () => {
     dataIdField: taskflow.data.detail.idField,
     paramId: params.id,
     queryMode: taskflow.data.detail.queryMode,
-    staticParams: taskflow.data.detail.staticParams,
+    staticParams: taskflow.data.detail.staticParams as Record<string, string> | null | undefined,
   });
   const datasetTitle = data ? data.title : 'Not Found';
   const [dataTabsValue, setDataTabsValue] = React.useState('1');

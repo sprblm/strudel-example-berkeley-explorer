@@ -1,4 +1,4 @@
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { FilterContextProvider } from '../../components/FilterContext';
 import { ControlsPanel } from './_components/ControlsPanel';
@@ -10,8 +10,11 @@ import { GlobeIcon } from '../../components/Icons';
  * and analyze climate data through interactive charts and maps.
  */
 const ExploreData: React.FC = () => {
-  const [activeChart, setActiveChart] = useState<'timeSeries' | 'map' | 'histogram' | 'distribution'>('timeSeries');
+  const [activeChart, setActiveChart] = useState<'timeSeries' | 'map' | 'histogram' | 'distribution'>('map');
   const [showControls, setShowControls] = useState(true);
+  const [dataType, setDataType] = useState<string>('trees');
+  const [treesLayerEnabled, setTreesLayerEnabled] = useState(true);
+  const [sensorsLayerEnabled, setSensorsLayerEnabled] = useState(true);
 
   const handleToggleControls = () => {
     setShowControls(!showControls);
@@ -49,6 +52,12 @@ const ExploreData: React.FC = () => {
               <ControlsPanel 
                 activeChart={activeChart}
                 setActiveChart={setActiveChart}
+                dataType={dataType}
+                setDataType={setDataType}
+                treesLayerEnabled={treesLayerEnabled}
+                setTreesLayerEnabled={setTreesLayerEnabled}
+                sensorsLayerEnabled={sensorsLayerEnabled}
+                setSensorsLayerEnabled={setSensorsLayerEnabled}
               />
             )}
             
@@ -67,9 +76,12 @@ const ExploreData: React.FC = () => {
                 }}
               >
                 <VisualizationView 
-                  activeChart={activeChart} 
+                  activeChart={activeChart}
                   onToggleControls={handleToggleControls}
                   showControls={showControls}
+                  dataType={dataType}
+                  treesLayerEnabled={treesLayerEnabled}
+                  sensorsLayerEnabled={sensorsLayerEnabled}
                 />
               </Paper>
             </Box>

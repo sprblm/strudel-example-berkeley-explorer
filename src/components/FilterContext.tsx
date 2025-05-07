@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useContext, useReducer } from 'react';
 import { DataFilter, FilterOperator } from '../context/filterTypes';
 
-interface FilterState {
+export interface FilterState {
   activeFilters: DataFilter[];
   expandedGroup: string | number | boolean;
 }
@@ -77,13 +77,13 @@ export const FilterContextProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [state, dispatch] = useReducer(filterReducer, initialState);
 
-const setFilter = (field: string, value: unknown) => {
+const setFilter = (field: string, value: unknown, operator: FilterOperator = FilterOperator.EQUALS) => {
   dispatch({
     type: 'SET_FILTER',
     payload: {
       field,
-      value: Array.isArray(value) ? value : [value],
-      operator: FilterOperator.EQUALS,
+      value,
+      operator,
     },
   });
 };

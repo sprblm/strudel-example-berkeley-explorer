@@ -31,7 +31,7 @@
     "@mui/x-date-pickers": "^7.0.0",
     "@tanstack/react-query": "^5.51.23",
     "@types/axios": "^0.9.36",
-    "@types/leaflet": "^1.9.16",
+    "@types/leaflet": "^1.9.17",
     "@vitejs/plugin-react": "^4.3.4",
     "antd": "^5.24.5",
     "axios": "^1.8.3",
@@ -45,13 +45,15 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^6.22.3",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/d3-fetch": "^3.0.7",
+    "@types/express": "^5.0.1",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^20.12.12",
     "@types/react": "^18.2.66",
