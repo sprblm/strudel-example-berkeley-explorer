@@ -5,17 +5,23 @@ import json
 import os
 import random
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configuration
 API_KEY = os.getenv("AIRNOW_API_KEY")
-ZIP_CODE = "94720"
-BASE_URL = "https://www.airnowapi.org/aq/observation/zipCode/historical/"
+if not API_KEY or not API_KEY.strip():
+    raise RuntimeError("AIRNOW_API_KEY is not set or is empty. Please check your environment variables or .env file.")
+LATITUDE = 37.871666
+LONGITUDE = -122.272781
+BASE_URL = "https://www.airnowapi.org/aq/observation/latLong/historical/"
 DATA_DIR = Path("data/airnow")
-OUTPUT_FILE = DATA_DIR / "airnow_94720_400days.json"
-TEMP_FILE = DATA_DIR / "airnow_94720_temp.json"
-START_DATE = datetime.date(2024, 5, 5)
+OUTPUT_FILE = DATA_DIR / "airnow_berkeley_latlong_400days.json"
+TEMP_FILE = DATA_DIR / "airnow_berkeley_latlong_temp.json"
+START_DATE = datetime.date(2025, 5, 12)
 DAYS = 400
-DISTANCE = 25
+DISTANCE = 20
 RATE_LIMIT_DELAY = 3  # Seconds between requests (more conservative)
 MAX_RETRIES = 3
 
@@ -45,7 +51,8 @@ for i in range(DAYS):
     date_str = date.strftime("%Y-%m-%dT00-0000")
     params = {
         "format": "application/json",
-        "zipCode": ZIP_CODE,
+        "latitude": LATITUDE,
+        "longitude": LONGITUDE,
         "date": date_str,
         "distance": DISTANCE,
         "API_KEY": API_KEY
@@ -57,7 +64,13 @@ for i in range(DAYS):
     while not success and retries < MAX_RETRIES:
         try:
             print(f"Fetching data for {date_str} (attempt {retries+1})...")
+            if i == 0 and retries == 0:
+                print(f"DEBUG: Request URL: {BASE_URL}")
+                print(f"DEBUG: Params: {params}")
+                print(f"DEBUG: API_KEY (first 8 chars): {API_KEY[:8]}")
             response = requests.get(BASE_URL, params=params)
+            if response.status_code >= 400:
+                print(f"DEBUG: Response content: {response.text}")
             
             # Handle rate limiting specifically
             if response.status_code == 429:
