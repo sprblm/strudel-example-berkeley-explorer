@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Chip, CircularProgress } from '@mui/material';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster';
 import type { AirQualityObservation } from '../types/air-quality.interfaces';
 
 interface DataPoint {
@@ -117,10 +120,9 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
           // Continue without air quality data
         }
           
-        // Process tree data - limit to 100 trees for performance
+        // Process tree data
         const treePoints: DataPoint[] = treeData && Array.isArray(treeData) ? 
           treeData
-            .slice(0, 100)
             .map((tree: any, index: number) => {
               if (!tree.location || !Array.isArray(tree.location) || tree.location.length < 2) {
                 return null;
@@ -227,7 +229,9 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
       }).addTo(map);
       
       // Create layer groups
-      const treeLayer = L.layerGroup();
+      const treeClusterGroup = L.markerClusterGroup({
+        chunkedLoading: true, // Helps with large datasets
+      });
       const airLayer = L.layerGroup();
       const boundaryLayer = L.layerGroup();
       
@@ -259,75 +263,59 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
       // Add data points to appropriate layers
       pointsToDisplay.forEach(point => {
         // Determine marker color based on data type and values
-        let markerColor;
+        let marker: L.Layer | null = null;
+        let popupContent = `
+          <div style="max-width: 200px;">
+            <h3>${point.title}</h3>
+            <p>Condition: ${point.category || 'Unknown'}</p>
+            <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
+            ${point.details?.DBHMAX ? `<p>Diameter: ${point.details.DBHMAX} inches</p>` : ''}
+            ${point.details?.HEIGHT ? `<p>Height: ${point.details.HEIGHT} feet</p>` : ''}
+            ${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
+          </div>
+        `;
+        
         if (point.type === 'tree') {
-          markerColor = getTreeColor(point.category || 'good');
-        } else {
-          markerColor = point.value ? getAqiColor(point.value) : '#2196F3';
-        }
-        
-        const icon = L.divIcon({
-          html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.3);">${point.type === 'tree' ? '🌳' : '📊'}</div>`,
-          className: '',
-          iconSize: [24, 24]
-        });
-        
-        // Create popup content based on point type
-        let popupContent = '';
-        if (point.type === 'tree') {
-          popupContent = `
-            <div style="max-width: 200px;">
-              <h3>${point.title}</h3>
-              <p>Condition: ${point.category || 'Unknown'}</p>
-              <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
-              ${point.details?.DBHMAX ? `<p>Diameter: ${point.details.DBHMAX} inches</p>` : ''}
-              ${point.details?.HEIGHT ? `<p>Height: ${point.details.HEIGHT} feet</p>` : ''}
-              ${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
-            </div>
-          `;
-        } else {
-          popupContent = `
-            <div style="max-width: 200px;">
-              <h3>${point.title}</h3>
-              <p>AQI: ${point.value} (${point.category})</p>
-              <p>Date: ${point.details?.DateObserved || 'Recent'}</p>
-              <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
-            </div>
-          `;
-        }
-        
-        const marker = L.marker([point.lat, point.lng], { icon })
-          .bindPopup(popupContent);
-        
-        // Add click handler if provided
-        if (onPointClick) {
-          marker.on('click', () => {
-            onPointClick(point);
+          const markerColor = getTreeColor(point.category || 'good');
+          const icon = L.divIcon({
+            className: 'tree-marker',
+            html: `<div style="background:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">🌳</div>`
           });
-        }
-        
-        // Add to appropriate layer
-        if (point.type === 'tree') {
-          marker.addTo(treeLayer);
+          const marker = L.marker([point.lat, point.lng], { icon }).bindPopup(popupContent);
+          if (onPointClick) {
+            marker.on('click', () => {
+              onPointClick(point);
+            });
+          }
+          treeClusterGroup.addLayer(marker);
+          markersRef.current[point.id] = marker;
         } else {
+          const icon = L.divIcon({
+            html: `<div style="background:${getAqiColor(point.value)};width:16px;height:16px;border-radius:50%;border:2px solid #000;"></div>`
+          });
+          marker = L.marker([point.lat, point.lng], { icon });
+          marker.bindPopup(popupContent);
+          if (onPointClick) {
+            marker.on('click', () => {
+              onPointClick(point);
+            });
+          }
           marker.addTo(airLayer);
+          markersRef.current[point.id] = marker;
         }
-        
-        // Store marker reference
-        markersRef.current[point.id] = marker;
       });
       
       // Store references
       mapRef.current = map;
       
       // Add layers to map
-      treeLayer.addTo(map);
+      treeClusterGroup.addTo(map);
       airLayer.addTo(map);
       boundaryLayer.addTo(map);
       
       // Store layer references
       markersRef.current.layers = {
-        tree: treeLayer,
+        tree: treeClusterGroup,
         air: airLayer,
         boundary: boundaryLayer
       };
