@@ -225,23 +225,22 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
       });
       
       // Add tree markers - limit to 200 trees for performance
-      if (treeData && treeData.features) {
+      if (treeData && Array.isArray(treeData)) {
         try {
           // Get a sample of trees (first 200) for better performance
-          const treeSample = treeData.features.slice(0, 200);
-          console.log(`Adding ${treeSample.length} tree markers out of ${treeData.features.length} total`);
+          const treeSample = treeData.slice(0, 200);
+          console.log(`Adding ${treeSample.length} tree markers out of ${treeData.length} total`);
           
           treeSample.forEach((tree: any) => {
-            if (!tree.geometry || !tree.geometry.coordinates) {
-              console.warn('Tree missing geometry or coordinates', tree);
+            if (!tree.location || !Array.isArray(tree.location) || tree.location.length < 2) {
+              console.warn('Tree missing location data', tree);
               return;
             }
             
-            const coordinates = tree.geometry.coordinates;
-            const properties = tree.properties || {};
+            const coordinates = tree.location;
             
             // Get tree color based on condition
-            const condition = properties.CONDITION || 'Unknown';
+            const condition = tree.healthCondition || 'Unknown';
             const treeColor = getTreeColor(condition);
             
             const customIcon = L.divIcon({
@@ -251,14 +250,14 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
             });
             
             try {
-              // GeoJSON uses [longitude, latitude] format
+              // Location array uses [longitude, latitude] format
               const marker = L.marker([coordinates[1], coordinates[0]], { icon: customIcon })
                 .bindPopup(`
                   <div>
-                    <h3>${properties.SPECIES || 'Unknown Species'}</h3>
+                    <h3>${tree.species || 'Unknown Species'}</h3>
                     <p>Condition: ${condition}</p>
-                    ${properties.DBHMAX ? `<p>Diameter: ${properties.DBHMAX} inches</p>` : ''}
-                    ${properties.HEIGHT ? `<p>Height: ${properties.HEIGHT} ft</p>` : ''}
+                    ${tree.dbh ? `<p>Diameter: ${tree.dbh} inches</p>` : ''}
+                    ${tree.height ? `<p>Height: ${tree.height} ft</p>` : ''}
                   </div>
                 `);
               

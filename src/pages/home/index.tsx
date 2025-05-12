@@ -87,27 +87,28 @@ export const HomePage = () => {
         setTreeData(treeData);
         
         // Calculate tree statistics
-        const trees = treeData.features || [];
+        const trees = Array.isArray(treeData) ? treeData : [];
         const totalTrees = trees.length;
         
         // Count unique species
         const species = new Set();
         trees.forEach((tree: any) => {
-          if (tree.properties?.SPECIES) {
-            species.add(tree.properties.SPECIES);
+          if (tree.species) {
+            species.add(tree.species);
           }
         });
         
         // Calculate percentage of healthy trees
         const healthyTrees = trees.filter((tree: any) => 
-          tree.properties?.CONDITION?.toLowerCase() === 'good' || 
-          tree.properties?.CONDITION?.toLowerCase() === 'excellent'
+          tree.healthCondition?.toLowerCase() === 'good' || 
+          tree.healthCondition?.toLowerCase() === 'excellent'
         ).length;
+        const healthyPercentage = totalTrees > 0 ? Math.round((healthyTrees / totalTrees) * 100) : 0;
         
         setTreeSummary({
           totalTrees,
           speciesCount: species.size,
-          healthyPercentage: totalTrees > 0 ? (healthyTrees / totalTrees) * 100 : 0
+          healthyPercentage,
         });
       } catch (error) {
         console.error('Error loading environmental data:', error);

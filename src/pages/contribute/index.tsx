@@ -97,11 +97,13 @@ const ContributeData: React.FC = () => {
         
         // Extract unique tree species for dropdown
         const species = new Set<string>();
-        treeData.features.forEach((tree: any) => {
-          if (tree.properties?.SPECIES) {
-            species.add(tree.properties.SPECIES);
-          }
-        });
+        if (Array.isArray(treeData)) {
+          treeData.forEach((tree: any) => {
+            if (tree.species) {
+              species.add(tree.species);
+            }
+          });
+        }
         setTreeSpeciesList(Array.from(species).sort());
         
         // Load air quality data

@@ -41,13 +41,13 @@ const DatasetExplorer: React.FC = () => {
           id: 'berkeley-trees',
           title: 'Berkeley Tree Inventory',
           publication_date: '2013-01-01',
-          summary: `Complete inventory of ${treeData.features.length.toLocaleString()} trees in Berkeley, including species, condition, and location data.`,
+          summary: `Complete inventory of ${Array.isArray(treeData) ? treeData.length.toLocaleString() : 0} trees in Berkeley, including species, condition, and location data.`,
           source: 'City of Berkeley',
           details: {
             type: 'tree',
-            count: treeData.features.length,
-            format: 'GeoJSON',
-            fields: ['SPECIES', 'CONDITION', 'DBHMAX', 'HEIGHT']
+            count: Array.isArray(treeData) ? treeData.length : 0,
+            format: 'JSON',
+            fields: ['species', 'healthCondition', 'dbh', 'height']
           }
         };
         
