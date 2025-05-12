@@ -59,12 +59,15 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
   
-  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air')[]>(['tree', 'air']);
+  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'boundary')[]>(['tree', 'air', 'boundary']);
   const [loading, setLoading] = useState(true);
   const [loadedDataPoints, setLoadedDataPoints] = useState<DataPoint[]>([]);
   
   // State for tracking data loading errors
   const [dataError, setDataError] = useState<string | null>(null);
+  
+  // State for boundary data
+  const [boundaryData, setBoundaryData] = useState<any>(null);
 
   // Load real data when component mounts
   useEffect(() => {
@@ -74,11 +77,21 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
       
       let treeData = null;
       let airData: AirQualityObservation[] = [];
+      let cityBoundary = null;
       
       try {
-        // Load tree data
-        let treeData = null;
-        let airData: AirQualityObservation[] = [];
+        // Load Berkeley city boundary
+        try {
+          const boundaryResponse = await fetch('./data/boundaries/berkeley_city_boundary.json');
+          if (!boundaryResponse.ok) {
+            throw new Error(`Failed to fetch boundary data: ${boundaryResponse.status}`);
+          }
+          cityBoundary = await boundaryResponse.json();
+          setBoundaryData(cityBoundary);
+        } catch (error) {
+          console.warn('City boundary data not available:', error);
+          // Continue without boundary data
+        }
         
         try {
           // Use absolute path from public directory
@@ -105,18 +118,34 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
         }
           
         // Process tree data - limit to 100 trees for performance
-        const treePoints: DataPoint[] = treeData && treeData.features ? 
-          treeData.features
+        const treePoints: DataPoint[] = treeData && Array.isArray(treeData) ? 
+          treeData
             .slice(0, 100)
-            .map((feature: any, index: number) => ({
-            id: `tree-${feature.properties.OBJECTID || index}`,
-            type: 'tree',
-            lat: feature.geometry.coordinates[1],
-            lng: feature.geometry.coordinates[0],
-            title: feature.properties.SPECIES || 'Unknown Species',
-            category: feature.properties.CONDITION,
-            details: feature.properties
-          })) : [];
+            .map((tree: any, index: number) => {
+              if (!tree.location || !Array.isArray(tree.location) || tree.location.length < 2) {
+                return null;
+              }
+              
+              return {
+                id: tree.id || `tree-${index}`,
+                type: 'tree' as const,
+                lat: tree.location[1], // Latitude is the second element in the location array
+                lng: tree.location[0], // Longitude is the first element in the location array
+                title: tree.species || 'Unknown Species',
+                category: tree.healthCondition || 'Unknown',
+                details: {
+                  DBHMAX: tree.dbh,
+                  HEIGHT: tree.height,
+                  SPREAD: tree.spread,
+                  OBSERVATIONDATE: tree.observationDate,
+                  SOURCE: tree.source,
+                  NOTES: tree.notes,
+                  LOCATION_TYPE: tree.location_type,
+                  IS_BASELINE: tree.isBaseline
+                }
+              };
+            })
+            .filter(point => point !== null) as DataPoint[] : [];
         
         // Process air quality data - use most recent data points
         // Group by parameter name to get both PM2.5 and Ozone
@@ -200,6 +229,32 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
       // Create layer groups
       const treeLayer = L.layerGroup();
       const airLayer = L.layerGroup();
+      const boundaryLayer = L.layerGroup();
+      
+      // Add city boundary if available
+      if (boundaryData && boundaryData.features && boundaryData.features.length > 0) {
+        try {
+          const boundaryStyle = {
+            color: '#3388ff',
+            weight: 3,
+            opacity: 0.7,
+            fill: true,
+            fillColor: '#3388ff',
+            fillOpacity: 0.1
+          };
+          
+          L.geoJSON(boundaryData, {
+            style: boundaryStyle,
+            onEachFeature: (feature, layer) => {
+              if (feature.properties && feature.properties.name) {
+                layer.bindPopup(`<h3>${feature.properties.name}</h3><p>${feature.properties.description || ''}</p>`);
+              }
+            }
+          }).addTo(boundaryLayer);
+        } catch (error) {
+          console.error('Error adding boundary to map:', error);
+        }
+      }
       
       // Add data points to appropriate layers
       pointsToDisplay.forEach(point => {
@@ -226,6 +281,8 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
               <p>Condition: ${point.category || 'Unknown'}</p>
               <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
               ${point.details?.DBHMAX ? `<p>Diameter: ${point.details.DBHMAX} inches</p>` : ''}
+              ${point.details?.HEIGHT ? `<p>Height: ${point.details.HEIGHT} feet</p>` : ''}
+              ${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
             </div>
           `;
         } else {
@@ -266,11 +323,13 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
       // Add layers to map
       treeLayer.addTo(map);
       airLayer.addTo(map);
+      boundaryLayer.addTo(map);
       
       // Store layer references
       markersRef.current.layers = {
         tree: treeLayer,
-        air: airLayer
+        air: airLayer,
+        boundary: boundaryLayer
       };
     }
     
@@ -285,7 +344,7 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
   // Update layer visibility when visibleLayers changes
   useEffect(() => {
     if (mapRef.current && markersRef.current.layers) {
-      const { tree, air } = markersRef.current.layers;
+      const { tree, air, boundary } = markersRef.current.layers;
       
       // Update tree layer visibility
       if (visibleLayers.includes('tree')) {
@@ -299,6 +358,13 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
         air.addTo(mapRef.current);
       } else {
         air.remove();
+      }
+      
+      // Update boundary layer visibility
+      if (boundary && visibleLayers.includes('boundary')) {
+        boundary.addTo(mapRef.current);
+      } else if (boundary) {
+        boundary.remove();
       }
     }
   }, [visibleLayers]);
@@ -399,6 +465,13 @@ const CampusDataMap: React.FC<CampusDataMapProps> = ({
               color={visibleLayers.includes('air') ? 'primary' : 'default'}
               variant={visibleLayers.includes('air') ? 'filled' : 'outlined'}
               onClick={() => toggleLayer('air')}
+            />
+            <Chip 
+              label="City Boundary" 
+              size="small"
+              color={visibleLayers.includes('boundary') ? 'info' : 'default'}
+              variant={visibleLayers.includes('boundary') ? 'filled' : 'outlined'}
+              onClick={() => toggleLayer('boundary')}
             />
           </Box>
         </Box>
