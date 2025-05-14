@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
 import L from 'leaflet';
-import 'leaflet.markercluster';
+import 'leaflet/dist/leaflet.css';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import DataLayersToggle from './DataLayersToggle';
 import '../lib/leaflet.canvas-markers'; // Import the plugin (ensure path is correct)
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -48,9 +50,9 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
   // State for boundary data
   const [boundaryData, setBoundaryData] = useState<any>(null);
 
-  // Data Layers toggle state
-  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'locations' | 'boundary')[]>(['tree', 'air', 'locations', 'boundary']);
-  const toggleLayer = (layer: 'tree' | 'air' | 'locations' | 'boundary') => {
+  // Data Layers toggle state (no boundary)
+  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'locations')[]>(['tree', 'air', 'locations']);
+  const toggleLayer = (layer: 'tree' | 'air' | 'locations') => {
     setVisibleLayers((prev) =>
       prev.includes(layer) ? prev.filter(l => l !== layer) : [...prev, layer]
     );
@@ -362,7 +364,6 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     if (canvasTreeLayer && visibleLayers.includes('tree')) canvasTreeLayer.addTo(map);
     if (canvasAirLayer && visibleLayers.includes('air')) canvasAirLayer.addTo(map);
     if (locationsLayer && visibleLayers.includes('locations')) locationsLayer.addTo(map);
-    if (boundaryLayer && visibleLayers.includes('boundary')) boundaryLayer.addTo(map);
 
     const renderVisibleMarkers = () => {
       if (!map) return;
@@ -450,96 +451,13 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
       if (canvasTreeLayer) canvasTreeLayer.remove();
       if (canvasAirLayer) canvasAirLayer.remove();
       if (locationsLayer) locationsLayer.remove();
-      if (boundaryLayer) boundaryLayer.remove();
     };
   }, [dataPoints, loadedDataPoints, loading, onPointClick, visibleLayers]);
 
   return (
     <Box sx={{ position: 'relative', width, height }}>
-      {/* Data Layers Toggle UI */}
-      <Box sx={{
-        position: 'absolute',
-        top: 16,
-        left: 16,
-        zIndex: 1000,
-        bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 3,
-        p: 2,
-        minWidth: 180
-      }}>
-        <div style={{ fontWeight: 500, fontSize: '0.98em', marginBottom: 8 }}>Data Layers</div>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Box component="span">
-            <button
-              style={{
-                background: visibleLayers.includes('tree') ? '#4caf50' : 'white',
-                color: visibleLayers.includes('tree') ? 'white' : '#333',
-                border: '1px solid #4caf50',
-                borderRadius: 16,
-                padding: '4px 12px',
-                marginRight: 4,
-                cursor: 'pointer',
-                fontWeight: 500
-              }}
-              onClick={() => toggleLayer('tree')}
-            >
-              Trees
-            </button>
-          </Box>
-          <Box component="span">
-            <button
-              style={{
-                background: visibleLayers.includes('air') ? '#1976d2' : 'white',
-                color: visibleLayers.includes('air') ? 'white' : '#333',
-                border: '1px solid #1976d2',
-                borderRadius: 16,
-                padding: '4px 12px',
-                marginRight: 4,
-                cursor: 'pointer',
-                fontWeight: 500
-              }}
-              onClick={() => toggleLayer('air')}
-            >
-              Sensors
-            </button>
-          </Box>
-          <Box component="span">
-            <button
-              style={{
-                background: visibleLayers.includes('locations') ? '#8e44ad' : 'white',
-                color: visibleLayers.includes('locations') ? 'white' : '#333',
-                border: '1px solid #8e44ad',
-                borderRadius: 16,
-                padding: '4px 12px',
-                marginRight: 4,
-                cursor: 'pointer',
-                fontWeight: 500
-              }}
-              onClick={() => toggleLayer('locations')}
-            >
-              Locations
-            </button>
-          </Box>
-          <Box component="span">
-            <button
-              style={{
-                background: visibleLayers.includes('boundary') ? '#3388ff' : 'white',
-                color: visibleLayers.includes('boundary') ? 'white' : '#333',
-                border: '1px solid #3388ff',
-                borderRadius: 16,
-                padding: '4px 12px',
-                marginRight: 4,
-                cursor: 'pointer',
-                fontWeight: 500
-              }}
-              onClick={() => toggleLayer('boundary')}
-            >
-              City Boundary
-            </button>
-          </Box>
-        </Box>
-      </Box>
+      {/* Data Layers Toggle UI (upper right, extracted) */}
+      <DataLayersToggle visibleLayers={visibleLayers} toggleLayer={toggleLayer} />
 
       {loading && (
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}>
