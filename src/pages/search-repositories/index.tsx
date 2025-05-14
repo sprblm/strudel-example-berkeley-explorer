@@ -5,7 +5,7 @@ import { FilterContextProvider } from '../../components/FilterContext';
 import { SearchIcon } from '../../components/Icons';
 import DataListPanel from './_components/DataListPanel';
 import type { Dataset } from '../../types/dataset.types';
-import CampusDataMap from '../../components/CampusDataMap';
+import BerkeleyDataMap from '../../components/BerkeleyDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 /**
@@ -127,7 +127,7 @@ const DatasetExplorer: React.FC = () => {
               <Paper 
                 elevation={0} 
                 sx={{ 
-                  height: 400, 
+                  height: 800, 
                   mb: 3, 
                   borderRadius: 2,
                   border: '1px solid',
@@ -136,7 +136,7 @@ const DatasetExplorer: React.FC = () => {
                   overflow: 'hidden'
                 }}
               >
-                <CampusDataMap 
+                <BerkeleyDataMap 
                   height="100%" 
                   onPointClick={handleMapPointClick}
                 />

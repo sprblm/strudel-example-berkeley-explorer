@@ -21,7 +21,7 @@ import {
   TreeIcon
 } from '../../components/Icons';
 
-import CampusDataMap from '../../components/CampusDataMap';
+import BerkeleyDataMap from '../../components/BerkeleyDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 /**
@@ -376,7 +376,7 @@ export const HomePage = () => {
             }}
           >
             {/* Interactive Campus Map */}
-            <CampusDataMap height="100%" showControls={true} />
+            <BerkeleyDataMap height="100%" showControls={true} />
           </Paper>
           
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Chip, CircularProgress } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import L from 'leaflet';
+import 'leaflet.markercluster';
+import '../lib/leaflet.canvas-markers'; // Import the plugin (ensure path is correct)
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-import 'leaflet.markercluster';
 import type { AirQualityObservation } from '../types/air-quality.interfaces';
 
 interface DataPoint {
@@ -16,17 +17,17 @@ interface DataPoint {
   value?: number;
   category?: string;
   details?: Record<string, any>;
+  provider?: string; // Optional provider property for air quality points
 }
 
 interface BerkeleyDataMapProps {
   height?: number | string;
   width?: string | number;
-  showControls?: boolean;
   dataPoints?: DataPoint[];
   onPointClick?: (point: DataPoint) => void;
 }
 
-// Function to get color based on AQI value
+// Function to get color based on AQI 
 const getAqiColor = (aqi: number): string => {
   if (aqi <= 50) return '#00E400'; // Good
   if (aqi <= 100) return '#FFFF00'; // Moderate
@@ -54,22 +55,17 @@ const getTreeColor = (condition: string): string => {
 const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ 
   height = 400,
   width = '100%',
-  showControls = true,
   dataPoints,
   onPointClick
 }) => {
+  // --- Date filtering state ---
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
-  
-  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'boundary' | 'locations')[]>(['tree', 'air', 'boundary', 'locations']);
   const [loading, setLoading] = useState(true);
   const [loadedDataPoints, setLoadedDataPoints] = useState<DataPoint[]>([]);
   const [locationsGeoJson, setLocationsGeoJson] = useState<any>(null);
-  
-  // State for tracking data loading errors
-  const [dataError, setDataError] = useState<string | null>(null);
-  
   // State for boundary data
   const [boundaryData, setBoundaryData] = useState<any>(null);
 
@@ -77,7 +73,6 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      setDataError(null);
       
       let treeData = null;
       let airData: AirQualityObservation[] = [];
@@ -91,8 +86,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
             const locationsData = await locationsResponse.json();
             setLocationsGeoJson(locationsData);
           }
-        } catch (err) {
-        }
+        } catch (err) {}
 
         // Load Berkeley city boundary
         try {
@@ -118,12 +112,12 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
         }
         
         try {
-          // Load air quality data
-          const airResponse = await fetch('./data/airnow/airnow_94720_400days.json');
-          if (!airResponse.ok) {
-            throw new Error(`Failed to fetch air quality data: ${airResponse.status}`);
-          }
-          airData = await airResponse.json();
+           // Load air quality data (all readings from new processed file)
+           const airQualityResponse = await fetch('./data/processed/berkeley_air_quality_all_readings.json');
+           if (!airQualityResponse.ok) {
+             throw new Error(`Failed to fetch air quality data: ${airQualityResponse.status}`);
+           }
+           airData = await airQualityResponse.json();
         } catch (error) {
           // Continue without air quality data
         }
@@ -157,18 +151,61 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
             })
             .filter(point => point !== null) as DataPoint[] : [];
         
-        // Process air quality data
-        const airPoints: DataPoint[] = airData && Array.isArray(airData) && airData.length > 0 ? airData.map((reading: any, index: number) => ({
-          id: `air-${index}`,
-          type: 'air',
-          lat: reading.Latitude,
-          lng: reading.Longitude,
-          title: `${reading.ParameterName} Sensor`,
-          value: reading.AQI,
-          category: reading.Category?.Name,
-          details: reading
-        })) : [];
-        
+        // --- Extract available dates from air quality data ---
+        let airPoints: DataPoint[] = [];
+        const dateSet = new Set<string>();
+        if (airData && Array.isArray(airData) && airData.length > 0) {
+           // Normalize date property (use datetimeUtc from new data)
+           airData.forEach((reading: any) => {
+             const dateStr = reading.datetimeUtc ? reading.datetimeUtc.split('T')[0] : null;
+             if (dateStr) dateSet.add(dateStr);
+           });
+           // setAvailableDates removed: availableDates state is no longer used
+
+           // By default, pick the most recent date
+           if (!selectedDate && dateSet.size > 0) {
+             setSelectedDate(Array.from(dateSet).sort().reverse()[0]);
+           }
+
+           // Show latest reading per station (location_id+parameter) for the selected date (or most recent date by default)
+           // For each meter (location_id), gather the latest reading for each parameter
+           const latestByMeter: Record<string, { location: any; readings: any[] }> = {};
+           const latestParamByMeter: Record<string, Record<string, any>> = {};
+           airData.forEach((reading: any) => {
+             if (!reading.location_id || !reading.parameter || !reading.datetimeUtc) return;
+             if (!latestParamByMeter[reading.location_id]) {
+               latestParamByMeter[reading.location_id] = {};
+             }
+             const prev = latestParamByMeter[reading.location_id][reading.parameter];
+             if (!prev || new Date(reading.datetimeUtc) > new Date(prev.datetimeUtc)) {
+               latestParamByMeter[reading.location_id][reading.parameter] = reading;
+             }
+           });
+           Object.values(latestParamByMeter).forEach((paramMap) => {
+             const readings = Object.values(paramMap);
+             if (readings.length > 0) {
+               // Use the latest reading (by datetime) for marker location and metadata
+               const latestReading = readings.reduce((a: any, b: any) => new Date(a.datetimeUtc) > new Date(b.datetimeUtc) ? a : b);
+               latestByMeter[latestReading.location_id] = {
+                 location: latestReading,
+                 readings
+               };
+             }
+           });
+           airPoints = Object.entries(latestByMeter).map(([location_id, { location, readings }]: any) => ({
+             id: `air-${location_id}`,
+             type: 'air',
+             lat: location.latitude,
+             lng: location.longitude,
+             title: location.location_name,
+             provider: location.provider,
+             details: {
+               readings,
+               provider: location.provider,
+               location_name: location.location_name
+             }
+           }));
+        }
         // If no real data is available, create sample data for demonstration
         let combinedDataPoints = [...treePoints, ...airPoints];
         
@@ -197,11 +234,14 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
           }));
           
           combinedDataPoints = [...sampleTreePoints, ...sampleAirPoints];
-          setDataError('Using sample data for demonstration. Real data files not found.');
+          // eslint-disable-next-line no-console
+          console.log('Using sample data for demonstration. Real data files not found.');
         }
         
         setLoadedDataPoints(combinedDataPoints);
-      } catch (error) {
+      } catch (error) { 
+        // eslint-disable-next-line no-console
+        console.error(`Failed to load data: ${error}`);
       } finally {
         setLoading(false);
       }
@@ -209,343 +249,224 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     
     loadData();
   }, []);
-  
-  // Initialize map when component mounts or data is loaded
-  useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current && !loading) {
-      // Use provided data points or loaded data points
-      const pointsToDisplay = dataPoints || loadedDataPoints;
-      
-      if (pointsToDisplay.length === 0) {
-        return; // No data to display yet
-      }
-      
-      // Initialize map centered on UC Berkeley
-      const map = L.map(mapContainerRef.current).setView([37.8715, -122.2680], 15);
-      
-      // Add tile layer (OpenStreetMap)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-      
-      // Create layer groups
-      const treeClusterGroup = L.markerClusterGroup({
-        chunkedLoading: true, // Helps with large datasets
-      });
-      const airClusterGroup = L.markerClusterGroup({
-  chunkedLoading: true,
-});
-      const boundaryLayer = L.layerGroup();
-      const locationsLayer = L.layerGroup();
 
-      // Add locations polygons if available
-      if (locationsGeoJson && locationsGeoJson.features && locationsGeoJson.features.length > 0) {
-        try {
-          L.geoJSON(locationsGeoJson, {
-            style: {
-              color: '#8e44ad',
-              weight: 2,
-              opacity: 0.7,
-              fill: true,
-              fillColor: '#d2b4de',
-              fillOpacity: 0.2
-            },
-            onEachFeature: (feature, layer) => {
-              if (feature.properties) {
-                // Format all properties as a table
-                const props = feature.properties;
-                let popupContent = `<div style="max-width:240px;">
-                  <h3>${props.name || props["addr:housename"] || "Location"}</h3>
-                  <table style='font-size:0.95em;'>`;
-                for (const [key, value] of Object.entries(props)) {
-                  if (value && key !== 'name') {
-                    popupContent += `<tr><td style='font-weight:bold;'>${key}</td><td>${value}</td></tr>`;
-                  }
-                }
-                popupContent += '</table></div>';
-                layer.bindPopup(popupContent);
-              }
-              // Allow onPointClick to work for polygons
-              if (onPointClick) {
-                layer.on('click', () => {
-                  onPointClick({
-                    id: feature.id || feature.properties.name || feature.properties["addr:housename"] || "location",
-                    type: 'location',
-                    lat: Array.isArray(feature.geometry.coordinates[0]) ? feature.geometry.coordinates[0][0][1] : null,
-                    lng: Array.isArray(feature.geometry.coordinates[0]) ? feature.geometry.coordinates[0][0][0] : null,
-                    title: feature.properties.name || feature.properties["addr:housename"] || "Location",
-                    details: feature.properties,
-                    geometry: feature.geometry
-                  });
-                });
-              }
-            }
-          }).addTo(locationsLayer);
-        } catch (error) {
-        }
-      }
-      
-      // Add city boundary if available
-      if (boundaryData && boundaryData.features && boundaryData.features.length > 0) {
-        try {
-          const boundaryStyle = {
-            color: '#3388ff',
-            weight: 3,
+  // Helper to filter points within bounds
+  const filterPointsInBounds = (points: DataPoint[], bounds: L.LatLngBounds) =>
+    points.filter(pt => bounds.contains([pt.lat, pt.lng]));
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current || loading) return;
+    const pointsToDisplay = dataPoints || loadedDataPoints;
+    if (!pointsToDisplay || pointsToDisplay.length === 0) return;
+
+    const map = L.map(mapContainerRef.current as HTMLElement).setView([37.8715, -122.2680], 15);
+    mapRef.current = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+
+    const boundaryLayer = L.layerGroup();
+    const locationsLayer = L.layerGroup();
+
+    if (locationsGeoJson && locationsGeoJson.features && locationsGeoJson.features.length > 0) {
+      try {
+        L.geoJSON(locationsGeoJson, {
+          style: {
+            color: '#8e44ad',
+            weight: 2,
             opacity: 0.7,
             fill: true,
-            fillColor: '#3388ff',
-            fillOpacity: 0.1
-          };
-          
-          L.geoJSON(boundaryData, {
-            style: boundaryStyle,
-            onEachFeature: (feature, layer) => {
-              if (feature.properties && feature.properties.name) {
-                layer.bindPopup(`<h3>${feature.properties.name}</h3><p>${feature.properties.description || ''}</p>`);
-              }
+            fillColor: '#d2b4de',
+            fillOpacity: 0.2
+          },
+          onEachFeature: (feature, layer) => {
+            if (feature.properties) {
+              const props = feature.properties;
+              let popupContent = `<div style="max-width:240px;">
+  <h3>${props.name || props["addr:housename"] || "Location"}</h3>
+  <table style='font-size:0.95em;'>`;
+              Object.entries(props).forEach(([key, value]) => {
+                if (value && key !== 'name') {
+                  popupContent += `<tr><td style='font-weight:bold;'>${key}</td><td>${value}</td></tr>`;
+                }
+              });
+              popupContent += '</table></div>';
+              layer.bindPopup(popupContent);
             }
-          }).addTo(boundaryLayer);
-        } catch (error) {
-        }
+            if (onPointClick) {
+              layer.on('click', () => {
+                let lat: number | null = null;
+                let lng: number | null = null;
+                if (
+                  feature.geometry && feature.geometry.type === 'Polygon' &&
+                  Array.isArray(feature.geometry.coordinates) &&
+                  Array.isArray(feature.geometry.coordinates[0]) &&
+                  Array.isArray(feature.geometry.coordinates[0][0]) &&
+                  typeof feature.geometry.coordinates[0][0][1] === 'number' &&
+                  typeof feature.geometry.coordinates[0][0][0] === 'number'
+                ) {
+                  lat = feature.geometry.coordinates[0][0][1];
+                  lng = feature.geometry.coordinates[0][0][0];
+                } else if (
+                  feature.geometry && feature.geometry.type === 'MultiPolygon' &&
+                  Array.isArray(feature.geometry.coordinates) &&
+                  Array.isArray(feature.geometry.coordinates[0]) &&
+                  Array.isArray(feature.geometry.coordinates[0][0]) &&
+                  Array.isArray(feature.geometry.coordinates[0][0][0]) &&
+                  typeof feature.geometry.coordinates[0][0][0][1] === 'number' &&
+                  typeof feature.geometry.coordinates[0][0][0][0] === 'number'
+                ) {
+                  lat = feature.geometry.coordinates[0][0][0][1];
+                  lng = feature.geometry.coordinates[0][0][0][0];
+                }
+                if (lat !== null && lng !== null) {
+                  onPointClick({
+                    id: feature.id || feature.properties.name || feature.properties["addr:housename"] || "location",
+                    type: 'tree',
+                    lat,
+                    lng,
+                    title: feature.properties.name || feature.properties["addr:housename"] || "Location",
+                    details: feature.properties
+                  });
+                }
+              });
+            }
+          }
+        }).addTo(locationsLayer);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Failed to load locations data: ${error}`);
       }
-      
-      // Add data points to appropriate layers
-      pointsToDisplay.forEach(point => {
-        // Determine marker color based on data type and values
-        let marker: L.Layer | null = null;
-        let popupContent = `
+    }
+
+    if (boundaryData && boundaryData.features && boundaryData.features.length > 0) {
+      try {
+        const boundaryStyle = {
+          color: '#3388ff',
+          weight: 3,
+          opacity: 0.7,
+          fill: true,
+          fillColor: '#3388ff',
+          fillOpacity: 0.1,
+        };
+
+        L.geoJSON(boundaryData, {
+          style: boundaryStyle,
+          onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.name) {
+              layer.bindPopup(`<h3>${feature.properties.name}</h3><p>${feature.properties.description || ''}</p>`);
+            }
+          },
+        }).addTo(boundaryLayer);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Failed to load boundary data: ${error}`);
+      }
+    }
+
+    const canvasTreeLayer = (L as any).canvasIconLayer ? (L as any).canvasIconLayer({}) : null;
+    const canvasAirLayer = (L as any).canvasIconLayer ? (L as any).canvasIconLayer({}) : null;
+    markersRef.current.canvasLayers = { tree: canvasTreeLayer, air: canvasAirLayer };
+    
+    // Add the canvas layers to the map BEFORE performing any operations on them
+    if (canvasTreeLayer) canvasTreeLayer.addTo(map);
+    if (canvasAirLayer) canvasAirLayer.addTo(map);
+
+    const renderVisibleMarkers = () => {
+      if (!map) return;
+      const bounds = map.getBounds();
+      const visiblePoints = filterPointsInBounds(pointsToDisplay, bounds);
+      if (canvasTreeLayer) canvasTreeLayer.clearLayers();
+      if (canvasAirLayer) canvasAirLayer.clearLayers();
+      visiblePoints.forEach((point: DataPoint) => {
+        let marker: any = null;
+        const popupContent = `
           <div style="max-width: 200px;">
             <h3>${point.title}</h3>
             <p>Condition: ${point.category || 'Unknown'}</p>
             <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
-            ${point.details?.DBHMAX ? `<p>Diameter: ${point.details.DBHMAX} inches</p>` : ''}
+            ${point.details?.DBHMAX ? `<p>DBH: ${point.details.DBHMAX} in</p>` : ''}
             ${point.details?.HEIGHT ? `<p>Height: ${point.details.HEIGHT} feet</p>` : ''}
-            ${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
+            <!-- Air Quality Meter Popup -->
+            ${point.type === 'air' && point.details && point.details.readings ? `
+              <div style="max-width:260px;">
+                <h3 style="margin-bottom:0.3em;">${point.title}</h3>
+                <div style="color:#666;font-size:0.95em;margin-bottom:0.5em;">
+                  Provider: <strong>${point.provider || (point.details.provider ?? '')}</strong>
+                </div>
+                <table style="width:100%;font-size:0.97em;margin-bottom:0.5em;">
+                  <thead>
+                    <tr><th align="left">Parameter</th><th align="right">Value</th><th align="left">Unit</th></tr>
+                  </thead>
+                  <tbody>
+                    ${point.details.readings.map((r: any) => `
+                      <tr>
+                        <td>${r.parameter?.toUpperCase?.() || r.parameter}</td>
+                        <td align="right">${r.value}</td>
+                        <td>${r.unit || ''}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+                ${point.details.readings[0]?.datetimeUtc ? `<div style="font-size:0.9em;color:#888;">Latest: ${new Date(point.details.readings[0].datetimeUtc).toLocaleString()}</div>` : ''}
+              </div>` :
+            // Tree popup fallback
+            `${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
+            </div>`}
           </div>
         `;
-        
+
         if (point.type === 'tree') {
           const markerColor = getTreeColor(point.category || 'good');
           const icon = L.divIcon({
             className: 'tree-marker',
-            html: `<div style="background:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">🌳</div>`
-          });
-          const treeMarker = L.marker([point.lat, point.lng], { icon }).bindPopup(popupContent);
-          if (onPointClick) {
-            treeMarker.on('click', () => {
-              onPointClick(point);
-            });
-          }
-          treeClusterGroup.addLayer(treeMarker);
-          markersRef.current[point.id] = treeMarker;
-        } else {
-          const icon = L.divIcon({
-            html: `<div style="background:${getAqiColor(point.value ?? 0)};width:16px;height:16px;border-radius:50%;border:2px solid #000;"></div>`
+            html: `<div style="background:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">🌳</div>`,
+            iconSize: [22, 22],
           });
           marker = L.marker([point.lat, point.lng], { icon });
-          marker.bindPopup(popupContent);
-          if (onPointClick) {
-            marker.on('click', () => {
-              onPointClick(point);
-            });
-          }
-          airClusterGroup.addLayer(marker);
+        } else {
+          const icon = L.divIcon({
+            html: `<div style="background:${getAqiColor(point.value ?? 0)};width:16px;height:16px;border-radius:50%;border:2px solid #000;"></div>`,
+            iconSize: [16, 16],
+          });
+          marker = L.marker([point.lat, point.lng], { icon });
+        }
+        marker.bindPopup(popupContent);
+        if (onPointClick) {
+          marker.on('click', () => onPointClick(point));
+        }
+        if (point.type === 'tree' && canvasTreeLayer) {
+          canvasTreeLayer.addLayer(marker);
+          markersRef.current[point.id] = marker;
+        } else if (point.type === 'air' && canvasAirLayer) {
+          canvasAirLayer.addLayer(marker);
           markersRef.current[point.id] = marker;
         }
       });
-      
-      // Store references
-      mapRef.current = map;
-      
-      // Add layers to map
-      treeClusterGroup.addTo(map);
-      airClusterGroup.addTo(map);
-      boundaryLayer.addTo(map);
-      locationsLayer.addTo(map);
-      
-      // Store layer references
-      markersRef.current.layers = {
-        tree: treeClusterGroup,
-        air: airClusterGroup,
-        boundary: boundaryLayer,
-        locations: locationsLayer
-      };
-    }
+    };
+
+    // Now it's safe to call renderVisibleMarkers since the layers have been added to the map
+    renderVisibleMarkers();
     
+    map.on('moveend zoomend', renderVisibleMarkers);
+
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      map.off('moveend zoomend', renderVisibleMarkers);
     };
   }, [dataPoints, loadedDataPoints, loading, onPointClick]);
-  
-  // Update layer visibility when visibleLayers changes
-  useEffect(() => {
-    if (mapRef.current && markersRef.current.layers) {
-      const { tree, air, boundary, locations } = markersRef.current.layers;
-      
-      // Update tree layer visibility
-      if (visibleLayers.includes('tree')) {
-        tree.addTo(mapRef.current);
-      } else {
-        tree.remove();
-      }
-      
-      // Update air layer visibility
-      if (visibleLayers.includes('air')) {
-        air.addTo(mapRef.current);
-      } else {
-        air.remove();
-      }
-      
-      // Update boundary layer visibility
-      if (boundary && visibleLayers.includes('boundary')) {
-        boundary.addTo(mapRef.current);
-      } else if (boundary) {
-        boundary.remove();
-      }
 
-      // Update locations layer visibility
-      if (locations && visibleLayers.includes('locations')) {
-        locations.addTo(mapRef.current);
-      } else if (locations) {
-        locations.remove();
-      }
-    }
-  }, [visibleLayers]);
-    
-    // Toggle layer visibility
-    const toggleLayer = (layer: 'tree' | 'air' | 'boundary' | 'locations') => {
-      if (visibleLayers.includes(layer)) {
-        setVisibleLayers(visibleLayers.filter(l => l !== layer));
-      } else {
-        setVisibleLayers([...visibleLayers, layer]);
-      }
-    };
-    
-    return (
-      <Box sx={{ position: 'relative', height, width }}>
-        <Box 
-          ref={mapContainerRef} 
-          sx={{ 
-            height: '100%',
-            width: '100%',
-            borderRadius: 2,
-            overflow: 'hidden',
-            position: 'relative'
-          }} 
-        />
-        
-        {/* Loading indicator */}
-        {loading && (
-          <Box sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            zIndex: 1000,
-            borderRadius: 2
-          }}>
-            <Box sx={{ textAlign: 'center' }}>
-              <CircularProgress size={40} />
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Loading environmental data...
-              </Typography>
-            </Box>
-          </Box>
-        )}
-        
-        {/* Data error notification */}
-        {!loading && dataError && (
-          <Box sx={{
-            position: 'absolute',
-            top: 10,
-            left: 10,
-            right: 10,
-            zIndex: 1000,
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            borderRadius: 1,
-            padding: 1,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            border: '1px solid #FFC107'
-          }}>
-            <Typography variant="body2" color="warning.main">
-              <strong>Note:</strong> {dataError}
-            </Typography>
-          </Box>
-        )}
-        
-        {/* Map controls */}
-        {showControls && !loading && (
-          <Box sx={{ 
-            position: 'absolute', 
-            top: 10, 
-            right: 10, 
-            bgcolor: 'white',
-            p: 1,
-            borderRadius: 1,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-            zIndex: 1000
-          }}>
-            <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
-              Data Layers
-            </Typography>
-            
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Chip 
-                label="Trees" 
-                size="small"
-                color={visibleLayers.includes('tree') ? 'success' : 'default'}
-                variant={visibleLayers.includes('tree') ? 'filled' : 'outlined'}
-                onClick={() => toggleLayer('tree')}
-              />
-              <Chip 
-                label="Air Quality" 
-                size="small"
-                color={visibleLayers.includes('air') ? 'primary' : 'default'}
-                variant={visibleLayers.includes('air') ? 'filled' : 'outlined'}
-                onClick={() => toggleLayer('air')}
-              />
-              <Chip 
-                label="City Boundary" 
-                size="small"
-                color={visibleLayers.includes('boundary') ? 'info' : 'default'}
-                variant={visibleLayers.includes('boundary') ? 'filled' : 'outlined'}
-                onClick={() => toggleLayer('boundary')}
-              />
-              <Chip 
-                label="Locations" 
-                size="small"
-                color={visibleLayers.includes('locations') ? 'secondary' : 'default'}
-                variant={visibleLayers.includes('locations') ? 'filled' : 'outlined'}
-                onClick={() => toggleLayer('locations')}
-              />
-            </Box>
-          </Box>
-        )}
-        
-        {/* Map attribution */}
-        <Box sx={{ 
-          position: 'absolute', 
-          bottom: 5, 
-          right: 5, 
-          bgcolor: 'rgba(255, 255, 255, 0.7)',
-          px: 0.5,
-          borderRadius: 0.5,
-          fontSize: '0.7rem'
-        }}>
-          <Typography variant="caption" color="text.secondary">
-            UC Berkeley Campus Map
-          </Typography>
+  return (
+    <Box sx={{ position: 'relative', width, height }}>
+      {loading && (
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}>
+          <CircularProgress />
         </Box>
-      </Box>
-    );
+      )}
+      <div ref={mapContainerRef} style={{ width: '100%', height: typeof height === 'number' ? `${height}px` : height, minHeight: 300, borderRadius: 8, overflow: 'hidden' }} />
+    </Box>
+  );
 };
 
 export default BerkeleyDataMap;

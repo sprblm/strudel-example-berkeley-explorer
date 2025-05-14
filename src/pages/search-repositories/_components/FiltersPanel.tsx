@@ -48,8 +48,11 @@ const FiltersPanel: React.FC = () => {
   
   // State for Air Quality filters
   const [dataSource, setDataSource] = useState('Any');
+  const [aqParam, setAqParam] = useState<string>('PM2.5');
   const [minPm25, setMinPm25] = useState<number>(0);
-  const [maxPm25, setMaxPm25] = useState<number>(50);
+  const [maxPm25, setMaxPm25] = useState<number>(100);
+  const [minOzone, setMinOzone] = useState<number>(0);
+  const [maxOzone, setMaxOzone] = useState<number>(200);
   
   // State for Locations filters
   const [locationName, setLocationName] = useState('');
@@ -183,7 +186,7 @@ const FiltersPanel: React.FC = () => {
     <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Box>
         <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
-          Data Source
+          Sensor
         </Typography>
         <Select
           fullWidth
@@ -197,74 +200,86 @@ const FiltersPanel: React.FC = () => {
           <MenuItem value="Sensor B">Sensor B</MenuItem>
         </Select>
       </Box>
-      
+      {/* Parameter selection */}
       <Box>
         <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
-          Min PM2.5 (µg/m³): {minPm25}
+          Parameter
         </Typography>
-        <Slider
-          value={minPm25}
-          onChange={(e, val) => setMinPm25(val as number)}
-          aria-labelledby="min-pm25-slider"
-          valueLabelDisplay="auto"
-          min={0}
-          max={50}
-          sx={{
-            color: '#2196F3', // Blue color for slider
-            '& .MuiSlider-thumb': {
-              borderRadius: '50%',
-              width: 16,
-              height: 16,
-              backgroundColor: '#fff',
-              border: '2px solid currentColor',
-            },
-            '& .MuiSlider-track': {
-              height: 6,
-              borderRadius: 3,
-            },
-            '& .MuiSlider-rail': {
-              height: 6,
-              borderRadius: 3,
-              opacity: 0.5,
-              backgroundColor: '#bfbfbf',
-            },
-          }}
-        />
+        <Select
+          fullWidth
+          size="small"
+          value={aqParam}
+          onChange={e => setAqParam(e.target.value as string)}
+        >
+          <MenuItem value="PM2.5">PM2.5</MenuItem>
+          <MenuItem value="OZONE">Ozone</MenuItem>
+        </Select>
       </Box>
-      
-      <Box>
-        <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
-          Max PM2.5 (µg/m³): {maxPm25}
-        </Typography>
-        <Slider
-          value={maxPm25}
-          onChange={(e, val) => setMaxPm25(val as number)}
-          aria-labelledby="max-pm25-slider"
-          valueLabelDisplay="auto"
-          min={0}
-          max={50}
-          sx={{
-            color: '#4CAF50', // Green color for slider
-            '& .MuiSlider-thumb': {
-              borderRadius: '50%',
-              width: 16,
-              height: 16,
-              backgroundColor: '#fff',
-              border: '2px solid currentColor',
-            },
-            '& .MuiSlider-track': {
-              height: 6,
-              borderRadius: 3,
-            },
-            '& .MuiSlider-rail': {
-              height: 6,
-              borderRadius: 3,
-              opacity: 0.5,
-              backgroundColor: '#bfbfbf',
-            },
-          }}
-        />
-      </Box>
+      {/* Dynamic sliders for selected AQ param */}
+      {aqParam === 'PM2.5' && (
+        <>
+          <Box>
+            <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+              Min PM2.5 (µg/m³): {minPm25}
+            </Typography>
+            <Slider
+              value={minPm25}
+              onChange={(e, val) => setMinPm25(val as number)}
+              aria-labelledby="min-pm25-slider"
+              valueLabelDisplay="auto"
+              min={0}
+              max={100}
+              sx={{ color: '#2196F3', '& .MuiSlider-thumb': { borderRadius: '50%', width: 16, height: 16, backgroundColor: '#fff', border: '2px solid currentColor' }, '& .MuiSlider-track': { height: 6, borderRadius: 3 }, '& .MuiSlider-rail': { height: 6, borderRadius: 3, opacity: 0.5, backgroundColor: '#bfbfbf' } }}
+            />
+          </Box>
+          <Box>
+            <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+              Max PM2.5 (µg/m³): {maxPm25}
+            </Typography>
+            <Slider
+              value={maxPm25}
+              onChange={(e, val) => setMaxPm25(val as number)}
+              aria-labelledby="max-pm25-slider"
+              valueLabelDisplay="auto"
+              min={0}
+              max={100}
+              sx={{ color: '#4CAF50', '& .MuiSlider-thumb': { borderRadius: '50%', width: 16, height: 16, backgroundColor: '#fff', border: '2px solid currentColor' }, '& .MuiSlider-track': { height: 6, borderRadius: 3 }, '& .MuiSlider-rail': { height: 6, borderRadius: 3, opacity: 0.5, backgroundColor: '#bfbfbf' } }}
+            />
+          </Box>
+        </>
+      )}
+      {aqParam === 'OZONE' && (
+        <>
+          <Box>
+            <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+              Min Ozone (ppb): {minOzone}
+            </Typography>
+            <Slider
+              value={minOzone}
+              onChange={(e, val) => setMinOzone(val as number)}
+              aria-labelledby="min-ozone-slider"
+              valueLabelDisplay="auto"
+              min={0}
+              max={200}
+              sx={{ color: '#2196F3', '& .MuiSlider-thumb': { borderRadius: '50%', width: 16, height: 16, backgroundColor: '#fff', border: '2px solid currentColor' }, '& .MuiSlider-track': { height: 6, borderRadius: 3 }, '& .MuiSlider-rail': { height: 6, borderRadius: 3, opacity: 0.5, backgroundColor: '#bfbfbf' } }}
+            />
+          </Box>
+          <Box>
+            <Typography variant="body1" fontWeight={500} sx={{ mb: 1 }}>
+              Max Ozone (ppb): {maxOzone}
+            </Typography>
+            <Slider
+              value={maxOzone}
+              onChange={(e, val) => setMaxOzone(val as number)}
+              aria-labelledby="max-ozone-slider"
+              valueLabelDisplay="auto"
+              min={0}
+              max={200}
+              sx={{ color: '#4CAF50', '& .MuiSlider-thumb': { borderRadius: '50%', width: 16, height: 16, backgroundColor: '#fff', border: '2px solid currentColor' }, '& .MuiSlider-track': { height: 6, borderRadius: 3 }, '& .MuiSlider-rail': { height: 6, borderRadius: 3, opacity: 0.5, backgroundColor: '#bfbfbf' } }}
+            />
+          </Box>
+        </>
+      )}
       
       <Button 
         variant="contained" 
