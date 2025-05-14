@@ -419,17 +419,19 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
         `;
 
         if (point.type === 'tree') {
-          const markerColor = getTreeColor(point.category || 'good');
-          const icon = L.divIcon({
-            className: 'tree-marker',
-            html: `<div style="background:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">🌳</div>`,
+          const icon = L.icon({
+            iconUrl: '/icons/tree.svg',
             iconSize: [22, 22],
+            iconAnchor: [11, 22], // bottom center
+            popupAnchor: [0, -22]
           });
           marker = L.marker([point.lat, point.lng], { icon });
         } else {
-          const icon = L.divIcon({
-            html: `<div style="background:${getAqiColor(point.value ?? 0)};width:16px;height:16px;border-radius:50%;border:2px solid #000;"></div>`,
+          const icon = L.icon({
+            iconUrl: '/icons/air.svg',
             iconSize: [16, 16],
+            iconAnchor: [8, 16], // bottom center
+            popupAnchor: [0, -16]
           });
           marker = L.marker([point.lat, point.lng], { icon });
         }
