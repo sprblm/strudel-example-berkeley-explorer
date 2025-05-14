@@ -27,27 +27,6 @@ interface BerkeleyDataMapProps {
   onPointClick?: (point: DataPoint) => void;
 }
 
-// Function to get color based on AQI 
-const getAqiColor = (aqi: number): string => {
-  if (aqi <= 50) return '#00E400'; // Good
-  if (aqi <= 100) return '#FFFF00'; // Moderate
-  if (aqi <= 150) return '#FF7E00'; // Unhealthy for Sensitive Groups
-  if (aqi <= 200) return '#FF0000'; // Unhealthy
-  if (aqi <= 300) return '#99004C'; // Very Unhealthy
-  return '#7E0023'; // Hazardous
-};
-
-// Function to get color based on tree condition
-const getTreeColor = (condition: string): string => {
-  switch (condition?.toLowerCase()) {
-    case 'good': return '#4CAF50';
-    case 'fair': return '#FFC107';
-    case 'poor': return '#FF9800';
-    case 'dead': return '#795548';
-    case 'critical': return '#F44336';
-    default: return '#4CAF50';
-  }
-};
 
 /**
  * A Leaflet map component for displaying campus environmental data points
@@ -68,6 +47,14 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
   const [locationsGeoJson, setLocationsGeoJson] = useState<any>(null);
   // State for boundary data
   const [boundaryData, setBoundaryData] = useState<any>(null);
+
+  // Data Layers toggle state
+  const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'locations' | 'boundary')[]>(['tree', 'air', 'locations', 'boundary']);
+  const toggleLayer = (layer: 'tree' | 'air' | 'locations' | 'boundary') => {
+    setVisibleLayers((prev) =>
+      prev.includes(layer) ? prev.filter(l => l !== layer) : [...prev, layer]
+    );
+  };
 
   // Load real data when component mounts
   useEffect(() => {
@@ -371,8 +358,11 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     markersRef.current.canvasLayers = { tree: canvasTreeLayer, air: canvasAirLayer };
     
     // Add the canvas layers to the map BEFORE performing any operations on them
-    if (canvasTreeLayer) canvasTreeLayer.addTo(map);
-    if (canvasAirLayer) canvasAirLayer.addTo(map);
+    // Add canvas layers to map if their layer is enabled
+    if (canvasTreeLayer && visibleLayers.includes('tree')) canvasTreeLayer.addTo(map);
+    if (canvasAirLayer && visibleLayers.includes('air')) canvasAirLayer.addTo(map);
+    if (locationsLayer && visibleLayers.includes('locations')) locationsLayer.addTo(map);
+    if (boundaryLayer && visibleLayers.includes('boundary')) boundaryLayer.addTo(map);
 
     const renderVisibleMarkers = () => {
       if (!map) return;
@@ -439,10 +429,10 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
         if (onPointClick) {
           marker.on('click', () => onPointClick(point));
         }
-        if (point.type === 'tree' && canvasTreeLayer) {
+        if (point.type === 'tree' && canvasTreeLayer && visibleLayers.includes('tree')) {
           canvasTreeLayer.addLayer(marker);
           markersRef.current[point.id] = marker;
-        } else if (point.type === 'air' && canvasAirLayer) {
+        } else if (point.type === 'air' && canvasAirLayer && visibleLayers.includes('air')) {
           canvasAirLayer.addLayer(marker);
           markersRef.current[point.id] = marker;
         }
@@ -454,13 +444,103 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     
     map.on('moveend zoomend', renderVisibleMarkers);
 
+    // Clean up: remove layers from map on unmount
     return () => {
       map.off('moveend zoomend', renderVisibleMarkers);
+      if (canvasTreeLayer) canvasTreeLayer.remove();
+      if (canvasAirLayer) canvasAirLayer.remove();
+      if (locationsLayer) locationsLayer.remove();
+      if (boundaryLayer) boundaryLayer.remove();
     };
-  }, [dataPoints, loadedDataPoints, loading, onPointClick]);
+  }, [dataPoints, loadedDataPoints, loading, onPointClick, visibleLayers]);
 
   return (
     <Box sx={{ position: 'relative', width, height }}>
+      {/* Data Layers Toggle UI */}
+      <Box sx={{
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        zIndex: 1000,
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 3,
+        p: 2,
+        minWidth: 180
+      }}>
+        <div style={{ fontWeight: 500, fontSize: '0.98em', marginBottom: 8 }}>Data Layers</div>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box component="span">
+            <button
+              style={{
+                background: visibleLayers.includes('tree') ? '#4caf50' : 'white',
+                color: visibleLayers.includes('tree') ? 'white' : '#333',
+                border: '1px solid #4caf50',
+                borderRadius: 16,
+                padding: '4px 12px',
+                marginRight: 4,
+                cursor: 'pointer',
+                fontWeight: 500
+              }}
+              onClick={() => toggleLayer('tree')}
+            >
+              Trees
+            </button>
+          </Box>
+          <Box component="span">
+            <button
+              style={{
+                background: visibleLayers.includes('air') ? '#1976d2' : 'white',
+                color: visibleLayers.includes('air') ? 'white' : '#333',
+                border: '1px solid #1976d2',
+                borderRadius: 16,
+                padding: '4px 12px',
+                marginRight: 4,
+                cursor: 'pointer',
+                fontWeight: 500
+              }}
+              onClick={() => toggleLayer('air')}
+            >
+              Sensors
+            </button>
+          </Box>
+          <Box component="span">
+            <button
+              style={{
+                background: visibleLayers.includes('locations') ? '#8e44ad' : 'white',
+                color: visibleLayers.includes('locations') ? 'white' : '#333',
+                border: '1px solid #8e44ad',
+                borderRadius: 16,
+                padding: '4px 12px',
+                marginRight: 4,
+                cursor: 'pointer',
+                fontWeight: 500
+              }}
+              onClick={() => toggleLayer('locations')}
+            >
+              Locations
+            </button>
+          </Box>
+          <Box component="span">
+            <button
+              style={{
+                background: visibleLayers.includes('boundary') ? '#3388ff' : 'white',
+                color: visibleLayers.includes('boundary') ? 'white' : '#333',
+                border: '1px solid #3388ff',
+                borderRadius: 16,
+                padding: '4px 12px',
+                marginRight: 4,
+                cursor: 'pointer',
+                fontWeight: 500
+              }}
+              onClick={() => toggleLayer('boundary')}
+            >
+              City Boundary
+            </button>
+          </Box>
+        </Box>
+      </Box>
+
       {loading && (
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}>
           <CircularProgress />
