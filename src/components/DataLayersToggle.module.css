@@ -1,0 +1,47 @@
+.toggleRoot {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--mui-palette-background-paper, #fff);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  padding: 16px;
+  min-width: 180px;
+}
+.toggleTitle {
+  font-weight: 500;
+  font-size: 0.98em;
+  margin-bottom: 8px;
+}
+.toggleButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.toggleBtn {
+  border-radius: 16px;
+  padding: 4px 12px;
+  margin-right: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid #aaa;
+  background: white;
+  color: #333;
+  transition: background 0.2s, color 0.2s;
+}
+.toggleBtnActiveTree {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+.toggleBtnActiveAir {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+.toggleBtnActiveLocations {
+  background: #8e44ad;
+  color: white;
+  border-color: #8e44ad;
+}
