@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import DataLayersToggle from './DataLayersToggle';
+import styles from './BerkeleyDataMap.module.css';
 import '../lib/leaflet.canvas-markers'; // Import the plugin (ensure path is correct)
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -75,7 +76,9 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
             const locationsData = await locationsResponse.json();
             setLocationsGeoJson(locationsData);
           }
-        } catch (err) {}
+        } catch (err) {
+          // Optional: locations.geojson not required, continue if missing
+        }
 
         // Load Berkeley city boundary
         try {
@@ -464,7 +467,11 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
           <CircularProgress />
         </Box>
       )}
-      <div ref={mapContainerRef} style={{ width: '100%', height: typeof height === 'number' ? `${height}px` : height, minHeight: 300, borderRadius: 8, overflow: 'hidden' }} />
+      <div
+        ref={mapContainerRef}
+        className={styles.mapContainer}
+        style={{ height: typeof height === 'number' ? `${height}px` : height }}
+      />
     </Box>
   );
 };
