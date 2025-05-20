@@ -1,6 +1,7 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { mapContainerStyles, mapPlaceholderStyles, loadingStyles } from './BerkeleyDataMap/BerkeleyDataMap.styles';
 import DataLayersToggle from './DataLayersToggle';
 import { TreeLayer } from './BerkeleyDataMap/TreeLayer';
 import { AirQualityLayer } from './BerkeleyDataMap/AirQualityLayer';
@@ -26,6 +27,7 @@ interface DataPoint {
 interface BerkeleyDataMapProps {
   height?: number | string;
   width?: string | number;
+  onPointClick?: (point: any) => void;
 }
 
 
@@ -255,26 +257,50 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     loadData();
   }, [mapVisible]);
 
+  const containerHeight = useMemo(() => ({
+    ...mapContainerStyles,
+    width,
+    height: typeof height === 'number' ? `${height}px` : height,
+  }), [width, height]);
+
+  const placeholderStyles = useMemo(() => ({
+    ...mapPlaceholderStyles,
+    height: typeof height === 'number' ? `${height}px` : height,
+  }), [height]);
+
+  const layers = useMemo(() => [
+    TreeLayer({ data: loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100), visible: visibleLayers.includes('tree') }),
+    AirQualityLayer({ data: loadedDataPoints.filter(p => p.type === 'air').slice(0, 100), visible: visibleLayers.includes('air') }),
+    LocationsLayer({ data: locationsGeoJson || { type: 'FeatureCollection', features: [] }, visible: visibleLayers.includes('locations') })
+  ].filter(Boolean), [loadedDataPoints, visibleLayers, locationsGeoJson]);
+
   return (
-    <Box sx={{ position: 'relative', width, height }}>
+    <Box sx={containerHeight}>
       {/* Data Layers Toggle UI (upper right, extracted) */}
       <DataLayersToggle visibleLayers={visibleLayers} toggleLayer={toggleLayer} />
       {/* Lazy load map and data only when visible */}
       {!mapVisible && (
-        <div ref={mapPlaceholderRef} style={{ width: '100%', height: typeof height === 'number' ? `${height}px` : height, minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+        <Box ref={mapPlaceholderRef} sx={placeholderStyles}>
           <CircularProgress />
-        </div>
+        </Box>
       )}
       {mapVisible && (
-        <Suspense fallback={<Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}><CircularProgress /></Box>}>
+        <Suspense fallback={(
+          <Box sx={loadingStyles}>
+            <CircularProgress />
+          </Box>
+        )}>
           <MapContainer
             height={height}
             width={width}
-            layers={[
-              TreeLayer({ data: loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100), visible: visibleLayers.includes('tree') }),
-              AirQualityLayer({ data: loadedDataPoints.filter(p => p.type === 'air').slice(0, 100), visible: visibleLayers.includes('air') }),
-              LocationsLayer({ data: locationsGeoJson || { type: 'FeatureCollection', features: [] }, visible: visibleLayers.includes('locations') })
-            ].filter(Boolean)}
+            layers={layers}
+            initialViewState={{
+              longitude: -122.2680,
+              latitude: 37.8715,
+              zoom: 15,
+              pitch: 0,
+              bearing: 0
+            }}
           />
         </Suspense>
       )}

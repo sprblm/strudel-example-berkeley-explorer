@@ -26,7 +26,7 @@ const INITIAL_VIEW_STATE = {
   bearing: 0,
 };
 
-const MapContainer: React.FC<MapContainerProps> = ({ children, height = 400, width = '100%' }) => {
+const MapContainer: React.FC<MapContainerProps> = ({ children, height = 400, width = '100%', layers }) => {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
 
   // Optionally: provide viewState/setViewState via context for children
@@ -44,6 +44,7 @@ const MapContainer: React.FC<MapContainerProps> = ({ children, height = 400, wid
         controller={true}
         onViewStateChange={(params: any) => setViewState(params.viewState)}
         style={{ height: heightStr, width: widthStr }}
+        layers={layers}
       >
         <StaticMap
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}

@@ -5,7 +5,7 @@ interface PopupProps {
 }
 
 // This component will render popup content for map features.
-const Popup: React.FC<PopupProps> = ({ data }) => {
+const Popup: React.FC<PopupProps> = ({ data: _data }) => {
   // TODO: Move popup rendering logic here from BerkeleyDataMap.tsx
   return null;
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { IconLayer } from '@deck.gl/layers';
 
 interface AirQualityLayerProps {
@@ -6,7 +6,7 @@ interface AirQualityLayerProps {
   visible: boolean;
 }
 
-export function AirQualityLayer({ data, visible }: AirQualityLayerProps) {
+export const AirQualityLayer = ({ data, visible }: AirQualityLayerProps) => {
   if (!visible) return null;
 
   return new IconLayer({
@@ -22,4 +22,4 @@ export function AirQualityLayer({ data, visible }: AirQualityLayerProps) {
     getColor: [0, 123, 255],
     // Tooltips should be handled at the DeckGL level, not here
   });
-}
+};

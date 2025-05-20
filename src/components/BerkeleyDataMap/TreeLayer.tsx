@@ -5,7 +5,7 @@ interface TreeLayerProps {
   visible: boolean;
 }
 
-export function TreeLayer({ data, visible }: TreeLayerProps) {
+export const TreeLayer = ({ data, visible }: TreeLayerProps) => {
   if (!visible) return null;
   return new IconLayer({
     id: "tree-icon-layer",
@@ -20,4 +20,4 @@ export function TreeLayer({ data, visible }: TreeLayerProps) {
     getColor: [34, 139, 34],
     // Tooltips should be handled at the DeckGL level, not here
   });
-}
+};
