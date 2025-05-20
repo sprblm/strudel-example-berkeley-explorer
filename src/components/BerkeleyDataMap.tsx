@@ -2,9 +2,9 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import DataLayersToggle from './DataLayersToggle';
-import TreeLayer from './BerkeleyDataMap/TreeLayer';
-import AirQualityLayer from './BerkeleyDataMap/AirQualityLayer';
-import LocationsLayer from './BerkeleyDataMap/LocationsLayer';
+import { TreeLayer } from './BerkeleyDataMap/TreeLayer';
+import { AirQualityLayer } from './BerkeleyDataMap/AirQualityLayer';
+import { LocationsLayer } from './BerkeleyDataMap/LocationsLayer';
 import type { AirQualityObservation } from '../types/air-quality.interfaces';
 
 import { getCachedTrees, setCachedTrees, getCachedAirQuality, setCachedAirQuality } from '../utils/dexieCache';
@@ -41,8 +41,8 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
 
   const [loadedDataPoints, setLoadedDataPoints] = useState<DataPoint[]>([]);
   const [locationsGeoJson, setLocationsGeoJson] = useState<GeoJSON.FeatureCollection | null>(null);
-  const [mapInstance, setMapInstance] = useState<any>(null);
-  const [mapVisible, setMapVisible] = useState(false);
+  // No more mapInstance needed for deck.gl
+  const [mapVisible, setMapVisible] = useState<boolean>(false);
   const mapPlaceholderRef = React.useRef<HTMLDivElement | null>(null);
 
   // Data Layers toggle state (no boundary)
@@ -81,11 +81,14 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
 
   // Lazy load data only when mapVisible
   useEffect(() => {
-    if (!mapVisible) return;
     const loadData = async () => {
-      
       let treeData = null;
       let airData: AirQualityObservation[] = [];
+      let treePoints: DataPoint[] = [];
+      let airPoints: DataPoint[] = [];
+      let dateSet = new Set<string>();
+      let combinedDataPoints: DataPoint[] = [];
+
       try {
         // Load locations.geojson (building outlines)
         const locationsResponse = await fetch('./data/locations.geojson');
@@ -93,7 +96,6 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
           const geojson = await locationsResponse.json();
           setLocationsGeoJson(geojson);
         }
-
 
         // Load Berkeley city boundary
         const boundaryResponse = await fetch('./data/boundaries/berkeley_city_boundary.json');
@@ -134,9 +136,9 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
             // Continue without air quality data
           }
         }
-          
+
         // Process tree data
-        const treePoints: DataPoint[] = treeData && Array.isArray(treeData) ? 
+        treePoints = treeData && Array.isArray(treeData) ? 
           treeData
             .map((tree: any, index: number) => {
               if (!tree.location || !Array.isArray(tree.location) || tree.location.length < 2) {
@@ -163,17 +165,14 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
               };
             })
             .filter(point => point !== null) as DataPoint[] : [];
-        
+
         // --- Extract available dates from air quality data ---
-        let airPoints: DataPoint[] = [];
-        const dateSet = new Set<string>();
         if (airData && Array.isArray(airData) && airData.length > 0) {
            // Normalize date property (use datetimeUtc from new data)
            airData.forEach((reading: any) => {
              const dateStr = reading.datetimeUtc ? reading.datetimeUtc.split('T')[0] : null;
              if (dateStr) dateSet.add(dateStr);
            });
-           // setAvailableDates removed: availableDates state is no longer used
 
            // By default, pick the most recent date
            if (!selectedDate && dateSet.size > 0) {
@@ -207,7 +206,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
            });
            airPoints = Object.entries(latestByMeter).map(([location_id, { location, readings }]: any) => ({
              id: `air-${location_id}`,
-             type: 'air',
+             type: 'air' as const,
              lat: location.latitude,
              lng: location.longitude,
              title: location.location_name,
@@ -219,56 +218,42 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
              }
            }));
         }
+
         // If no real data is available, create sample data for demonstration
-        let combinedDataPoints = [...treePoints, ...airPoints];
-        
+        combinedDataPoints = [...treePoints, ...airPoints];
         if (combinedDataPoints.length === 0) {
-          // Create sample tree data points around Berkeley
-          const sampleTreePoints: DataPoint[] = Array(20).fill(0).map((_, index) => ({
-            id: `sample-tree-${index}`,
-            type: 'tree',
-            lat: 37.8715 + (Math.random() * 0.02 - 0.01),
-            lng: -122.2680 + (Math.random() * 0.02 - 0.01),
-            title: `Sample Tree ${index + 1}`,
-            category: ['Good', 'Fair', 'Poor'][Math.floor(Math.random() * 3)],
-            details: { DBHMAX: Math.floor(Math.random() * 30) + 5 }
-          }));
-          
-          // Create sample air quality data points
-          const sampleAirPoints: DataPoint[] = Array(5).fill(0).map((_, index) => ({
-            id: `sample-air-${index}`,
-            type: 'air',
-            lat: 37.8715 + (Math.random() * 0.02 - 0.01),
-            lng: -122.2680 + (Math.random() * 0.02 - 0.01),
-            title: `Sample ${['PM2.5', 'Ozone'][index % 2]} Sensor`,
-            value: Math.floor(Math.random() * 150) + 10,
-            category: 'Moderate',
-            details: { DateObserved: new Date().toISOString().split('T')[0] }
-          }));
-          
-          combinedDataPoints = [...sampleTreePoints, ...sampleAirPoints];
+          combinedDataPoints = [
+            ...Array(20).fill(0).map((_, index) => ({
+              id: `sample-tree-${index}`,
+              type: 'tree' as const,
+              lat: 37.8715 + (Math.random() * 0.02 - 0.01),
+              lng: -122.2680 + (Math.random() * 0.02 - 0.01),
+              title: `Sample Tree ${index + 1}`,
+              category: ['Good', 'Fair', 'Poor'][Math.floor(Math.random() * 3)],
+              details: { DBHMAX: Math.floor(Math.random() * 30) + 5 }
+            })),
+            ...Array(5).fill(0).map((_, index) => ({
+              id: `sample-air-${index}`,
+              type: 'air' as const,
+              lat: 37.8715 + (Math.random() * 0.02 - 0.01),
+              lng: -122.2680 + (Math.random() * 0.02 - 0.01),
+              title: `Sample ${['PM2.5', 'Ozone'][index % 2]} Sensor`,
+              value: Math.floor(Math.random() * 150) + 10,
+              category: 'Moderate',
+              details: { DateObserved: new Date().toISOString().split('T')[0] }
+            }))
+          ];
           // eslint-disable-next-line no-console
           console.log('Using sample data for demonstration. Real data files not found.');
         }
-        
         setLoadedDataPoints(combinedDataPoints);
-
-      } catch (error) { 
+      } catch (error) {
         // eslint-disable-next-line no-console
-        console.error(`Failed to load data: ${error}`);
-      } finally {
-        
-
+        console.error('Error loading data:', error);
       }
     };
-    
     loadData();
   }, [mapVisible]);
-
-
-
-  // --- Map, marker, and layer logic is now handled by MapContainer and subcomponents ---
-
 
   return (
     <Box sx={{ position: 'relative', width, height }}>
@@ -285,23 +270,25 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
           <MapContainer
             height={height}
             width={width}
-            onMapReady={setMapInstance}
-          >
-            {/* Only render layers if map is ready and data loaded */}
-            {mapInstance && visibleLayers.includes('tree') && (
-              <TreeLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100)} visible={visibleLayers.includes('tree')} />
-            )}
-            {mapInstance && visibleLayers.includes('air') && (
-              <AirQualityLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'air').slice(0, 100)} visible={visibleLayers.includes('air')} />
-            )}
-            {mapInstance && visibleLayers.includes('locations') && locationsGeoJson && (
-              <LocationsLayer map={mapInstance} data={locationsGeoJson} visible={visibleLayers.includes('locations')} />
-            )}
-          </MapContainer>
+            layers={[
+              TreeLayer({ data: loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100), visible: visibleLayers.includes('tree') }),
+              AirQualityLayer({ data: loadedDataPoints.filter(p => p.type === 'air').slice(0, 100), visible: visibleLayers.includes('air') }),
+              LocationsLayer({ data: locationsGeoJson || { type: 'FeatureCollection', features: [] }, visible: visibleLayers.includes('locations') })
+            ].filter(Boolean)}
+          />
         </Suspense>
       )}
     </Box>
   );
-}
+
+            TreeLayer({ data: loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100), visible: visibleLayers.includes('tree') }),
+            AirQualityLayer({ data: loadedDataPoints.filter(p => p.type === 'air').slice(0, 100), visible: visibleLayers.includes('air') }),
+            LocationsLayer({ data: locationsGeoJson || { type: 'FeatureCollection', features: [] }, visible: visibleLayers.includes('locations') })
+          ].filter(Boolean)}
+        />
+      </Suspense>
+    )}
+  </Box>
+);
 
 export default BerkeleyDataMap;
