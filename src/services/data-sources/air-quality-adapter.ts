@@ -1,5 +1,4 @@
 import { DataSourceAdapter, HttpClientConfig, SearchOptions, SearchResult, SourceMetadata } from './types';
-import { HttpClient } from './http-client';
 
 export class AirQualityAdapter implements DataSourceAdapter {
   public id = 'air-quality';

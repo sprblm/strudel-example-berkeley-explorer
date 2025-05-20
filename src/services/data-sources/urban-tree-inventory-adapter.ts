@@ -1,5 +1,4 @@
 import { DataSourceAdapter, HttpClientConfig, SearchOptions, SearchResult, SourceMetadata } from './types';
-import { HttpClient } from './http-client';
 
 export class UrbanTreeInventoryAdapter implements DataSourceAdapter {
   public id = 'urban-tree-inventory';
