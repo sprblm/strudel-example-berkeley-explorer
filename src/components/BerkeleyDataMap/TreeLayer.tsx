@@ -1,42 +1,44 @@
-import React, { useEffect } from 'react';
-import L from 'leaflet';
+import React, { useContext } from 'react';
+import { IconLayer } from '@deck.gl/layers';
+import { ViewStateContext } from './MapContainer';
 
 interface TreeLayerProps {
-  map: L.Map;
   data: any[];
   visible: boolean;
 }
 
-const TreeLayer: React.FC<TreeLayerProps> = ({ map, data, visible }) => {
-  useEffect(() => {
-    if (!map || !visible) return;
-    const markers: L.Layer[] = [];
-    data.forEach(point => {
-      const icon = L.icon({
-        iconUrl: '/icons/tree.svg',
-        iconSize: [22, 22],
-        iconAnchor: [11, 22],
-        popupAnchor: [0, -22]
-      });
-      const marker = L.marker([point.lat, point.lng], { icon });
-      marker.bindPopup(
-        `<div style="max-width: 200px;">
-          <h3>${point.title}</h3>
-          <p>Condition: ${point.category || 'Unknown'}</p>
-          <p>Location: ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}</p>
-          ${point.details?.DBHMAX ? `<p>DBH: ${point.details.DBHMAX} in</p>` : ''}
-          ${point.details?.HEIGHT ? `<p>Height: ${point.details.HEIGHT} feet</p>` : ''}
-          ${point.details?.OBSERVATIONDATE ? `<p>Observed: ${point.details.OBSERVATIONDATE}</p>` : ''}
-        </div>`
-      );
-      marker.addTo(map);
-      markers.push(marker);
-    });
-    return () => {
-      markers.forEach(marker => marker.remove());
-    };
-  }, [map, data, visible]);
-  return null;
+export function TreeLayer({ data, visible }: TreeLayerProps) {
+  const viewState = useContext(ViewStateContext);
+  if (!visible) return null;
+
+  return (
+    <IconLayer
+      id="tree-icon-layer"
+      data={data}
+      pickable
+      iconAtlas="/icons/tree.svg"
+      iconMapping={{ marker: { x: 0, y: 0, width: 22, height: 22, mask: false } }}
+      getIcon={() => 'marker'}
+      sizeScale={1}
+      getPosition={d => [d.lng, d.lat]}
+      getSize={22}
+      getColor={[34, 139, 34]}
+      getTooltip={({ object }) =>
+        object
+          ? {
+              html: `<div style="max-width: 200px;">
+                <h3>${object.title}</h3>
+                <p>Condition: ${object.category || 'Unknown'}</p>
+                <p>Location: ${object.lat?.toFixed(4)}, ${object.lng?.toFixed(4)}</p>
+                ${object.details?.DBHMAX ? `<p>DBH: ${object.details.DBHMAX} in</p>` : ''}
+                ${object.details?.HEIGHT ? `<p>Height: ${object.details.HEIGHT} feet</p>` : ''}
+                ${object.details?.OBSERVATIONDATE ? `<p>Observed: ${object.details.OBSERVATIONDATE}</p>` : ''}
+              </div>`
+            }
+          : null
+      }
+    />
+  );
 };
 
-export default TreeLayer;
+
