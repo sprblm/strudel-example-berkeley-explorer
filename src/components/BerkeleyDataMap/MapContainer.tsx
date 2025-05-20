@@ -12,13 +12,14 @@ interface MapContainerProps {
 /**
  * MapContainer handles Leaflet map initialization and provides the map instance to children via onMapReady.
  */
+
 const MapContainer: React.FC<MapContainerProps> = ({ children, height = 400, width = '100%', onMapReady }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
-    // Initialize the map
+    // Optionally handle mapContainerRef.current size if needed
     mapRef.current = L.map(mapContainerRef.current).setView([37.8715, -122.2680], 15);
     // Add base tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

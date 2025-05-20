@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import DataLayersToggle from './DataLayersToggle';
-import MapContainer from './BerkeleyDataMap/MapContainer';
 import TreeLayer from './BerkeleyDataMap/TreeLayer';
 import AirQualityLayer from './BerkeleyDataMap/AirQualityLayer';
+import LocationsLayer from './BerkeleyDataMap/LocationsLayer';
 import type { AirQualityObservation } from '../types/air-quality.interfaces';
+
+import { getCachedTrees, setCachedTrees, getCachedAirQuality, setCachedAirQuality } from '../utils/dexieCache';
+
+const MapContainer = React.lazy(() => import('./BerkeleyDataMap/MapContainer'));
 
 interface DataPoint {
   id: string;
@@ -34,11 +38,12 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
 }) => {
   // --- Date filtering state ---
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+
   const [loadedDataPoints, setLoadedDataPoints] = useState<DataPoint[]>([]);
-  const [_locationsGeoJson, setLocationsGeoJson] = useState<any>(null);
-  const [_boundaryData, setBoundaryData] = useState<any>(null);
+  const [locationsGeoJson, setLocationsGeoJson] = useState<GeoJSON.FeatureCollection | null>(null);
   const [mapInstance, setMapInstance] = useState<any>(null);
+  const [mapVisible, setMapVisible] = useState(false);
+  const mapPlaceholderRef = React.useRef<HTMLDivElement | null>(null);
 
   // Data Layers toggle state (no boundary)
   const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'locations')[]>(['tree', 'air', 'locations']);
@@ -48,60 +53,86 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
     );
   };
 
-
-  // Load real data when component mounts
+  // IntersectionObserver to trigger map/data load
   useEffect(() => {
+    if (mapVisible) return; // Only observe if not visible
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+
+        if (entries[0].isIntersecting) {
+
+          setMapVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (mapPlaceholderRef.current) {
+      observer.observe(mapPlaceholderRef.current);
+
+    } else {
+      // mapPlaceholderRef.current is null
+    }
+    return () => {
+      if (mapPlaceholderRef.current) {
+        observer.unobserve(mapPlaceholderRef.current);
+      }
+    };
+  }, [mapVisible]);
+
+  // Lazy load data only when mapVisible
+  useEffect(() => {
+    if (!mapVisible) return;
     const loadData = async () => {
-      setLoading(true);
       
       let treeData = null;
       let airData: AirQualityObservation[] = [];
-      let cityBoundary = null;
-      
       try {
-        // Load locations.geojson (buildings)
-        try {
-          const locationsResponse = await fetch('./data/locations.geojson');
-          if (locationsResponse.ok) {
-            const locationsData = await locationsResponse.json();
-            setLocationsGeoJson(locationsData);
-          }
-        } catch (err) {
-          // Optional: locations.geojson not required, continue if missing
+        // Load locations.geojson (building outlines)
+        const locationsResponse = await fetch('./data/locations.geojson');
+        if (locationsResponse.ok) {
+          const geojson = await locationsResponse.json();
+          setLocationsGeoJson(geojson);
         }
 
+
         // Load Berkeley city boundary
-        try {
-          const boundaryResponse = await fetch('./data/boundaries/berkeley_city_boundary.json');
-          if (!boundaryResponse.ok) {
-            throw new Error(`Failed to fetch boundary data: ${boundaryResponse.status}`);
-          }
-          cityBoundary = await boundaryResponse.json();
-          setBoundaryData(cityBoundary);
-        } catch (error) {
-          // Continue without boundary data
+        const boundaryResponse = await fetch('./data/boundaries/berkeley_city_boundary.json');
+        if (!boundaryResponse.ok) {
+          throw new Error(`Failed to fetch boundary data: ${boundaryResponse.status}`);
         }
-        
-        try {
-          // Use absolute path from public directory
-          const treeResponse = await fetch('./data/processed/berkeley_trees_processed.json');
-          if (!treeResponse.ok) {
-            throw new Error(`Failed to fetch tree data: ${treeResponse.status}`);
+
+        // Try cache first for trees
+        const cachedTrees = await getCachedTrees();
+        if (cachedTrees && cachedTrees.data) {
+          treeData = cachedTrees.data;
+        } else {
+          try {
+            const treeResponse = await fetch('./data/processed/berkeley_trees_processed.json');
+            if (!treeResponse.ok) {
+              throw new Error(`Failed to fetch tree data: ${treeResponse.status}`);
+            }
+            treeData = await treeResponse.json();
+            await setCachedTrees(treeData);
+          } catch (error) {
+            // Continue without tree data
           }
-          treeData = await treeResponse.json();
-        } catch (error) {
-          // Continue without tree data
         }
-        
-        try {
-           // Load air quality data (all readings from new processed file)
-           const airQualityResponse = await fetch('./data/processed/berkeley_air_quality_all_readings.json');
-           if (!airQualityResponse.ok) {
-             throw new Error(`Failed to fetch air quality data: ${airQualityResponse.status}`);
-           }
-           airData = await airQualityResponse.json();
-        } catch (error) {
-          // Continue without air quality data
+
+        // Try cache first for air quality
+        const cachedAir = await getCachedAirQuality();
+        if (cachedAir && cachedAir.data) {
+          airData = cachedAir.data;
+        } else {
+          try {
+            const airQualityResponse = await fetch('./data/processed/berkeley_air_quality_all_readings.json');
+            if (!airQualityResponse.ok) {
+              throw new Error(`Failed to fetch air quality data: ${airQualityResponse.status}`);
+            }
+            airData = await airQualityResponse.json();
+            await setCachedAirQuality(airData);
+          } catch (error) {
+            // Continue without air quality data
+          }
         }
           
         // Process tree data
@@ -221,47 +252,56 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
         }
         
         setLoadedDataPoints(combinedDataPoints);
+
       } catch (error) { 
         // eslint-disable-next-line no-console
         console.error(`Failed to load data: ${error}`);
       } finally {
-        setLoading(false);
+        
+
       }
     };
     
     loadData();
-  }, []);
+  }, [mapVisible]);
 
 
 
   // --- Map, marker, and layer logic is now handled by MapContainer and subcomponents ---
 
+
   return (
     <Box sx={{ position: 'relative', width, height }}>
       {/* Data Layers Toggle UI (upper right, extracted) */}
       <DataLayersToggle visibleLayers={visibleLayers} toggleLayer={toggleLayer} />
-
-      {loading && (
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}>
+      {/* Lazy load map and data only when visible */}
+      {!mapVisible && (
+        <div ref={mapPlaceholderRef} style={{ width: '100%', height: typeof height === 'number' ? `${height}px` : height, minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
           <CircularProgress />
-        </Box>
+        </div>
       )}
-      <MapContainer
-        height={height}
-        width={width}
-        onMapReady={setMapInstance}
-      >
-        {/* Only render layers if map is ready and data loaded */}
-        {mapInstance && visibleLayers.includes('tree') && (
-          <TreeLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'tree')} visible={visibleLayers.includes('tree')} />
-        )}
-        {mapInstance && visibleLayers.includes('air') && (
-          <AirQualityLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'air')} visible={visibleLayers.includes('air')} />
-        )}
-        {/* TODO: Add locations and boundary overlays as new subcomponents */}
-      </MapContainer>
+      {mapVisible && (
+        <Suspense fallback={<Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2 }}><CircularProgress /></Box>}>
+          <MapContainer
+            height={height}
+            width={width}
+            onMapReady={setMapInstance}
+          >
+            {/* Only render layers if map is ready and data loaded */}
+            {mapInstance && visibleLayers.includes('tree') && (
+              <TreeLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100)} visible={visibleLayers.includes('tree')} />
+            )}
+            {mapInstance && visibleLayers.includes('air') && (
+              <AirQualityLayer map={mapInstance} data={loadedDataPoints.filter(p => p.type === 'air').slice(0, 100)} visible={visibleLayers.includes('air')} />
+            )}
+            {mapInstance && visibleLayers.includes('locations') && locationsGeoJson && (
+              <LocationsLayer map={mapInstance} data={locationsGeoJson} visible={visibleLayers.includes('locations')} />
+            )}
+          </MapContainer>
+        </Suspense>
+      )}
     </Box>
   );
-};
+}
 
 export default BerkeleyDataMap;
