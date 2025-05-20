@@ -1,27 +1,18 @@
-import { 
-  Box, 
-  Container, 
-  Grid, 
-  Paper, 
-  Typography, 
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
   Stack,
-  Button as MuiButton,
+  Grid,
+  Paper,
   CircularProgress,
   Chip
 } from '@mui/material';
-import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { 
-  SearchIcon, 
-  LineChartIcon, 
-  BarChartIcon, 
-  UploadIcon,
-  CheckCircleIcon,
-  AirQualityIcon,
-  TreeIcon
-} from '../../components/Icons';
-
 import BerkeleyDataMap from '../../components/BerkeleyDataMap';
+import { CheckCircle, Air, Park } from '@mui/icons-material';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 /**
@@ -130,65 +121,22 @@ export const HomePage = () => {
     return '#7E0023'; // Hazardous
   };
 
-  /**
-   * Feature definitions for the main application sections
-   * Each feature includes:
-   * - title: Display name for the feature
-   * - description: Brief explanation of the feature's purpose
-   * - icon: Visual representation of the feature
-   * - path: Route to navigate to when clicked
-   * - color: Theme color for the feature card
-   */
-  // Feature cards for navigation - defined for future use
-  // Currently not used in the UI but kept for planned feature implementation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const features = [
-    {
-      title: 'Search',
-      description: 'Find specific trees, air quality sensors, or campus locations using filters',
-      icon: <SearchIcon size={24} />,
-      path: '/search-repositories',
-      color: '#4caf50', // green
-    },
-    {
-      title: 'Explore',
-      description: 'Visualize tree distribution, health, and air quality readings through interactive maps',
-      icon: <LineChartIcon size={24} />,
-      path: '/explore-data',
-      color: '#2196f3', // blue
-    },
-    {
-      title: 'Compare',
-      description: 'Analyze differences in environmental conditions across campus locations or time periods',
-      icon: <BarChartIcon size={24} />,
-      path: '/compare-data',
-      color: '#f44336', // red
-    },
-    {
-      title: 'Contribute',
-      description: 'Add observations like tree measurements or air quality readings during fieldwork',
-      icon: <UploadIcon size={24} />,
-      path: '/contribute',
-      color: '#00bcd4', // cyan
-    },
-  ];
-
   const benefits = [
     {
       text: 'Tangible, relatable scale for learning and data collection',
-      icon: <CheckCircleIcon size={16} color="#4caf50" />,
+      icon: <CheckCircle fontSize="small" sx={{ color: '#4caf50' }} />,
     },
     {
       text: 'Combines complementary datasets in a familiar setting',
-      icon: <CheckCircleIcon size={16} color="#4caf50" />,
+      icon: <CheckCircle fontSize="small" sx={{ color: '#4caf50' }} />,
     },
     {
       text: 'Enables meaningful citizen science participation',
-      icon: <CheckCircleIcon size={16} color="#4caf50" />,
+      icon: <CheckCircle fontSize="small" sx={{ color: '#4caf50' }} />,
     },
     {
       text: 'Leverages local relevance and immediate impact',
-      icon: <CheckCircleIcon size={16} color="#4caf50" />,
+      icon: <CheckCircle fontSize="small" sx={{ color: '#4caf50' }} />,
     },
   ];
 
@@ -200,7 +148,7 @@ export const HomePage = () => {
           background: 'linear-gradient(to bottom, #1e3a8a, #3b82f6)',
           color: 'white', 
           py: 6,
-          textAlign: 'center', // Ensure all content is centered
+          textAlign: 'center',
         }}
       >
         <Container maxWidth="lg">
@@ -233,7 +181,7 @@ export const HomePage = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <AirQualityIcon size={24} color="#3B82F6" />
+                  <Air sx={{ color: '#3B82F6', fontSize: 24 }} />
                   <Typography variant="h6" sx={{ ml: 1 }}>
                     Current Air Quality
                   </Typography>
@@ -288,14 +236,14 @@ export const HomePage = () => {
                           <Typography variant="caption" color="text.secondary" display="block">
                             Last updated: {new Date(latestAirQuality.date || '').toLocaleDateString()}
                           </Typography>
-                          <MuiButton 
+                          <Button 
                             component={RouterLink} 
                             to="/compare-data" 
                             size="small" 
                             sx={{ mt: 1, px: 0 }}
                           >
                             View Air Quality Trends
-                          </MuiButton>
+                          </Button>
                         </Grid>
                       </Grid>
                     ) : (
@@ -318,7 +266,7 @@ export const HomePage = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <TreeIcon size={24} color="#4CAF50" />
+                  <Park sx={{ color: '#4CAF50', fontSize: 24 }} />
                   <Typography variant="h6" sx={{ ml: 1 }}>
                     Berkeley Tree Inventory
                   </Typography>
@@ -350,14 +298,14 @@ export const HomePage = () => {
                           {Math.round(treeSummary.healthyPercentage)}%
                         </Typography>
                       </Box>
-                      <MuiButton 
+                      <Button 
                         component={RouterLink} 
                         to="/search-repositories" 
                         size="small" 
                         sx={{ mt: 1, px: 0 }}
                       >
                         Search Tree Database
-                      </MuiButton>
+                      </Button>
                     </Grid>
                   </Grid>
                 )}
@@ -376,19 +324,33 @@ export const HomePage = () => {
             }}
           >
             {/* Interactive Campus Map */}
-            <BerkeleyDataMap height="100%" showControls={true} />
+            <BerkeleyDataMap height="100%" />
+            <Button
+              variant="outlined"
+              color="primary"
+              sx={{ 
+                borderColor: '#1e3a8a', 
+                color: '#1e3a8a',
+                '&:hover': {
+                  borderColor: '#3b82f6',
+                  bgcolor: 'rgba(59, 130, 246, 0.04)'
+                }
+              }}
+            >
+              Learn More
+            </Button>
           </Paper>
           
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <MuiButton 
-              component={RouterLink} 
-              to="/explore-data" 
-              variant="contained" 
+            <Button
+              component={RouterLink}
+              to="/explore-data"
+              variant="contained"
               color="primary"
-              startIcon={<LineChartIcon size={16} />}
+              startIcon={<Park sx={{ fontSize: 16 }} />}
             >
               Explore Full Map
-            </MuiButton>
+            </Button>
           </Box>
         </Container>
       </Box>
@@ -410,7 +372,7 @@ export const HomePage = () => {
                 Built with STRUDEL Kit, it integrates key scientific data flows into a cohesive educational 
                 experience, turning the campus into a living laboratory.
               </Typography>
-              <MuiButton 
+              <Button 
                 variant="outlined" 
                 color="primary"
                 sx={{ 
@@ -423,7 +385,7 @@ export const HomePage = () => {
                 }}
               >
                 Learn More
-              </MuiButton>
+              </Button>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>

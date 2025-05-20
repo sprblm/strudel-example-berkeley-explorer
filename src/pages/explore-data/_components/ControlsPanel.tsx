@@ -10,12 +10,11 @@ import {
   ListItemIcon,
   ListItemText,
   Button,
-  ToggleButton,
-  ToggleButtonGroup,
+
   IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { TreeIcon, SensorIcon, AirQualityIcon, InfoCircleIcon, ChevronLeft, ChevronRight } from '../../../components/Icons';
+import { TreeIcon, AirQualityIcon, InfoCircleIcon, ChevronLeft, ChevronRight } from '../../../components/Icons';
 import Plot from 'react-plotly.js';
 
 const PillTabs = styled(Tabs)(({ theme }) => ({

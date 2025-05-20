@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {
   Box,
   Button,
@@ -131,7 +131,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 to={`${previewItem[dataIdField]}`}
                 underline="hover"
               >
-                {previewItem[columns[0].field]}
+                {columns?.[0]?.field ? previewItem[columns[0].field] : ''}
               </Link>
             </Typography>
             <IconButton size="small" onClick={onClose}>
@@ -139,7 +139,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             </IconButton>
           </Stack>
           <Typography variant="body2">
-            Detailed information and visualizations for {previewItem[columns[0].field]}.
+            Detailed information and visualizations for {columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'}.
           </Typography>
         </Stack>
 
@@ -205,9 +205,9 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                     },
                   ]}
                   layout={{
-                    title: `${previewItem[columns[0].field]} - Time Series`,
-                    xaxis: { title: 'Time (days)' },
-                    yaxis: { title: 'Value' },
+                    title: { text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Time Series` },
+                    xaxis: { title: { text: 'Time (days)' } },
+                    yaxis: { title: { text: 'Value' } },
                     autosize: true,
                     margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
                   }}
@@ -237,9 +237,9 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                     },
                   ]}
                   layout={{
-                    title: `${previewItem[columns[0].field]} - Comparison`,
-                    xaxis: { title: 'Parameter 1' },
-                    yaxis: { title: 'Parameter 2' },
+                    title: { text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Comparison` },
+                    xaxis: { title: { text: 'Parameter 1' } },
+                    yaxis: { title: { text: 'Parameter 2' } },
                     autosize: true,
                     margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
                   }}

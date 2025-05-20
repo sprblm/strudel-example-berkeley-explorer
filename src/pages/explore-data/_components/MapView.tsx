@@ -5,6 +5,7 @@ import { filterData } from '../../../utils/filters.utils';
 import { useListQuery } from '../../../utils/useListQuery';
 import { taskflow } from '../_config/taskflow.config';
 import Plot from 'react-plotly.js';
+import { FilterConfig } from '../../../types/filters.types';
 
 interface MapViewProps {
   searchTerm: string;
@@ -19,12 +20,12 @@ export const MapView: React.FC<MapViewProps> = ({
   setPreviewItem,
 }) => {
   const { activeFilters } = useFilters();
-  const filterConfigs = taskflow.pages.index.tableFilters;
+  const filterConfigs = taskflow.pages.index.tableFilters || [];
    
-  const { isPending, isError, data, error } = useListQuery({
+  const { isPending, isError, data } = useListQuery({
     activeFilters,
     dataSource: 'urban-tree-inventory',
-    filterConfigs,
+    filterConfigs: filterConfigs as FilterConfig[],
     queryMode: 'client',
     staticParams: { /* Add static params if necessary */ },
     offset: 0,
@@ -33,10 +34,10 @@ export const MapView: React.FC<MapViewProps> = ({
   });
 
   // Add similar useListQuery for air quality data
-  const { isPending: isPendingAirQuality, isError: isErrorAirQuality, data: airQualityData, error: airQualityError } = useListQuery({
+  const { data: airQualityData } = useListQuery({
     activeFilters,
     dataSource: 'air-quality',
-    filterConfigs,
+    filterConfigs: filterConfigs as FilterConfig[],
     queryMode: 'client',
     staticParams: { /* Add static params if necessary */ },
     offset: 0,
@@ -55,14 +56,14 @@ export const MapView: React.FC<MapViewProps> = ({
   if (isError) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography color="error">Error loading map data: {error.message}</Typography>
+        <Typography color="error">Error loading map data. Please try again later.</Typography>
       </Box>
     );
   }
 
   // Filter the data based on active filters and search term
-  const filteredTreeData = filterData(data, activeFilters, filterConfigs, searchTerm);
-  const filteredAirQualityData = filterData(airQualityData, activeFilters, filterConfigs, searchTerm);
+  const filteredTreeData = filterData(data, activeFilters, filterConfigs as FilterConfig[], searchTerm);
+  const filteredAirQualityData = filterData(airQualityData, activeFilters, filterConfigs as FilterConfig[], searchTerm);
 
   // Combine and visualize both tree and air quality data on the map
   const combinedData: Plotly.Data[] = [
@@ -144,7 +145,7 @@ export const MapView: React.FC<MapViewProps> = ({
   );
 
   // Extract columns for potential map data
-  const columns = taskflow.pages.index.tableColumns;
+  const columns = taskflow.pages.index.tableColumns ?? [];
   const numericColumns = columns.filter((col: any) => col.type === 'number');
   
   // For a map, we need to generate some latitude and longitude data
@@ -153,9 +154,6 @@ export const MapView: React.FC<MapViewProps> = ({
   const mapData = filteredTreeData.map((item, index) => {
     // Generate random coordinates centered around different regions based on some property
     // This is just for demonstration - in a real app, you'd use actual coordinates
-    const baseLatitude = 0;
-    const baseLongitude = 0;
-    
     // Use some property to determine the region, or just use the index
     const region = index % 5;
     
@@ -204,8 +202,8 @@ export const MapView: React.FC<MapViewProps> = ({
   });
 
   // Handle clicking on a map point to show preview
-  const handleMapClick = (data: any) => {
-    const pointIndex = data.points[0].pointIndex;
+  const handleMapClick = (clickData: any) => {
+    const pointIndex = clickData.points[0].pointIndex;
     setPreviewItem(filteredTreeData[pointIndex]);
   };
 
@@ -214,7 +212,7 @@ export const MapView: React.FC<MapViewProps> = ({
   const colorValues = colorField ? mapData.map((item: any) => item[colorField]) : [];
   
   // Get a field for the hover text
-  const titleField = columns[0].field;
+  const titleField = columns?.[0]?.field || 'id';
 
   return (
     <Box sx={{ p: 2 }}>
@@ -237,7 +235,7 @@ export const MapView: React.FC<MapViewProps> = ({
                   colorscale: 'Viridis',
                   showscale: !!colorField,
                   colorbar: colorField ? {
-                    title: columns.find((col: any) => col.field === colorField)?.headerName || colorField
+                    title: { text: columns?.find((col: any) => col.field === colorField)?.headerName || colorField }
                   } : undefined,
                   opacity: 0.8,
                 },
@@ -246,14 +244,14 @@ export const MapView: React.FC<MapViewProps> = ({
                 hovertext: mapData.map(item => {
                   // Create hover text with key information
                   return `${(item as any)[titleField]}<br>` +
-                    columns.slice(1, 4).map((col: any) =>
+                    (columns ? columns.slice(1, 4).map((col: any) =>
                       `${col.headerName}: ${(item as any)[col.field]}${col.units ? ` ${col.units}` : ''}`
-                    ).join('<br>');
+                    ).join('<br>') : '')
                 })
               }
             ]}
             layout={{
-              title: 'Climate Data Geographic Distribution',
+              title: { text: 'Climate Data Geographic Distribution' },
               autosize: true,
               margin: { l: 0, r: 0, b: 0, t: 50, pad: 4 },
               geo: {
@@ -274,7 +272,7 @@ export const MapView: React.FC<MapViewProps> = ({
             }}
             style={{ width: '100%', height: '100%' }}
             useResizeHandler={true}
-            onClick={(data) => handleMapClick(data)}
+            onClick={(clickData) => handleMapClick(clickData)}
           />
         </Box>
       </Paper>

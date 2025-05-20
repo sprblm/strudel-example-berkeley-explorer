@@ -3,9 +3,6 @@ import { Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, Slid
 import type { TreeObservation } from '../types/data.interfaces';
 import 'leaflet/dist/leaflet.css';
 
-// Center of Berkeley, CA
-const DEFAULT_CENTER: [number, number] = [37.8715, -122.2730];
-const DEFAULT_ZOOM = 14;
 
 // Colors for different health conditions
 const HEALTH_COLORS = {
@@ -16,20 +13,6 @@ const HEALTH_COLORS = {
   'Unknown': '#9e9e9e'    // gray
 };
 
-// Colors for different species (top 10)
-const SPECIES_COLORS: Record<string, string> = {
-  'Platanus hybrida': '#8bc34a',
-  'Liquidambar styraciflua': '#4caf50',
-  'Prunus cerasifera': '#e91e63',
-  'Quercus agrifolia': '#795548',
-  'Pistacia chinensis': '#ff9800',
-  'Pyrus calleryana': '#cddc39',
-  'Acer rubrum': '#f44336',
-  'Cinnamomum camphora': '#009688',
-  'Acer palmatum': '#e57373',
-  'Ulmus parvifolia': '#81c784',
-  'Other': '#9e9e9e'
-};
 
 interface TreeMapProps {
   trees?: TreeObservation[];
@@ -108,14 +91,6 @@ const TreeMap: React.FC<TreeMapProps> = ({
     setMapReady(true);
   }, []);
 
-  // Get marker color based on selected property
-  const getMarkerColor = (tree: TreeObservation) => {
-    if (colorBy === 'health') {
-      return HEALTH_COLORS[tree.healthCondition as keyof typeof HEALTH_COLORS] || HEALTH_COLORS.Unknown;
-    } else {
-      return SPECIES_COLORS[tree.species] || SPECIES_COLORS.Other;
-    }
-  };
 
   if (loading) {
     return <Box>Loading tree data...</Box>;

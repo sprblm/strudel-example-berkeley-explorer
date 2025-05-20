@@ -6,9 +6,7 @@ import {
   InfoIcon, 
   HomeIcon,
   UploadIcon,
-  PlayCircle,
   SearchIcon,
-  MonitorIcon,
   BarChartIcon
 } from './Icons';
 
@@ -17,7 +15,8 @@ import {
  * Updated with modern aesthetic and Lucide icons
  */
 export const TopBar: React.FC = () => {
-  const location = useLocation();
+  // Location is available if needed for future use
+  // const location = useLocation();
 
   return (
     <AppBar 

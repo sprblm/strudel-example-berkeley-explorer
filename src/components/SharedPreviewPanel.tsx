@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Button,
   IconButton,
-  Link,
   Paper,
   Stack,
   Typography,
@@ -15,6 +14,13 @@ import { Link as RouterLink } from 'react-router-dom';
 import { LabelValueTable } from './LabelValueTable';
 import { DataGrid } from '@mui/x-data-grid';
 import Plot from 'react-plotly.js';
+
+interface LabelValuePair {
+  label: string;
+  value: React.ReactNode;
+  type?: string;
+  units?: string;
+}
 
 interface SharedPreviewPanelProps {
   /**
@@ -32,7 +38,12 @@ interface SharedPreviewPanelProps {
   /**
    * Optional columns configuration for displaying the item data
    */
-  columns?: Array<any>;
+  columns?: Array<{
+    field: string;
+    headerName?: string;
+    type?: string;
+    units?: string;
+  }>;
   /**
    * Optional configuration for detail page navigation
    */
@@ -55,39 +66,14 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  // Generate visualization data based on the preview item properties
+  // Generate sample visualization data
   const generateVisualizationData = () => {
     try {
-      // Check for time-related or numeric fields to use in visualizations
-      const numericKeys = Object.keys(previewItem || {}).filter(
-        key => typeof previewItem[key] === 'number'
-      );
-      
-      // If there are at least 2 numeric fields, create a basic visualization
-      if (numericKeys.length >= 2) {
-        const key1 = numericKeys[0];
-        const key2 = numericKeys[1];
-        
-        return {
-          timeSeriesData: {
-            x: Array.from({ length: 20 }, (_, i) => i),
-            y: Array.from({ length: 20 }, (_, i) => 
-              Math.sin(i * 0.5) * previewItem[key1] / 10 + previewItem[key1]
-            ),
-          },
-          scatterData: {
-            x: [previewItem[key1], previewItem[key1] * 1.2],
-            y: [previewItem[key2], previewItem[key2] * 0.8],
-            text: ['Current', 'Projected'],
-          }
-        };
-      }
-      
-      // Default visualization data if no suitable properties found
+      // In a real implementation, this would fetch or process the actual data
       return {
         timeSeriesData: {
           x: Array.from({ length: 20 }, (_, i) => i),
@@ -100,7 +86,10 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
         }
       };
     } catch (error) {
-      console.error('Error generating visualization data:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.error('Error generating visualization data:', error);
+      }
       // Return safe default data
       return {
         timeSeriesData: {
@@ -124,18 +113,21 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
   }
 
   // Extract the item attributes to display in the details
-  const attributes = columns.length > 0
-    ? columns.map(col => ({
-        label: col.headerName || col.field,
-        value: previewItem[col.field],
+  const attributes: LabelValuePair[] = useMemo(() => {
+    if (columns?.length) {
+      return columns.map(col => ({
+        label: col.headerName || col.field || '',
+        value: previewItem[col.field] as React.ReactNode,
         type: col.type,
         units: col.units
-      }))
-    : Object.entries(previewItem).map(([key, value]) => ({
-        label: key,
-        value,
-        type: typeof value === 'number' ? 'number' : 'string'
       }));
+    }
+    return Object.entries(previewItem).map(([key, value]) => ({
+      label: key,
+      value: value as React.ReactNode,
+      type: typeof value === 'number' ? 'number' : 'string'
+    }));
+  }, [columns, previewItem]);
 
   return (
     <Paper 
@@ -215,12 +207,17 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                   autosize: true,
                   height: 300,
                   margin: {l: 50, r: 50, t: 30, b: 50},
-                  xaxis: {title: 'Time'},
-                  yaxis: {title: 'Value'},
+                  xaxis: {title: {text: 'Time'}},
+                  yaxis: {title: {text: 'Value'}},
                 }}
                 style={{width: '100%'}}
                 useResizeHandler={true}
-                onError={(error) => console.error('Error rendering Plotly chart:', error)}
+                onError={(error) => {
+                  if (process.env.NODE_ENV !== 'production') {
+                    // eslint-disable-next-line no-console
+                    console.error('Error rendering Plotly chart:', error);
+                  }
+                }}
               />
             </Box>
             
@@ -246,12 +243,17 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                   autosize: true,
                   height: 300,
                   margin: {l: 50, r: 50, t: 30, b: 50},
-                  xaxis: {title: 'X Value'},
-                  yaxis: {title: 'Y Value'},
+                  xaxis: {title: {text: 'X Value'}},
+                  yaxis: {title: {text: 'Y Value'}},
                 }}
                 style={{width: '100%'}}
                 useResizeHandler={true}
-                onError={(error) => console.error('Error rendering Plotly chart:', error)}
+                onError={(error) => {
+                  if (process.env.NODE_ENV !== 'production') {
+                    // eslint-disable-next-line no-console
+                    console.error('Error rendering Plotly chart:', error);
+                  }
+                }}
               />
             </Box>
           </Stack>

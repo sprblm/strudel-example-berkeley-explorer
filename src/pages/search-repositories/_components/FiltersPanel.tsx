@@ -6,8 +6,7 @@ import {
   MenuItem, 
   TextField,
   Paper, 
-  Button,
-  ButtonGroup
+  Button
 } from '@mui/material';
 import React, { useState } from 'react';
 import { TreeIcon, AirQualityIcon, LocationIcon } from '../../../components/Icons';

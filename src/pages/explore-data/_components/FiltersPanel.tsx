@@ -1,23 +1,23 @@
 import React from 'react';
 import {
-  Box,
+  Box, 
+  Typography, 
+  Slider, 
+  Select, 
+  MenuItem, 
+  Paper, 
   Button,
-  Divider,
   FormControl,
   FormControlLabel,
   FormGroup,
-  IconButton,
-  MenuItem,
-  Paper,
-  Select,
-  Slider,
+  Checkbox,
   Stack,
-  Switch,
-  Typography,
+  Divider,
+  IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFilters } from '../../../components/FilterContext';
-import { taskflow } from '../_config/taskflow.config';
+import { useTaskflow } from '../../../hooks/useTaskflow';
 
 interface FiltersPanelProps {
   onClose: () => void;
@@ -29,7 +29,7 @@ interface FiltersPanelProps {
  */
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
   const { activeFilters, setFilter, clearFilters } = useFilters();
-  const filterConfigs = taskflow.pages.index.tableFilters;
+  const { filterConfigs = [] } = useTaskflow();
 
   const handleClearFilters = () => {
     clearFilters();
@@ -39,12 +39,12 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
     setFilter(field, value);
   };
 
-  const handleSelectFilterChange = (field: string, value: string) => {
-    setFilter(field, value);
-  };
-
   const handleToggleFilterChange = (field: string, checked: boolean) => {
     setFilter(field, checked);
+  };
+
+  const handleSelectFilterChange = (field: string, value: string) => {
+    setFilter(field, value);
   };
 
   return (
@@ -66,12 +66,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
       </Button>
       
       <Stack spacing={3}>
-        {filterConfigs.map((filter) => {
+        {filterConfigs.map((filter: any) => {
           const { field, label, type, options } = filter;
+          const filterValue = activeFilters[field];
           
           // Range filter (for numeric values)
           if (type === 'range' && options?.min !== undefined && options?.max !== undefined) {
-            const value = activeFilters[field] || [options.min, options.max];
+            const value = Array.isArray(filterValue) ? filterValue : [options.min, options.max];
             return (
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
@@ -97,14 +98,15 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
             );
           }
           
-          // Select filter (dropdown)
+          // Select filter (for dropdowns)
           if (type === 'select' && Array.isArray(options)) {
+            const value = typeof filterValue !== 'undefined' ? String(filterValue) : '';
             return (
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
                 <FormControl fullWidth size="small">
                   <Select
-                    value={activeFilters[field]?.toString() || ''}
+                    value={value}
                     onChange={(e) => handleSelectFilterChange(field, e.target.value as string)}
                     displayEmpty
                   >
@@ -123,16 +125,18 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
             );
           }
           
-          // Toggle filter (checkbox/switch)
+          // Toggle filter (for boolean values)
           if (type === 'toggle') {
+            const checked = Boolean(filterValue);
             return (
               <Box key={field}>
                 <FormGroup>
                   <FormControlLabel
                     control={
-                      <Switch
-                        checked={!!activeFilters[field]}
-                        onChange={(e) => handleToggleFilterChange(field, e.target.checked)}
+                      <Checkbox
+                        checked={checked}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleToggleFilterChange(field, e.target.checked)}
+                        size="small"
                       />
                     }
                     label={label}

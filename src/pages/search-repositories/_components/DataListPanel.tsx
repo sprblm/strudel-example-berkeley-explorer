@@ -1,7 +1,7 @@
 import { Box, Typography, Paper, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { ArrowRightIcon } from '../../../components/Icons';
 import { Button } from '../../../components/Button';
-import { DataListPanelProps, Dataset } from '../_config/taskflow.types';
+import { DataListPanelProps } from '../_config/taskflow.types';
 import { useState, useEffect } from 'react';
 
 /**
@@ -47,15 +47,6 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
     return count.toString();
   };
 
-  // Format data for urban tree inventory and air quality datasets
-  const formatData = (data: Dataset): string => {
-    if (data.type === 'urban-tree-inventory') {
-      return `Tree Species: ${data.species}, Location: ${data.location}`;
-    } else if (data.type === 'air-quality') {
-      return `Air Quality Parameter: ${data.parameter}, Value: ${data.value}`;
-    }
-    return 'Unknown dataset type';
-  };
 
   if (!searchResults || searchResults.length === 0) {
     return (

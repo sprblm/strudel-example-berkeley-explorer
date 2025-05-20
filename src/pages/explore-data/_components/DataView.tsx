@@ -6,6 +6,7 @@ import { SciDataGrid } from '../../../components/SciDataGrid';
 import { filterData } from '../../../utils/filters.utils';
 import { useListQuery } from '../../../utils/useListQuery';
 import { taskflow } from '../_config/taskflow.config';
+import { FilterConfig } from '../../../types/filters.types';
 
 interface DataViewProps {
   searchTerm: string;
@@ -23,8 +24,8 @@ export const DataView: React.FC<DataViewProps> = ({
   const [pageSize, setPageSize] = useState(25);
   const [offset, setOffest] = useState(page * pageSize);
   const dataIdField = taskflow.data.list.idField;
-  const columns = taskflow.pages.index.tableColumns;
-  const filterConfigs = taskflow.pages.index.tableFilters;
+  const columns = (taskflow.pages.index.tableColumns || []) as any[]; // Cast to any[] to avoid GridColType issues
+  const filterConfigs = (taskflow.pages.index.tableFilters || []) as FilterConfig[];
   const queryMode = taskflow.data.list.queryMode;
   const { isPending, isFetching, isError, data, error } = useListQuery({
     activeFilters,
@@ -79,9 +80,11 @@ export const DataView: React.FC<DataViewProps> = ({
       {isFetching && <LinearProgress variant="indeterminate" />}
       <SciDataGrid
         rows={
-          queryMode === 'server'
+          queryMode === 'server' && data
             ? data.results
-            : filterData(data, activeFilters, filterConfigs, searchTerm)
+            : data
+              ? filterData(data, activeFilters, filterConfigs, searchTerm)
+              : []
         }
         rowCount={queryMode === 'server' ? data.count : undefined}
         pagination
