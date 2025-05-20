@@ -280,15 +280,6 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
       )}
     </Box>
   );
-
-            TreeLayer({ data: loadedDataPoints.filter(p => p.type === 'tree').slice(0, 100), visible: visibleLayers.includes('tree') }),
-            AirQualityLayer({ data: loadedDataPoints.filter(p => p.type === 'air').slice(0, 100), visible: visibleLayers.includes('air') }),
-            LocationsLayer({ data: locationsGeoJson || { type: 'FeatureCollection', features: [] }, visible: visibleLayers.includes('locations') })
-          ].filter(Boolean)}
-        />
-      </Suspense>
-    )}
-  </Box>
-);
+}
 
 export default BerkeleyDataMap;
