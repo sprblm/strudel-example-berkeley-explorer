@@ -21,6 +21,9 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.1.12",
+    "@deck.gl/core": "^9.1.12",
+    "@deck.gl/geo-layers": "^9.1.12",
     "@deck.gl/layers": "^9.1.12",
     "@deck.gl/react": "^9.1.12",
     "@emotion/react": "^11.11.4",
