@@ -5,13 +5,34 @@ import { Box } from '@mui/material';
 import { mapContainerSx } from './BerkeleyDataMap.styles';
 import { mapContainerStyle, mapElementStyle } from './MapContainer.styles';
 
-// Use a public Mapbox token for demos and development
-// In Vite, we should use import.meta.env instead of process.env for client-side code
-// For simplicity, we'll use the token directly here
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+// No token needed when using our own style
+// We can remove token requirement by providing OSM tiles directly
 
-// Set the token for mapbox-gl
-mapboxgl.accessToken = MAPBOX_TOKEN;
+// Define a minimal style directly instead of using hosted Mapbox styles
+const MINIMAL_STYLE = {
+  version: 8,
+  sources: {
+    'osm-tiles': {
+      type: 'raster',
+      tiles: [
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      ],
+      tileSize: 256,
+      attribution: ' OpenStreetMap contributors'
+    }
+  },
+  layers: [
+    {
+      id: 'osm-tiles',
+      type: 'raster',
+      source: 'osm-tiles',
+      minzoom: 0,
+      maxzoom: 19
+    }
+  ]
+};
 
 /**
  * Simple props interface for the MapContainer
@@ -49,7 +70,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     try {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11', // Use a light style for better visibility
+        style: MINIMAL_STYLE, // Use our own style definition
         center: [-122.25948, 37.872], // Berkeley
         zoom: 14,
         attributionControl: true,
