@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Tiles Test</title>
+  <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+  <script src="https://unpkg.com/@deck.gl/layers@latest/dist.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const INITIAL_VIEW_STATE = {
+      latitude: 37.8719,
+      longitude: -122.2585,
+      zoom: 13,
+      pitch: 0,
+      bearing: 0
+    };
+
+    const map = new deck.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      initialViewState: INITIAL_VIEW_STATE,
+      controller: true
+    });
+
+    const tileLayer = new deck.MVTLayer({
+      id: 'trees-vector',
+      data: '/tiles/tiles/{z}/{x}/{y}.pbf',
+      minZoom: 0,
+      maxZoom: 22,
+      getFillColor: [34, 139, 34, 200],
+      getLineColor: [255, 255, 255, 200],
+      getLineWidth: 1,
+      getRadius: 3,
+      pickable: true,
+      onClick: (info) => {
+        if (info.object) {
+          console.log('Clicked:', info.object);
+        }
+      },
+      loadOptions: {
+        mvt: {
+          tileSize: 256,
+          maxZoom: 22,
+          extent: 4096,
+          buffer: 64
+        }
+      }
+    });
+
+    map.setProps({
+      layers: [tileLayer],
+      getTooltip: ({ object }) => {
+        if (!object) return null;
+        return {
+          html: `<div>${JSON.stringify(object.properties, null, 2)}</div>`,
+          style: {
+            backgroundColor: 'white',
+            color: 'black',
+            padding: '10px',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+          }
+        };
+      }
+    });
+  </script>
+</body>
+</html>

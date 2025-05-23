@@ -6,10 +6,10 @@ export type DataLayerType = 'tree' | 'air' | 'locations';
 
 interface DataLayersToggleProps {
   visibleLayers: DataLayerType[];
-  toggleLayer: (layer: DataLayerType) => void;
+  onToggle: (layer: DataLayerType) => void;
 }
 
-const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, toggleLayer }) => (
+const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, onToggle }) => (
   <div className={styles.toggleRoot}>
     <div className={styles.toggleTitle}>Data Layers</div>
     <div className={styles.toggleButtons}>
@@ -17,7 +17,7 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, togg
         className={clsx(styles.toggleBtn, {
           [styles.toggleBtnActiveTree]: visibleLayers.includes('tree'),
         })}
-        onClick={() => toggleLayer('tree')}
+        onClick={() => onToggle('tree')}
       >
         Trees
       </button>
@@ -25,7 +25,7 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, togg
         className={clsx(styles.toggleBtn, {
           [styles.toggleBtnActiveAir]: visibleLayers.includes('air'),
         })}
-        onClick={() => toggleLayer('air')}
+        onClick={() => onToggle('air')}
       >
         Sensors
       </button>
@@ -33,7 +33,7 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, togg
         className={clsx(styles.toggleBtn, {
           [styles.toggleBtnActiveLocations]: visibleLayers.includes('locations'),
         })}
-        onClick={() => toggleLayer('locations')}
+        onClick={() => onToggle('locations')}
       >
         Locations
       </button>

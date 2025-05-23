@@ -1,0 +1,564 @@
+–x
+trees(€ idspecieshealthdbhheightspreaddate"
+0"
+1"
+2"
+3"
+4"
+5"
+6"
+7"
+8"
+9"
+10"
+11"
+12"
+13"
+14"
+15"
+16"
+17"
+18"
+19"
+20"
+21"
+24"
+25"
+27"
+28"
+30"
+31"
+33"
+35"
+36"
+37"
+38"
+39"
+40"
+42"
+45"
+48"
+50"
+51"
+54"
+55"
+57"
+60"
+65"
+70"
+NA"
+0.5"
+1.5"
+2.5"
+3.5"
+4.5"
+5.5"
+6.5"
+7.5"
+8.5"
+9.5"
+10.5"
+11.5"
+12.5"
+13.5"
+14.5"
+15.5"
+16.5"
+20.5"
+25.5"
+Fair"
+Good"
+Poor"
+Stump"
+	Excellent"
+
+2013-04-30"
+
+Morus alba"
+Acer rubrum"
+Rhus lancea"
+Citrus limon"
+Ficus carica"
+Acer palmatum"
+Arbutus unedo"
+Ginkgo biloba"
+Juglans nigra"
+Juglans regia"
+Malus ioensis"
+Olea europaea"
+Schinus molle"
+Tilia cordata"
+Betula pendula"
+Malus  species"
+Quercus lobata"
+Yucca gloriosa"
+Maytenus boaria"
+Nyssa sylvatica"
+Prunus  species"
+Pyrus kawakamii"
+Acacia baileyana"
+Carpinus betulus"
+Dodonaea viscosa"
+Platanus hybrida"
+Prunus amygdalus"
+Prunus armeniaca"
+Prunus blieriana"
+Prunus serrulata"
+Prunus yedoensis"
+Pyrus calleryana"
+Ulmus parvifolia"
+Fraxinus  species"
+Fraxinus velutina"
+Grevillea robusta"
+Magnolia stellata"
+Prunus cerasifera"
+Quercus agrifolia"
+Triadica sebifera"
+baseline-tree-223"
+baseline-tree-224"
+baseline-tree-225"
+baseline-tree-226"
+baseline-tree-227"
+baseline-tree-228"
+baseline-tree-229"
+baseline-tree-230"
+baseline-tree-231"
+baseline-tree-232"
+baseline-tree-233"
+baseline-tree-234"
+baseline-tree-235"
+baseline-tree-236"
+baseline-tree-237"
+baseline-tree-238"
+baseline-tree-239"
+baseline-tree-240"
+baseline-tree-241"
+baseline-tree-242"
+baseline-tree-243"
+baseline-tree-244"
+baseline-tree-245"
+baseline-tree-246"
+baseline-tree-247"
+baseline-tree-248"
+baseline-tree-249"
+baseline-tree-250"
+baseline-tree-251"
+baseline-tree-252"
+baseline-tree-253"
+baseline-tree-254"
+baseline-tree-255"
+baseline-tree-256"
+baseline-tree-278"
+baseline-tree-279"
+baseline-tree-280"
+baseline-tree-281"
+baseline-tree-282"
+baseline-tree-283"
+baseline-tree-284"
+baseline-tree-285"
+baseline-tree-286"
+baseline-tree-287"
+baseline-tree-288"
+baseline-tree-289"
+baseline-tree-290"
+baseline-tree-291"
+baseline-tree-292"
+baseline-tree-293"
+baseline-tree-294"
+baseline-tree-295"
+baseline-tree-297"
+baseline-tree-298"
+baseline-tree-299"
+baseline-tree-300"
+baseline-tree-301"
+baseline-tree-302"
+baseline-tree-303"
+baseline-tree-304"
+baseline-tree-305"
+baseline-tree-306"
+baseline-tree-307"
+baseline-tree-308"
+baseline-tree-309"
+baseline-tree-310"
+baseline-tree-313"
+baseline-tree-314"
+baseline-tree-329"
+baseline-tree-416"
+baseline-tree-417"
+baseline-tree-418"
+baseline-tree-419"
+baseline-tree-420"
+baseline-tree-421"
+baseline-tree-422"
+baseline-tree-423"
+baseline-tree-424"
+baseline-tree-425"
+baseline-tree-426"
+baseline-tree-427"
+baseline-tree-428"
+baseline-tree-429"
+baseline-tree-430"
+baseline-tree-437"
+baseline-tree-438"
+baseline-tree-439"
+baseline-tree-440"
+baseline-tree-441"
+baseline-tree-442"
+baseline-tree-443"
+baseline-tree-444"
+baseline-tree-445"
+baseline-tree-446"
+baseline-tree-447"
+baseline-tree-448"
+baseline-tree-449"
+baseline-tree-450"
+baseline-tree-451"
+baseline-tree-452"
+baseline-tree-453"
+baseline-tree-454"
+baseline-tree-455"
+baseline-tree-456"
+baseline-tree-457"
+baseline-tree-458"
+baseline-tree-459"
+baseline-tree-460"
+baseline-tree-461"
+baseline-tree-462"
+baseline-tree-463"
+baseline-tree-464"
+baseline-tree-465"
+baseline-tree-466"
+baseline-tree-467"
+baseline-tree-468"
+baseline-tree-469"
+baseline-tree-470"
+baseline-tree-471"
+baseline-tree-472"
+baseline-tree-473"
+baseline-tree-474"
+baseline-tree-475"
+baseline-tree-476"
+baseline-tree-477"
+baseline-tree-478"
+baseline-tree-479"
+baseline-tree-480"
+baseline-tree-481"
+baseline-tree-482"
+baseline-tree-483"
+baseline-tree-484"
+baseline-tree-485"
+baseline-tree-486"
+baseline-tree-487"
+baseline-tree-488"
+baseline-tree-494"
+baseline-tree-495"
+baseline-tree-496"
+baseline-tree-497"
+baseline-tree-498"
+baseline-tree-499"
+baseline-tree-500"
+baseline-tree-501"
+baseline-tree-502"
+baseline-tree-503"
+baseline-tree-504"
+baseline-tree-505"
+baseline-tree-506"
+baseline-tree-507"
+baseline-tree-508"
+baseline-tree-509"
+baseline-tree-510"
+baseline-tree-511"
+baseline-tree-512"
+baseline-tree-513"
+baseline-tree-514"
+baseline-tree-515"
+baseline-tree-516"
+baseline-tree-517"
+baseline-tree-518"
+baseline-tree-519"
+baseline-tree-520"
+baseline-tree-521"
+baseline-tree-522"
+baseline-tree-523"
+baseline-tree-524"
+baseline-tree-525"
+baseline-tree-526"
+baseline-tree-527"
+baseline-tree-528"
+baseline-tree-529"
+baseline-tree-530"
+baseline-tree-531"
+baseline-tree-532"
+baseline-tree-533"
+baseline-tree-534"
+baseline-tree-535"
+baseline-tree-536"
+baseline-tree-537"
+baseline-tree-538"
+baseline-tree-539"
+baseline-tree-540"
+baseline-tree-541"
+baseline-tree-542"
+baseline-tree-543"
+baseline-tree-544"
+baseline-tree-545"
+baseline-tree-546"
+baseline-tree-547"
+baseline-tree-548"
+baseline-tree-549"
+baseline-tree-550"
+baseline-tree-551"
+baseline-tree-552"
+baseline-tree-553"
+baseline-tree-554"
+baseline-tree-555"
+baseline-tree-556"
+baseline-tree-557"
+baseline-tree-558"
+baseline-tree-559"
+baseline-tree-560"
+baseline-tree-561"
+baseline-tree-562"
+baseline-tree-563"
+baseline-tree-564"
+baseline-tree-565"
+baseline-tree-566"
+baseline-tree-567"
+baseline-tree-568"
+baseline-tree-569"
+baseline-tree-570"
+baseline-tree-571"
+baseline-tree-572"
+baseline-tree-573"
+baseline-tree-574"
+baseline-tree-575"
+baseline-tree-576"
+baseline-tree-577"
+baseline-tree-578"
+baseline-tree-579"
+baseline-tree-580"
+baseline-tree-581"
+baseline-tree-582"
+baseline-tree-583"
+baseline-tree-584"
+baseline-tree-585"
+baseline-tree-586"
+baseline-tree-587"
+baseline-tree-588"
+baseline-tree-589"
+baseline-tree-590"
+baseline-tree-591"
+baseline-tree-592"
+baseline-tree-593"
+baseline-tree-594"
+baseline-tree-595"
+baseline-tree-596"
+baseline-tree-597"
+baseline-tree-598"
+baseline-tree-599"
+baseline-tree-600"
+baseline-tree-601"
+baseline-tree-602"
+baseline-tree-603"
+baseline-tree-604"
+baseline-tree-605"
+baseline-tree-606"
+baseline-tree-607"
+baseline-tree-608"
+baseline-tree-609"
+baseline-tree-610"
+baseline-tree-611"
+baseline-tree-612"
+baseline-tree-613"
+baseline-tree-614"
+baseline-tree-615"
+baseline-tree-616"
+baseline-tree-617"
+baseline-tree-618"
+baseline-tree-640"
+baseline-tree-641"
+baseline-tree-642"
+baseline-tree-643"
+baseline-tree-644"
+baseline-tree-645"
+baseline-tree-646"
+baseline-tree-647"
+baseline-tree-648"
+baseline-tree-649"
+baseline-tree-650"
+baseline-tree-651"
+baseline-tree-652"
+baseline-tree-653"
+baseline-tree-654"
+baseline-tree-655"
+baseline-tree-656"
+baseline-tree-657"
+baseline-tree-658"
+baseline-tree-659"
+baseline-tree-660"
+baseline-tree-661"
+baseline-tree-662"
+baseline-tree-663"
+baseline-tree-664"
+baseline-tree-665"
+baseline-tree-666"
+baseline-tree-667"
+baseline-tree-668"
+baseline-tree-669"
+baseline-tree-670"
+baseline-tree-671"
+baseline-tree-672"
+baseline-tree-673"
+baseline-tree-674"
+baseline-tree-683"
+baseline-tree-684"
+baseline-tree-835"
+baseline-tree-836"
+baseline-tree-837"
+baseline-tree-838"
+baseline-tree-839"
+baseline-tree-840"
+baseline-tree-841"
+baseline-tree-842"
+baseline-tree-843"
+baseline-tree-844"
+baseline-tree-845"
+baseline-tree-846"
+baseline-tree-847"
+baseline-tree-848"
+baseline-tree-849"
+baseline-tree-850"
+baseline-tree-851"
+baseline-tree-852"
+baseline-tree-853"
+baseline-tree-854"
+baseline-tree-855"
+baseline-tree-856"
+baseline-tree-857"
+baseline-tree-858"
+baseline-tree-859"
+baseline-tree-860"
+Acacia melanoxylon"
+Crataegus  species"
+Pistacia chinensis"
+baseline-tree-1706"
+baseline-tree-1707"
+baseline-tree-1708"
+baseline-tree-1709"
+baseline-tree-1710"
+baseline-tree-1711"
+baseline-tree-1712"
+baseline-tree-1713"
+Cinnamomum camphora"
+Cordyline australis"
+Eucalyptus  species"
+Ligustrum japonicum"
+Callistemon citrinus"
+Calocedrus decurrens"
+Diospyros virginiana"
+Lagerstroemia indica"
+Lagunaria patersonii"
+Magnolia grandiflora"
+Fraxinus angustifolia"
+Gleditsia triacanthos"
+Jacaranda mimosifolia"
+Pittosporum undulatum"
+Eucalyptus sideroxylon"
+Magnolia x soulangiana"
+Liquidambar styraciflua"
+Liriodendron tulipifera"
+Broadleaf Deciduous Small"
+Broadleaf Deciduous Medium ²gCGÚ"	c„ ³iC"GÛ"	yĞ šcC0
+	GÂ"	%ü ›cC
+GÃ"	¢ ¹jC/G«"	%Ò( ¸VC/
+Gª"	) ·ÊC	$G©"	›¸* ®ÏC:"GÖ"	ìÄ	 ­ÏC<"GÕ"	Ú¬
+ ¬mD4GÔ"	ôÌ ¯gC1G×"	Àº °gCGØ"	ª˜ «gBGÓ"	Ò° ±gCGÙ"	fî ªgCGÒ"	.Ú ©gCGÑ"	„ ¨iCGĞ"	\´ §cB
+GÏ"	şğ œWCGÄ"	’ MC
+GÅ"	¶è SB0
+GÆ"	îÖ ŸKCGÇ"	¤ü  ÅC/GÈ"	Èî ¡SC
+GÉ"	úà ¦SC2
+GÎ"	Ø¾ ¥SC1
+GÍ"	øÀ ¢[C0
+	GÊ"	†Ö £[C	GË"	Ö¶ ¤mCGÌ"	ÄÄ Ú¶F0GÏ"	–Ú ÛËF
+GĞ"	È® İZC1	GÒ"	Ê¨ ÜZC	GÑ"	–Ü ËLC4
+GÀ"	Êš ÊZC
+G¿"	Ü¸ ÉZC0
+G¾"	ÆÊ ÈÏC/G½"	¨¾ ÇZC
+	G¼"	„ú ÖÈC3GË"	œĞ ×[C
+GÌ"	êÚ ØED  .GÍ"	ŠÜ ÕhF
+GÊ"	âª ÔSFGÉ"	Ò˜ ÓiC	GÈ"	ü˜ ÒZC0
+GÇ"	æ ÙÈCGÎ"	”ä ĞOCGÅ"	¶Š ÏÇCGÄ"	Ä˜ Ñ¶C4GÆ"	ŠÀ ÎIC0GÃ"	‚Ö Í¿D  .GÂ"	ä° ÌÈCGÁ"	„Ö ªKCGŸ"	î˜ ¬eC
+	G¡"	àº «eB
+G "	†  ©eC
+	G"	°ˆ ¨¶C6G"	ÚÄ ¦ÑC4G›"	ªÜ §eC7
+	Gœ"	°Ò ±¶C	G¦"	îØ ²¶C	G§"	Âö ´¶CG©"	úê ³¶F
+G¨"	šş ¡¶CG–"	â¬ ®HB
+G£"	ÎÖ ­¶C5G¢"	„â ¯ËC0
+G¤"	¨ °ËC1
+G¥"	šò ¤ĞC9G™"	¶¢ £ĞC"G˜"	²† ¥ED  .Gš"	¾‚ ¢¶CG—"	ºŞ ¼ÊC7"$G®"	>š% »ÊCG­"	2˜& èËB
+Gİ"	¤š$ çbC0
+GÜ"	ş´$ æbC
+GÛ"	ØÒ$ ¾ÈC
+G°"	Ô¦& ºfC0
+G¬"	
+€( åbC
+GÚ"	¶Ê$ äbC
+GÙ"		 % ãbC1
+	GØ"	Ş	š% ½ÈCG¯"	ˆ& ˜ÈC	Gª"	ü	ê& ™ÈCG«"	¼	' âbBG×"	°
+´% ábB0GÖ"	êÄ$ ŞZC1
+GÓ"	öº  ßÈC1GÔ"	Öö! à¿BGÕ"	¶ˆ# ÅgC6Gº"	ÈÚ# ÆgC0
+G»"	”Ş" ÄZB1
+G¹"	Ê% …ÈC0
+G"	¼ğ' Ã¶CG¸"	Êà& ¿BG—"	ê
+¬* ‚nC
+	GŒ"	†Â, ËC0
+G‹"	Ğ
+’. €¿BGŠ"	ô
+¢/ „¶C3G"	†) ƒ¶C2G"	°ş) †¶CG"	Àˆ( ‡ÈC
+G‘"	ø¼( ’¿B!Gœ"	ğ 7 ¿CGš"	ê€4 ‘¿B@$G›"	ÂÒ5 ûRC0G…"	Î®7 úRC0
+G„"	âè7 “¿B>G"	”¦8 ùµB
+Gƒ"	¨ö8 ø¿BG‚"	Òæ; ”cC
+	G"	¸À< •cC
+GŸ"	¦ª= –cC2	G "	ö= ö¿CAG€"	°Ø= õ¿BGÿ"	’ú> ÷kC
+G"	 Æ< ÂC
+	G˜"	„0 ÏC=G™"	°š1 ÿaC$%G‰"	†	ì0 ı¿BG‡"	ìè3 şËC0
+Gˆ"	š	È2 üËC
+G†"	îÄ4 Â¶B1G·"	²¬' Á¶C1G¶"	¬ğ' ˆ¶C6G’"	†( ÀNC
+Gµ"	ô„( ‰¶C0G“"	Â˜) Š¶C6G”"	Ø´) ¿`CG´"	¬¾( ¾NC0
+G³"	ö´( ½NC0
+G²"	öŠ) ‹¶C
+G•"	–˜* Œ¶C
+G–"	ú´* ¼`CG±"	˜ş( »¶C1
+G°"	–š) é_CGŞ"	¼+ ë[B0
+Gà"	ò - ê_CGß"	°š, ìTC7Gá"	š. ·¶CG¬"	ò# µ¶CGª"	¾! ¶¶C3G«"	Š¸" ¶B6G“"	ææ# Ÿ¶CG”"	¼œ" ¸¶C4G­"	”Ş% ¹¶CG®"	Ğ„' ¶C3G’"	”ä$ œÒB
+G‘"	Ü& ›¶CG"	´”'  ¶CG•"	²‚! º¶CG¯"	”Â( šNC7G"	„’( ™NBG"	Œ¦* ˜¶B2G"	ÒŠ* ƒ¶C1Gø"	‚°+ —NBGŒ"	ÈØ* …¶C0	Gú"	ºş+ ‚mCG÷"	®â, „¶C0Gù"	àŒ, †ËC1
+	Gû"	ş, –¶B3G‹"	Â¾+ •¶CGŠ"	Ş†+ ˆËCGı"	°º, ‡ED  .Gü"	„Ğ, ŠËC6Gÿ"	îê, ‰ËC5	Gş"	’Œ- ğTDGå"	êÖ6 í[C0
+Gâ"	Ø®1 îTBGã"	¨Ò3 €[C0
+Gõ"	²ğ3 [C0
+Gö"	Ğ–3 ï]CGä"	Æ–5 ÿ[C0Gô"	²Š7 şZB
+	Gó"	Œü7 ñ]B	Gæ"	¢´8 òÁC=Gç"	Ô®9 ó¶C
+Gè"	ª¾< ü[C/Gñ"	è¼< û[C
+Gğ"	À²= ú[C
+Gï"	 –> ù[C/Gî"	„ø> ıËC
+Gò"	¼Â9 öiC#Gæ"	ê < ÀoBGª"	’¼= çÅC
+	G×"	ä+  èJC
+	GØ"	Ô+¤ ãÀB	GÓ"	‚-¤ äÀBGÔ"	œ-ä åÅCGÕ"	¼,ì ægC
+GÖ"	¨,¼ âgCGÒ"	 -Â ágC3GÑ"	º-œ ëgCGÛ"	ş)² égC2GÙ"	¼+š êÃCGÚ"	+Ê ìgC4GÜ"	ª* ŞgCGÎ"	ì*¶ ßgCGÏ"	˜,â àgC4GĞ"	œ-‚ sÀC
+Gá"	ú9ö rÀCGà"	°:À qUC$#Gß"	Â;† tUC$!Gâ"	ˆ:¼ phC;"GŞ"	î<Â xÀCGæ"	è8è wÀCGå"	Ô9¤ uQC,$Gã"	”:Â vPC-+Gä"	:ü ‹ZCGù"	Î:¤ yPC -*Gç"	î8” íOC1Gİ"	²'Ö$ îdC	GŞ"	ò&ì& ‹ËBG€"	° Œ- ŒËB3G"	„!Ş- ËBG‚"	Ø!¨. ”ËCG‰"	Æ"Ø, “ËCGˆ"	†#¾, ’ËCG‡"	â#Ú- ËCGƒ"	ê"†. ËCG„"	Â#ª. ïfC0Gß"	è&( ÛÆB4GË"	ü&Ê* ÚfB
+GÊ"	¤'²+ ‘ËC5G†"	°$¼- ËC7G…"	†$. ğ^C9Gà"	À$î/ ÙfC
+	GÉ"	ø&¶, Î¶C2G¾"	ø&Ü/ Ø¶C1GÈ"	ş'². Í¶CG½"	®'Ì/ Ü^CGÌ"	Ô)ğ# İgC3GÍ"	Æ*Ş  ×¶CGÇ"	Ü(”. ÖWB	GÆ"	†*à. òËCGâ"	Â#è2 ó¶CGã"	Ô"„6 ô¶C	Gä"	œ"Ö7 ñmC5Gá"	Š$Ä1 ÏMBG¿"	Ì%Ä0 Ğ\BGÀ"	¸%Â1 Ñ\CGÁ"	È%î1 ÄiB9G´"	¢&Š6 õiC'Gå"	Ê ä: ¾iCG¨"	ğ"Ì: ¿oB1G©"	” ¾< ¼hC1G¦"	ê%„9 ½TCG§"	ˆ$’: »hCG¥"	–&’8 ºgC2	G¤"	¢'€9 ¹gC2	G£"	 '¨: ¸gC2	G¢"	ì'€; ·hC"#G¡"	¸'Œ> ¶hC"G "	°'¸> µhC"!GŸ"	ü'˜? ÌlB5	G¼"	(0 ËRC
+G»"	ø(¢0 Ê\DGº"	È)Ô0 ÇiC"!G·"	ö)Ü2 ÆMB0G¶"	À)è3 É´CA"G¹"	²*Ä0 ÈiB="#G¸"	¸+ô1 ÅiC"Gµ"	À(’4 ªÉC"G®"	À)Ê5 «aC"G¯"	¬/ğ2 ©gCG­"	ğ(¾: ¨gCG¬"	È(€< §gC2G«"	Œ)Ğ< ¦gC1Gª"	Œ)ò= ¥gC
+G©"	 )ø> ¡WC0
+	G¤"	ü-Ü?  WC0
+G£"	Ì.ª? |UC&$Gê"	î4„! zUC
+&Gè"	Œ7¸  ˆMC
+Gö"	¶7ò! ‰MC
+G÷"	Ä7¶! {UC&(Gé"	´6Š# †MC
+Gô"	ò6”# ‡KFGõ"	7¾" }UC8Gë"	ğ4Š% UC1	Gí"	´4â' ~UC1	Gì"	Æ4„' …ZCGó"	º6$ „dCGò"	„6& €MC0Gî"	Ş3š) MCGï"	ä3Æ) ÔgC9GÄ"	œ1 / ¬iC#$#G°"	æ1¦/ ÒMC
+GÂ"	Ä2Ú- ÓMC
+GÃ"	ª2¬. ƒYCGñ"	è5†( ‚MCGğ"	¸4¾* ‘iC"#Gÿ"	¦7”+ ­oD1G±"	Ú4æ. ®ÄC!+G²"	ˆ6†, ŠOC1Gø"	˜8–  ÌC!Gû"	À<Ê& iC>!Gü"	Š<ü' ŒÌB!Gú"	ò?º% ¯\C1G³"	à8Ú+ MC
+Gı"	ø:¼( iC"(Gş"	Â:„) ÕiC"GÅ"	ê00 ŸXCG¢"	Î0€? fC1
+G "	¼3Ğ< fC
+	G¡"	Š3ª= šÎC3G"	Ö7¨: œgC4GŸ"	”5°< ›gCG"	¢5„< —gCGš"	ä<Ø7 –gC7G™"	†=¦7 •gCG˜"	æ=–7 “gCG–"	Ò?ì5 ”gC5G—"	¼>Ì6 ™gCGœ"	ì:Ô8 ˜gC1	G›"	Ì;8 ´gCGÈ"	¶:´: —¿B#G¡"	’À@ ô]C0
+Gé"	”¸@ ø[CGí"	ÀŞ@ ÷iC"!Gç"	†ª@ ÃhC1G­"	ê˜A ÂiC)#G¬"	Üè@ ÁiC>)#G«"	Öœ@ ¤gC1
+G¨"	®)Ê@ ¢gCG¥"	Ä,œ@ £gCG¦"	Š,˜A °ÉDG´"	æ@ª- ±¿B?Gµ"	Ú@¬/ ²´C2G¸"	ò@Ú2 ³´CG¹"	Aü2 ’ÍC&G•"	Ê@„5
