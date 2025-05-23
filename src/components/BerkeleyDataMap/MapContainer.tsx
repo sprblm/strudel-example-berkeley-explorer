@@ -6,7 +6,7 @@ import { mapContainerSx } from './BerkeleyDataMap.styles';
 import { mapContainerStyle, mapElementStyle } from './MapContainer.styles';
 
 // Use a public Mapbox token for demos and development
-const MAPBOX_TOKEN = 'pk.eyJ1IjoicGhpbHRzIiwiYSI6ImNscTRuM25ndTRlbjAya292MnFoOGQ1b3kifQ.YIK5clZbZjIz6-1BgHwLEQ';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 // Set the token for mapbox-gl
 mapboxgl.accessToken = MAPBOX_TOKEN;
