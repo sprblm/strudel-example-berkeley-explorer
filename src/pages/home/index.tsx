@@ -314,31 +314,41 @@ export const HomePage = () => {
           </Grid>
           
           <Paper 
-            elevation={1}
+            elevation={2}
             sx={{ 
               borderRadius: 2, 
               overflow: 'hidden',
               position: 'relative',
-              height: '400px',
+              height: '600px',
               mb: 1,
+              '& > div': { height: '100%' } // Ensure inner divs take full height
             }}
           >
             {/* Interactive Campus Map */}
-            <BerkeleyDataMap height="100%" />
-            <Button
-              variant="outlined"
-              color="primary"
-              sx={{ 
-                borderColor: '#1e3a8a', 
-                color: '#1e3a8a',
-                '&:hover': {
-                  borderColor: '#3b82f6',
-                  bgcolor: 'rgba(59, 130, 246, 0.04)'
-                }
+            <BerkeleyDataMap height="100%" width="100%" />
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 16,
+                right: 16,
+                zIndex: 1000
               }}
             >
-              Learn More
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ 
+                  bgcolor: 'rgba(255, 255, 255, 0.9)',
+                  color: '#1e3a8a',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 1)',
+                  }
+                }}
+              >
+                Learn More
+              </Button>
+            </Box>
           </Paper>
           
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
