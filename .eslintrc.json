@@ -15,7 +15,8 @@
     "!.stylelintrc.json",
     "*.md",
     "*.css",
-    "dist"
+    "dist",
+    "vite.config.js"
   ],
   "extends": [
     "eslint:recommended",
