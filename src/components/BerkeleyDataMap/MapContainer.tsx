@@ -2,8 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Box } from '@mui/material';
+import { SxProps, Theme } from '@mui/material/styles';
 import { mapContainerSx } from './BerkeleyDataMap.styles';
 import { mapContainerStyle, mapElementStyle } from './MapContainer.styles';
+
+// Set the Mapbox access token from environment variables
+// The token is in .env.local as VITE_MAPBOX_API_KEY
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || '';
 
 // No token needed when using our own style
 // We can remove token requirement by providing OSM tiles directly
@@ -23,13 +28,14 @@ const MINIMAL_STYLE = {
       attribution: ' OpenStreetMap contributors'
     }
   },
+  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
   layers: [
     {
       id: 'osm-tiles',
       type: 'raster',
       source: 'osm-tiles',
       minzoom: 0,
-      maxzoom: 19
+      maxzoom: 22 // Increased maxzoom to 22 for better compatibility
     }
   ]
 };
@@ -39,8 +45,7 @@ const MINIMAL_STYLE = {
  */
 interface MapContainerProps {
   height?: number | string;
-  width?: number | string;
-  layers?: any[];
+
   onClick?: (info: any) => void;
 }
 
@@ -50,13 +55,10 @@ interface MapContainerProps {
  */
 const MapContainer: React.FC<MapContainerProps> = ({
   height = 600,
-  width = '100%',
-  layers = [],
   onClick
 }) => {
   // Convert height/width to CSS string values
   const heightStr = typeof height === 'number' ? `${height}px` : height;
-  const widthStr = typeof width === 'number' ? `${width}px` : width;
   
   // Create refs for the map container and map instance
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -82,13 +84,14 @@ const MapContainer: React.FC<MapContainerProps> = ({
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
       
       // Add debug info to help troubleshoot
-      console.log('Mapbox initialized successfully');
+
       
       // Add vector tile source and layer when map loads
       map.current.on('load', () => {
         if (!map.current) return;
+
         
-        console.log('Map loaded, adding vector tile source');
+
         
         try {
           // Add a GeoJSON source with sample tree data instead of vector tiles
@@ -158,56 +161,50 @@ const MapContainer: React.FC<MapContainerProps> = ({
             }
           });
           
-          console.log('GeoJSON source added successfully');
         } catch (error) {
-          console.error('Error adding GeoJSON source:', error);
+          // eslint-disable-next-line no-console
+          console.error('Error adding GeoJSON source:', error as any);
         }
       
-        try {
-          // Add a layer for tree data using the GeoJSON source
-          map.current.addLayer({
-            id: 'trees-layer',
-            type: 'circle',
-            source: 'trees',
-            paint: {
-              'circle-radius': 8,
-              'circle-color': [
-                'match',
-                ['get', 'health'],
-                'Good', '#228B22',
-                'Fair', '#FFD700',
-                'Poor', '#FF4500',
-                'Excellent', '#006400',
-                '#A9A9A9' // default
-              ],
-              'circle-opacity': 0.8,
-              'circle-stroke-width': 1.5,
-              'circle-stroke-color': '#FFFFFF'
-            }
-          });
-          
-          // Add labels for the trees
-          map.current.addLayer({
-            id: 'tree-labels',
-            type: 'symbol',
-            source: 'trees',
-            layout: {
-              'text-field': ['get', 'species'],
-              'text-font': ['Open Sans Regular'],
-              'text-offset': [0, 1.5],
-              'text-size': 12
-            },
-            paint: {
-              'text-color': '#333',
-              'text-halo-color': '#fff',
-              'text-halo-width': 1
-            }
-          });
-          
-          console.log('Tree layers added successfully');
-        } catch (error) {
-          console.error('Error adding tree layers:', error);
-        }
+        // Add a layer for tree data using the GeoJSON source
+        map.current.addLayer({
+          id: 'trees-layer',
+          type: 'circle',
+          source: 'trees',
+          paint: {
+            'circle-radius': 8,
+            'circle-color': [
+              'match',
+              ['get', 'health'],
+              'Good', '#228B22',
+              'Fair', '#FFD700',
+              'Poor', '#FF4500',
+              'Excellent', '#006400',
+              '#A9A9A9' // default
+            ],
+            'circle-opacity': 0.8,
+            'circle-stroke-width': 1.5,
+            'circle-stroke-color': '#FFFFFF'
+          }
+        });
+        
+        // Add labels for the trees
+        map.current.addLayer({
+          id: 'tree-labels',
+          type: 'symbol',
+          source: 'trees',
+          layout: {
+            'text-field': ['get', 'species'],
+            'text-font': ['Open Sans Regular'],
+            'text-offset': [0, 1.5],
+            'text-size': 12
+          },
+          paint: {
+            'text-color': '#333',
+            'text-halo-color': '#fff',
+            'text-halo-width': 1
+          }
+        });
       
       // Add click event handler
       if (onClick) {
@@ -251,11 +248,11 @@ const MapContainer: React.FC<MapContainerProps> = ({
   
   return (
     <Box sx={{
-      ...mapContainerSx,
-      ...mapContainerStyle,
+      ...(mapContainerSx as SxProps<Theme>),
+      ...(mapContainerStyle as SxProps<Theme>),
       height: heightStr,
-      width: widthStr
-    }}>
+      width: '100%',
+    } as SxProps<Theme>}>
       <Box ref={mapContainer} component="div" sx={mapElementStyle} />
     </Box>
   );
