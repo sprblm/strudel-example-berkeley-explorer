@@ -102,7 +102,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         // Fetch tree data from the public directory
         const response = await fetch('/data/processed/berkeley_trees_processed.json');
         if (!response.ok) {
-          console.error("Failed to fetch tree data:", response.status, response.statusText);
+          // console.error("Failed to fetch tree data:", response.status, response.statusText);
           throw new Error(`HTTP error! status: ${response.status} while fetching /data/processed/berkeley_trees_processed.json`);
         }
         const fetchedBerkeleyTreesRawData = await response.json() as RawTreeDataItem[];
@@ -157,7 +157,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
           airQuality: mockAirQualityData
         });
       } catch (error) {
-        console.error("Error loading or processing data:", error); // Log errors
+        // console.error("Error loading or processing data:", error); // Log errors
       }
     };
 
