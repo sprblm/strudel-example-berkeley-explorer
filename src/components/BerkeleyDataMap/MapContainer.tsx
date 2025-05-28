@@ -1,20 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { FeatureCollection } from 'geojson';
 import { Box } from '@mui/material';
-import { SxProps, Theme } from '@mui/material/styles';
-import { mapContainerSx } from './BerkeleyDataMap.styles';
-import { mapContainerStyle, mapElementStyle } from './MapContainer.styles';
+import { mapContainerStyle } from './MapContainer.styles'; 
 
-// Set the Mapbox access token from environment variables
-// The token is in .env.local as VITE_MAPBOX_API_KEY
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || '';
 
-// No token needed when using our own style
-// We can remove token requirement by providing OSM tiles directly
-
-// Define a minimal style directly instead of using hosted Mapbox styles
-const MINIMAL_STYLE = {
+const MINIMAL_STYLE: mapboxgl.Style = {
   version: 8,
   sources: {
     'osm-tiles': {
@@ -25,235 +18,180 @@ const MINIMAL_STYLE = {
         'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
       ],
       tileSize: 256,
-      attribution: ' OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors'
     }
   },
-  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
   layers: [
     {
-      id: 'osm-tiles',
+      id: 'osm-tiles-layer',
       type: 'raster',
       source: 'osm-tiles',
       minzoom: 0,
-      maxzoom: 22 // Increased maxzoom to 22 for better compatibility
+      maxzoom: 22
     }
-  ]
+  ],
+  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
 };
 
-/**
- * Simple props interface for the MapContainer
- */
 interface MapContainerProps {
   height?: number | string;
-
-  onClick?: (info: any) => void;
+  width?: number | string;
+  onClick?: (info: { object: { properties: any; coordinates: mapboxgl.LngLat } }) => void;
+  treeData: FeatureCollection | null;
+  treeVisibility: boolean;
 }
 
-/**
- * A MapContainer component using pure Mapbox GL JS for rendering
- * This approach gives maximum control over vector tile rendering
- */
 const MapContainer: React.FC<MapContainerProps> = ({
   height = 600,
-  onClick
+  width = '100%',
+  onClick,
+  treeData,
+  treeVisibility
 }) => {
-  // Convert height/width to CSS string values
-  const heightStr = typeof height === 'number' ? `${height}px` : height;
-  
-  // Create refs for the map container and map instance
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  
-  // Initialize map when component mounts
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
   useEffect(() => {
-    if (!mapContainer.current) return;
-    
-    // Initialize the map
+    if (!mapContainerRef.current || mapRef.current) return;
+
     try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: MINIMAL_STYLE, // Use our own style definition
-        center: [-122.25948, 37.872], // Berkeley
+      mapRef.current = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: MINIMAL_STYLE,
+        center: [-122.25948, 37.872],
         zoom: 14,
         attributionControl: true,
         maxZoom: 18,
         minZoom: 10
       });
-      
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      
-      // Add debug info to help troubleshoot
-
-      
-      // Add vector tile source and layer when map loads
-      map.current.on('load', () => {
-        if (!map.current) return;
-
-        
-
-        
-        try {
-          // Add a GeoJSON source with sample tree data instead of vector tiles
-          map.current.addSource('trees', {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                // Sample tree data points in Berkeley
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [-122.259, 37.872]
-                  },
-                  properties: {
-                    id: 'tree-1',
-                    species: 'Oak',
-                    health: 'Good',
-                    height: 45,
-                    dbh: 24
-                  }
-                },
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [-122.262, 37.875]
-                  },
-                  properties: {
-                    id: 'tree-2',
-                    species: 'Redwood',
-                    health: 'Excellent',
-                    height: 80,
-                    dbh: 36
-                  }
-                },
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [-122.255, 37.868]
-                  },
-                  properties: {
-                    id: 'tree-3',
-                    species: 'Maple',
-                    health: 'Fair',
-                    height: 30,
-                    dbh: 18
-                  }
-                },
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [-122.258, 37.869]
-                  },
-                  properties: {
-                    id: 'tree-4',
-                    species: 'Pine',
-                    health: 'Poor',
-                    height: 25,
-                    dbh: 12
-                  }
-                }
-              ]
-            }
-          });
-          
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error('Error adding GeoJSON source:', error as any);
-        }
-      
-        // Add a layer for tree data using the GeoJSON source
-        map.current.addLayer({
-          id: 'trees-layer',
-          type: 'circle',
-          source: 'trees',
-          paint: {
-            'circle-radius': 8,
-            'circle-color': [
-              'match',
-              ['get', 'health'],
-              'Good', '#228B22',
-              'Fair', '#FFD700',
-              'Poor', '#FF4500',
-              'Excellent', '#006400',
-              '#A9A9A9' // default
-            ],
-            'circle-opacity': 0.8,
-            'circle-stroke-width': 1.5,
-            'circle-stroke-color': '#FFFFFF'
-          }
-        });
-        
-        // Add labels for the trees
-        map.current.addLayer({
-          id: 'tree-labels',
-          type: 'symbol',
-          source: 'trees',
-          layout: {
-            'text-field': ['get', 'species'],
-            'text-font': ['Open Sans Regular'],
-            'text-offset': [0, 1.5],
-            'text-size': 12
-          },
-          paint: {
-            'text-color': '#333',
-            'text-halo-color': '#fff',
-            'text-halo-width': 1
-          }
-        });
-      
-      // Add click event handler
-      if (onClick) {
-        map.current.on('click', 'trees-layer', (e) => {
-          if (e.features && e.features.length > 0) {
-            const feature = e.features[0];
-            const props = feature.properties || {};
-            
-            onClick({
-              object: {
-                properties: props,
-                coordinates: e.lngLat
-              }
-            });
-          }
-        });
-        
-        // Change cursor on hover
-        map.current.on('mouseenter', 'trees-layer', () => {
-          if (map.current) map.current.getCanvas().style.cursor = 'pointer';
-        });
-        
-        map.current.on('mouseleave', 'trees-layer', () => {
-          if (map.current) map.current.getCanvas().style.cursor = '';
-        });
-      }
-    });
-    
+      mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      console.log('[MapContainer] Map initialized.');
     } catch (error) {
-      console.error('Error initializing Mapbox map:', error);
+      console.error('[MapContainer] Error initializing Mapbox map:', error);
     }
-    
-    // Clean up on unmount
     return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
+      if (mapRef.current) {
+        console.log('[MapContainer] Cleaning up map instance.');
+        mapRef.current.remove();
+        mapRef.current = null;
       }
     };
-  }, [onClick]);
-  
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const setupOrUpdateLayers = () => {
+      const sourceId = 'trees';
+      const layerId = 'trees-layer';
+      const labelLayerId = 'tree-labels';
+      const existingSource = map.getSource(sourceId) as mapboxgl.GeoJSONSource;
+
+      if (treeData && treeData.features.length > 0) {
+        if (existingSource) {
+          existingSource.setData(treeData);
+          console.log('[MapContainer] Updated "trees" source data.');
+        } else {
+          map.addSource(sourceId, { type: 'geojson', data: treeData });
+          console.log('[MapContainer] Added "trees" source.');
+        }
+
+        if (!map.getLayer(layerId)) {
+          map.addLayer({
+            id: layerId,
+            type: 'circle',
+            source: sourceId,
+            layout: { visibility: treeVisibility ? 'visible' : 'none' },
+            paint: { 'circle-radius': 6, 'circle-color': '#2E8B57', 'circle-stroke-width': 1, 'circle-stroke-color': '#FFFFFF' }
+          });
+          console.log('[MapContainer] Added "trees-layer". Initial visibility:', treeVisibility);
+        } else {
+          map.setLayoutProperty(layerId, 'visibility', treeVisibility ? 'visible' : 'none');
+        }
+
+        if (!map.getLayer(labelLayerId)) {
+          map.addLayer({
+            id: labelLayerId,
+            type: 'symbol',
+            source: sourceId,
+            layout: { 
+              'text-field': ['get', 'species'], 
+              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'], 
+              'text-offset': [0, 1.2], 
+              'text-size': 10, 
+              'text-allow-overlap': false, 
+              visibility: treeVisibility ? 'visible' : 'none' 
+            },
+            paint: { 'text-color': '#000000', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1 }
+          });
+          console.log('[MapContainer] Added "tree-labels" layer. Initial visibility:', treeVisibility);
+        } else {
+          map.setLayoutProperty(labelLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
+        }
+      } else {
+        if (map.getLayer(labelLayerId)) map.removeLayer(labelLayerId);
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (existingSource) map.removeSource(sourceId);
+        console.log('[MapContainer] No treeData, removed tree layers/source.');
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      setupOrUpdateLayers();
+    } else {
+      map.once('load', setupOrUpdateLayers);
+      console.log('[MapContainer] Map style not loaded, deferring layer setup for treeData.');
+    }
+  }, [treeData, treeVisibility]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !onClick) return;
+
+    const layerId = 'trees-layer';
+    const handleClick = (e: mapboxgl.MapLayerMouseEvent) => {
+      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
+        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+      }
+    };
+    const onMouseEnter = () => { if (map.getCanvas()) map.getCanvas().style.cursor = 'pointer'; };
+    const onMouseLeave = () => { if (map.getCanvas()) map.getCanvas().style.cursor = ''; };
+
+    // Only add listeners if the layer might exist (i.e., treeData is present)
+    if (treeData && treeData.features.length > 0) {
+        // It's safer to add listeners after layers are confirmed to be there.
+        // This effect runs after the treeData effect that adds layers.
+        // A slight delay or checking layer existence again might be needed if races occur.
+        if (map.getLayer(layerId)) {
+            map.on('click', layerId, handleClick);
+            map.on('mouseenter', layerId, onMouseEnter);
+            map.on('mouseleave', layerId, onMouseLeave);
+            console.log('[MapContainer] Click listeners attached to tree layer.');
+        }
+    }
+
+    return () => {
+      if (map && map.getLayer(layerId)) { // Check layer existence before removing
+        map.off('click', layerId, handleClick);
+        map.off('mouseenter', layerId, onMouseEnter);
+        map.off('mouseleave', layerId, onMouseLeave);
+        console.log('[MapContainer] Click listeners removed from tree layer.');
+      }
+    };
+  }, [onClick, treeData, treeVisibility]); // treeVisibility ensures listeners are re-evaluated if layer visibility changes them
+
   return (
-    <Box sx={{
-      ...(mapContainerSx as SxProps<Theme>),
-      ...(mapContainerStyle as SxProps<Theme>),
-      height: heightStr,
-      width: '100%',
-    } as SxProps<Theme>}>
-      <Box ref={mapContainer} component="div" sx={mapElementStyle} />
+    <Box
+      ref={mapContainerRef} // mapContainerRef is now on the Box itself
+      sx={{
+        ...mapContainerStyle, // Spread the base style from MapContainer.styles.ts
+        height: typeof height === 'number' ? `${height}px` : height, // Override with prop
+        width: typeof width === 'number' ? `${width}px` : width,     // Override with prop
+        // 'position' and 'overflow' are handled by mapContainerStyle
+      }}
+    >
+      {/* Mapbox will attach to the Box element directly */}
     </Box>
   );
 };
