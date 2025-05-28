@@ -65,13 +65,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
         minZoom: 10
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      console.log('[MapContainer] Map initialized.');
+      // console.log('[MapContainer] Map initialized.');
     } catch (error) {
-      console.error('[MapContainer] Error initializing Mapbox map:', error);
+      // console.error('[MapContainer] Error initializing Mapbox map:', error);
     }
     return () => {
       if (mapRef.current) {
-        console.log('[MapContainer] Cleaning up map instance.');
+        // console.log('[MapContainer] Cleaning up map instance.');
         mapRef.current.remove();
         mapRef.current = null;
       }
@@ -91,10 +91,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
       if (treeData && treeData.features.length > 0) {
         if (existingSource) {
           existingSource.setData(treeData);
-          console.log('[MapContainer] Updated "trees" source data.');
+          // console.log('[MapContainer] Updated "trees" source data.');
         } else {
           map.addSource(sourceId, { type: 'geojson', data: treeData });
-          console.log('[MapContainer] Added "trees" source.');
+          // console.log('[MapContainer] Added "trees" source.');
         }
 
         if (!map.getLayer(layerId)) {
@@ -105,7 +105,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             layout: { visibility: treeVisibility ? 'visible' : 'none' },
             paint: { 'circle-radius': 6, 'circle-color': '#2E8B57', 'circle-stroke-width': 1, 'circle-stroke-color': '#FFFFFF' }
           });
-          console.log('[MapContainer] Added "trees-layer". Initial visibility:', treeVisibility);
+          // console.log('[MapContainer] Added "trees-layer". Initial visibility:', treeVisibility);
         } else {
           map.setLayoutProperty(layerId, 'visibility', treeVisibility ? 'visible' : 'none');
         }
@@ -125,15 +125,25 @@ const MapContainer: React.FC<MapContainerProps> = ({
             },
             paint: { 'text-color': '#000000', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1 }
           });
-          console.log('[MapContainer] Added "tree-labels" layer. Initial visibility:', treeVisibility);
+          // console.log('[MapContainer] Added "tree-labels" layer. Initial visibility:', treeVisibility);
         } else {
           map.setLayoutProperty(labelLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
         }
       } else {
-        if (map.getLayer(labelLayerId)) map.removeLayer(labelLayerId);
-        if (map.getLayer(layerId)) map.removeLayer(layerId);
-        if (existingSource) map.removeSource(sourceId);
-        console.log('[MapContainer] No treeData, removed tree layers/source.');
+        const currentMap = mapRef.current;
+        if (currentMap && currentMap.isStyleLoaded()) {
+          if (currentMap.getLayer(labelLayerId)) {
+            currentMap.removeLayer(labelLayerId);
+          }
+          if (currentMap.getLayer(layerId)) {
+            currentMap.removeLayer(layerId);
+          }
+          // Ensure source exists before attempting to remove it
+          if (currentMap.getSource(sourceId)) {
+            currentMap.removeSource(sourceId);
+          }
+          // // console.log('[MapContainer] No treeData, attempted removal of tree layers/source.');
+        }
       }
     };
 
@@ -141,7 +151,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       setupOrUpdateLayers();
     } else {
       map.once('load', setupOrUpdateLayers);
-      console.log('[MapContainer] Map style not loaded, deferring layer setup for treeData.');
+      // console.log('[MapContainer] Map style not loaded, deferring layer setup for treeData.');
     }
   }, [treeData, treeVisibility]);
 
@@ -160,23 +170,24 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
     // Only add listeners if the layer might exist (i.e., treeData is present)
     if (treeData && treeData.features.length > 0) {
-        // It's safer to add listeners after layers are confirmed to be there.
-        // This effect runs after the treeData effect that adds layers.
-        // A slight delay or checking layer existence again might be needed if races occur.
-        if (map.getLayer(layerId)) {
+        // Ensure map and style are loaded and layer exists before adding listeners
+        if (map.isStyleLoaded() && map.getLayer(layerId)) {
             map.on('click', layerId, handleClick);
             map.on('mouseenter', layerId, onMouseEnter);
             map.on('mouseleave', layerId, onMouseLeave);
-            console.log('[MapContainer] Click listeners attached to tree layer.');
+            // // console.log('[MapContainer] Click listeners attached to tree layer.');
         }
     }
 
     return () => {
-      if (map && map.getLayer(layerId)) { // Check layer existence before removing
-        map.off('click', layerId, handleClick);
-        map.off('mouseenter', layerId, onMouseEnter);
-        map.off('mouseleave', layerId, onMouseLeave);
-        console.log('[MapContainer] Click listeners removed from tree layer.');
+      const currentMap = mapRef.current;
+      // Check if map instance and its style are valid before trying to remove listeners
+      if (currentMap && currentMap.isStyleLoaded()) {
+        // map.off is generally safe even if listener/layer doesn't exist, but good to be defensive.
+        currentMap.off('click', layerId, handleClick);
+        currentMap.off('mouseenter', layerId, onMouseEnter);
+        currentMap.off('mouseleave', layerId, onMouseLeave);
+        // // console.log('[MapContainer] Attempted to remove click listeners from tree layer.');
       }
     };
   }, [onClick, treeData, treeVisibility]); // treeVisibility ensures listeners are re-evaluated if layer visibility changes them
