@@ -1,107 +1,66 @@
-import { useEffect, useRef } from 'react';
-import { useMap } from 'react-map-gl';
-import type { MapRef } from 'react-map-gl';
+import { MVTLayer } from '@deck.gl/geo-layers';
 
-interface VectorTileLayerProps {
+export function createVectorTileLayer(options: {
   id: string;
-  source: string;
   sourceUrl: string;
-  sourceLayer: string;
-  visible: boolean;
+  visible?: boolean;
   minZoom?: number;
   maxZoom?: number;
-  paint?: any;
-  layout?: any;
+  onClick?: (info: any) => void;
+  onHover?: (info: any) => void;
+  getFillColor?: any;
+  getLineColor?: any;
+  getLineWidth?: any;
+  getPointRadius?: number;
+  source?: string;
+  sourceLayer?: string;
+  paint?: {
+    [key: string]: any;
+  };
+  layout?: {
+    [key: string]: any;
+  };
+}) {
+  // Ensure the MVTLayer is properly configured
+  return new MVTLayer({
+    id: options.id,
+    data: options.sourceUrl,
+    minZoom: options.minZoom ?? 0,
+    maxZoom: options.maxZoom ?? 16,
+    visible: options.visible ?? true,
+    pickable: true,
+    pointType: 'circle',
+    lineWidthUnits: 'pixels',
+    lineWidthScale: 1,
+    pointRadiusUnits: 'pixels',
+    pointRadiusScale: 1,
+    // Define default colors and widths
+    getFillColor: options.getFillColor ?? [34, 139, 34, 200], // green with alpha
+    getLineColor: options.getLineColor ?? [255, 255, 255, 180], // white with alpha
+    getLineWidth: options.getLineWidth ?? 1,
+    getRadius: options.getPointRadius ?? 5,
+    // Event handlers
+    onClick: options.onClick,
+    onHover: options.onHover,
+    // Configure the MVT loading options
+    loadOptions: {
+      mvt: {
+        tileSize: 256,
+        maxZoom: options.maxZoom ?? 16,
+        buffer: 64,
+        extent: 4096,
+        layerName: options.sourceLayer ?? 'trees',
+        workerUrl: ''
+      }
+    },
+    // Spread any additional paint properties
+    ...options.paint,
+    // Define update triggers
+    updateTriggers: {
+      getFillColor: [options.paint?.['circle-color']],
+      getLineColor: [options.paint?.['line-color']],
+      getLineWidth: [options.paint?.['line-width']],
+      getRadius: [options.paint?.['circle-radius']],
+    },
+  });
 }
-
-export const VectorTileLayer: React.FC<VectorTileLayerProps> = ({
-  id,
-  source,
-  sourceUrl,
-  sourceLayer,
-  visible = true,
-  minZoom = 0,
-  maxZoom = 24,
-  paint = {},
-  layout = {},
-}) => {
-  const { current: map } = useMap();
-  const layerId = useRef<string>();
-  const sourceId = useRef<string>();
-
-  useEffect(() => {
-    if (!map) return;
-
-    const mapInstance = map.getMap();
-    
-    // Add source if it doesn't exist
-    if (!mapInstance.getSource(source)) {
-      mapInstance.addSource(source, {
-        type: 'vector',
-        tiles: [sourceUrl],
-        minzoom: minZoom,
-        maxzoom: maxZoom,
-      });
-      sourceId.current = source;
-    }
-
-    // Add layer if it doesn't exist
-    if (!mapInstance.getLayer(id)) {
-      mapInstance.addLayer(
-        {
-          id,
-          type: 'circle',
-          source,
-          'source-layer': sourceLayer,
-          minzoom: minZoom,
-          maxzoom: maxZoom,
-          paint: {
-            'circle-radius': 4,
-            'circle-color': '#4CAF50',
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff',
-            'circle-opacity': 0.8,
-            ...paint,
-          },
-          layout: {
-            visibility: visible ? 'visible' : 'none',
-            ...layout,
-          },
-        },
-        // Insert before first symbol layer if it exists
-        mapInstance.getStyle().layers?.find((l) => l.type === 'symbol')?.id
-      );
-      layerId.current = id;
-    }
-
-    // Cleanup
-    return () => {
-      if (mapInstance && layerId.current) {
-        if (mapInstance.getLayer(layerId.current)) {
-          mapInstance.removeLayer(layerId.current);
-        }
-      }
-      if (mapInstance && sourceId.current && !mapInstance.getStyle().sources[sourceId.current]) {
-        mapInstance.removeSource(sourceId.current);
-      }
-    };
-  }, [map, id, source, sourceUrl, sourceLayer, visible, minZoom, maxZoom, paint, layout]);
-
-  // Update visibility when it changes
-  useEffect(() => {
-    if (!map || !layerId.current) return;
-    
-    const mapInstance = map.getMap();
-    if (mapInstance.getLayer(layerId.current)) {
-      mapInstance.setLayoutProperty(
-        layerId.current,
-        'visibility',
-        visible ? 'visible' : 'none'
-      );
-    }
-  }, [map, visible]);
-
-  return null;
-};
-
-export default VectorTileLayer;
