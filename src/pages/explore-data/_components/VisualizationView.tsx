@@ -124,10 +124,17 @@ export const VisualizationView: React.FC<VisualizationViewProps> = ({
     const map = L.map(mapContainerRef.current, {
       center: [37.87, -122.27], // Berkeley coordinates
       zoom: 13,
+      attributionControl: false // Disable the default attribution control with 'Learn more' button
     });
     
+    // Add tile layer with attribution text only (no 'Learn more' button)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: ' OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add custom attribution control without the 'Leaflet' prefix (which contains the 'Learn more' button)
+    L.control.attribution({
+      prefix: false // This removes the 'Leaflet' text and the associated 'Learn more' button
     }).addTo(map);
     
     // Initialize layer groups with proper TypeScript typing
