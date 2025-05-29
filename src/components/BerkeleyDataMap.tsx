@@ -77,6 +77,14 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         return [...prev, layerName];
       }
     });
+    
+    // Ensure the map is always visible if at least one layer is selected
+    setTimeout(() => {
+      setVisibleLayers(current => {
+        setMapVisible(current.length > 0);
+        return current;
+      });
+    }, 0);
   };
 
   /**
@@ -143,43 +151,43 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         }
         // --- End Process Building Data ---
 
-        // Mock Air Quality Data (as before)
-        const mockAirQualityData = [
-          {
-            id: 'air-1',
-            lat: 37.870, 
-            lng: -122.270, 
-            value: 42,
-            unit: 'AQI',
-            timestamp: new Date().toISOString(),
-            source: 'EPA',
-            pollutant: 'PM2.5'
-          },
-          {
-            id: 'air-2',
-            lat: 37.867, 
-            lng: -122.255, 
-            value: 35,
-            unit: 'AQI',
-            timestamp: new Date().toISOString(),
-            source: 'EPA',
-            pollutant: 'Ozone'
-          },
-          {
-            id: 'air-3',
-            lat: 37.862,
-            lng: -122.265,
-            value: 28,
-            unit: 'AQI',
-            timestamp: new Date().toISOString(),
-            source: 'EPA',
-            pollutant: 'NO2'
+        // --- Process Air Quality Data ---
+        let airQualityData = [];
+        try {
+          const airResponse = await fetch('/data/processed/berkeley_air_quality.json');
+          if (airResponse.ok) {
+            airQualityData = await airResponse.json();
+          } else {
+            // If no air quality file, try looking for other variations
+            const altAirResponse = await fetch('/data/processed/air_quality_data.json');
+            if (altAirResponse.ok) {
+              airQualityData = await altAirResponse.json();
+            }
           }
-        ];
+        } catch (airError) {
+          // Silent fail - we'll use empty array if no air quality data found
+        }
+        
+        // If no air quality data was found, create a minimal dataset for testing
+        if (!airQualityData.length) {
+          airQualityData = [
+            {
+              id: 'air-1',
+              lat: 37.870, 
+              lng: -122.270, 
+              value: 42,
+              unit: 'AQI',
+              timestamp: new Date().toISOString(),
+              source: 'EPA',
+              pollutant: 'PM2.5'
+            }
+          ];
+        }
+        // --- End Process Air Quality Data ---
 
         setLayerData({
           trees: treesGeoJSON, // Set the processed GeoJSON tree data
-          airQuality: mockAirQualityData,
+          airQuality: airQualityData,
           buildings: buildingsGeoJSON
         });
       } catch (error) {
