@@ -214,10 +214,10 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         </Box>
       )}
       
-      <DataLayersToggle 
-        visibleLayers={visibleLayers}
-        onToggle={toggleLayer}
-      />
+      <DataLayersToggle
+            visibleLayers={visibleLayers}
+            onToggle={toggleLayer}
+        />
     </Box>
   );
 };
