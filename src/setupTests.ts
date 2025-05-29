@@ -1,9 +1,5 @@
-import { JSDOM } from 'jsdom';
-import React from 'react';
-
-const dom = new JSDOM('<!doctype html><html><body></body></html>');
-document = dom.window.document;
-window = dom.window as unknown as Window & typeof globalThis;
+import React from 'react'; // Keep React if Wrapper or other React-specific setup is used.
+import '@testing-library/jest-dom';
 
 export const Wrapper = ({ children }: { children: React.ReactNode }) => {
   return children;
