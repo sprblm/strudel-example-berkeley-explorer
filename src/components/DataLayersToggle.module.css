@@ -1,7 +1,7 @@
 .toggleRoot {
   position: absolute;
   top: 16px;
-  right: 16px;
+  left: 16px;
   z-index: 1000;
   background: var(--mui-palette-background-paper, #fff);
   border-radius: 16px;
