@@ -334,20 +334,6 @@ export const HomePage = () => {
                 zIndex: 1000
               }}
             >
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ 
-                  bgcolor: 'rgba(255, 255, 255, 0.9)',
-                  color: '#1e3a8a',
-                  fontWeight: 'bold',
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 1)',
-                  }
-                }}
-              >
-                Learn More
-              </Button>
             </Box>
           </Paper>
           
@@ -394,7 +380,7 @@ export const HomePage = () => {
                   }
                 }}
               >
-                Learn More
+      
               </Button>
             </Grid>
             <Grid item xs={12} md={6}>
