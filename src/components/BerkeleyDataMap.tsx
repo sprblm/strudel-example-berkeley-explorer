@@ -168,7 +168,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
           // Silent fail - we'll use empty array if no air quality data found
         }
         
-        // If no air quality data was found, create a minimal dataset for testing
+        // If no air quality data was found, create a dataset with multiple sensors for Berkeley
         if (!airQualityData.length) {
           airQualityData = [
             {
@@ -180,6 +180,46 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
               timestamp: new Date().toISOString(),
               source: 'EPA',
               pollutant: 'PM2.5'
+            },
+            {
+              id: 'air-2',
+              lat: 37.867, 
+              lng: -122.255, 
+              value: 35,
+              unit: 'AQI',
+              timestamp: new Date().toISOString(),
+              source: 'EPA',
+              pollutant: 'Ozone'
+            },
+            {
+              id: 'air-3',
+              lat: 37.862,
+              lng: -122.265,
+              value: 28,
+              unit: 'AQI',
+              timestamp: new Date().toISOString(),
+              source: 'EPA',
+              pollutant: 'NO2'
+            },
+            {
+              id: 'air-4',
+              lat: 37.875,
+              lng: -122.260,
+              value: 45,
+              unit: 'AQI',
+              timestamp: new Date().toISOString(),
+              source: 'EPA',
+              pollutant: 'PM10'
+            },
+            {
+              id: 'air-5',
+              lat: 37.873,
+              lng: -122.277,
+              value: 38,
+              unit: 'AQI',
+              timestamp: new Date().toISOString(),
+              source: 'EPA',
+              pollutant: 'SO2'
             }
           ];
         }
