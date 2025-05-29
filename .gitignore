@@ -18,12 +18,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Vite
-__snapshots__/
-*.test.*
-*.spec.*
+# Test output
+__snapshots__/*.snap
 coverage/
 .vercel
+
+# Vite
+*.test.js
+*.spec.js
+*.test.jsx
+*.spec.jsx
 
 # build
 dist/
