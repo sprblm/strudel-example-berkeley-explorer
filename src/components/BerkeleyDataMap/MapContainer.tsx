@@ -39,6 +39,10 @@ interface MapContainerProps {
   onClick?: (info: { object: { properties: any; coordinates: mapboxgl.LngLat } }) => void;
   treeData: FeatureCollection | null;
   treeVisibility: boolean;
+  airQualityData?: any[];
+  airQualityVisibility?: boolean;
+  buildingData?: FeatureCollection | null;
+  buildingVisibility?: boolean;
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({
@@ -46,7 +50,11 @@ const MapContainer: React.FC<MapContainerProps> = ({
   width = '100%',
   onClick,
   treeData,
-  treeVisibility
+  treeVisibility,
+  airQualityData = [],
+  airQualityVisibility = false,
+  buildingData = null,
+  buildingVisibility = false
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -83,38 +91,39 @@ const MapContainer: React.FC<MapContainerProps> = ({
     if (!map) return;
 
     const setupOrUpdateLayers = () => {
-      const sourceId = 'trees';
-      const layerId = 'trees-layer';
-      const labelLayerId = 'tree-labels';
-      const existingSource = map.getSource(sourceId) as mapboxgl.GeoJSONSource;
+      // Trees layer setup
+      const treeSourceId = 'trees';
+      const treeLayerId = 'trees-layer';
+      const treeLabelLayerId = 'tree-labels';
+      const existingTreeSource = map.getSource(treeSourceId) as mapboxgl.GeoJSONSource;
 
       if (treeData && treeData.features.length > 0) {
-        if (existingSource) {
-          existingSource.setData(treeData);
+        if (existingTreeSource) {
+          existingTreeSource.setData(treeData);
           // console.log('[MapContainer] Updated "trees" source data.');
         } else {
-          map.addSource(sourceId, { type: 'geojson', data: treeData });
+          map.addSource(treeSourceId, { type: 'geojson', data: treeData });
           // console.log('[MapContainer] Added "trees" source.');
         }
 
-        if (!map.getLayer(layerId)) {
+        if (!map.getLayer(treeLayerId)) {
           map.addLayer({
-            id: layerId,
+            id: treeLayerId,
             type: 'circle',
-            source: sourceId,
+            source: treeSourceId,
             layout: { visibility: treeVisibility ? 'visible' : 'none' },
             paint: { 'circle-radius': 6, 'circle-color': '#2E8B57', 'circle-stroke-width': 1, 'circle-stroke-color': '#FFFFFF' }
           });
           // console.log('[MapContainer] Added "trees-layer". Initial visibility:', treeVisibility);
         } else {
-          map.setLayoutProperty(layerId, 'visibility', treeVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(treeLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
         }
 
-        if (!map.getLayer(labelLayerId)) {
+        if (!map.getLayer(treeLabelLayerId)) {
           map.addLayer({
-            id: labelLayerId,
+            id: treeLabelLayerId,
             type: 'symbol',
-            source: sourceId,
+            source: treeSourceId,
             layout: { 
               'text-field': ['get', 'species'], 
               'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'], 
@@ -127,22 +136,119 @@ const MapContainer: React.FC<MapContainerProps> = ({
           });
           // console.log('[MapContainer] Added "tree-labels" layer. Initial visibility:', treeVisibility);
         } else {
-          map.setLayoutProperty(labelLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(treeLabelLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
         }
       } else {
         const currentMap = mapRef.current;
         if (currentMap && currentMap.isStyleLoaded()) {
-          if (currentMap.getLayer(labelLayerId)) {
-            currentMap.removeLayer(labelLayerId);
+          if (currentMap.getLayer(treeLabelLayerId)) {
+            currentMap.removeLayer(treeLabelLayerId);
           }
-          if (currentMap.getLayer(layerId)) {
-            currentMap.removeLayer(layerId);
+          if (currentMap.getLayer(treeLayerId)) {
+            currentMap.removeLayer(treeLayerId);
           }
           // Ensure source exists before attempting to remove it
-          if (currentMap.getSource(sourceId)) {
-            currentMap.removeSource(sourceId);
+          if (currentMap.getSource(treeSourceId)) {
+            currentMap.removeSource(treeSourceId);
           }
           // // console.log('[MapContainer] No treeData, attempted removal of tree layers/source.');
+        }
+      }
+      
+      // Air Quality layer setup
+      const airSourceId = 'air-quality';
+      const airLayerId = 'air-quality-layer';
+      const existingAirSource = map.getSource(airSourceId) as mapboxgl.GeoJSONSource;
+      
+      if (airQualityData && airQualityData.length > 0) {
+        // Convert air quality data to GeoJSON
+        const airFeatures = airQualityData.map(point => ({
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [point.lng, point.lat]
+          },
+          properties: {
+            ...point,
+            id: point.id || `air-${Math.random().toString(36).slice(2, 9)}`,
+          }
+        }));
+        
+        const airGeoJSON = {
+          type: 'FeatureCollection' as const,
+          features: airFeatures
+        };
+        
+        if (existingAirSource) {
+          existingAirSource.setData(airGeoJSON);
+        } else {
+          map.addSource(airSourceId, { type: 'geojson', data: airGeoJSON });
+        }
+        
+        if (!map.getLayer(airLayerId)) {
+          map.addLayer({
+            id: airLayerId,
+            type: 'circle',
+            source: airSourceId,
+            layout: { visibility: airQualityVisibility ? 'visible' : 'none' },
+            paint: { 
+              'circle-radius': 10, 
+              'circle-color': '#4287f5',
+              'circle-stroke-width': 2, 
+              'circle-stroke-color': '#FFFFFF'
+            }
+          });
+        } else {
+          map.setLayoutProperty(airLayerId, 'visibility', airQualityVisibility ? 'visible' : 'none');
+        }
+      } else {
+        const currentMap = mapRef.current;
+        if (currentMap && currentMap.isStyleLoaded()) {
+          if (currentMap.getLayer(airLayerId)) {
+            currentMap.removeLayer(airLayerId);
+          }
+          if (currentMap.getSource(airSourceId)) {
+            currentMap.removeSource(airSourceId);
+          }
+        }
+      }
+      
+      // Building layer setup
+      const buildingSourceId = 'buildings';
+      const buildingLayerId = 'buildings-layer';
+      const existingBuildingSource = map.getSource(buildingSourceId) as mapboxgl.GeoJSONSource;
+      
+      if (buildingData && buildingData.features && buildingData.features.length > 0) {
+        if (existingBuildingSource) {
+          existingBuildingSource.setData(buildingData);
+        } else {
+          map.addSource(buildingSourceId, { type: 'geojson', data: buildingData });
+        }
+        
+        if (!map.getLayer(buildingLayerId)) {
+          map.addLayer({
+            id: buildingLayerId,
+            type: 'fill',
+            source: buildingSourceId,
+            layout: { visibility: buildingVisibility ? 'visible' : 'none' },
+            paint: { 
+              'fill-color': '#8a2be2', 
+              'fill-opacity': 0.6,
+              'fill-outline-color': '#000000'
+            }
+          });
+        } else {
+          map.setLayoutProperty(buildingLayerId, 'visibility', buildingVisibility ? 'visible' : 'none');
+        }
+      } else {
+        const currentMap = mapRef.current;
+        if (currentMap && currentMap.isStyleLoaded()) {
+          if (currentMap.getLayer(buildingLayerId)) {
+            currentMap.removeLayer(buildingLayerId);
+          }
+          if (currentMap.getSource(buildingSourceId)) {
+            currentMap.removeSource(buildingSourceId);
+          }
         }
       }
     };
@@ -153,44 +259,86 @@ const MapContainer: React.FC<MapContainerProps> = ({
       map.once('load', setupOrUpdateLayers);
       // console.log('[MapContainer] Map style not loaded, deferring layer setup for treeData.');
     }
-  }, [treeData, treeVisibility]);
+  }, [treeData, treeVisibility, airQualityData, airQualityVisibility, buildingData, buildingVisibility]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !onClick) return;
 
-    const layerId = 'trees-layer';
-    const handleClick = (e: mapboxgl.MapLayerMouseEvent) => {
+    // Click handler setup for tree layer
+    const treeLayerId = 'trees-layer';
+    const handleTreeClick = (e: mapboxgl.MapLayerMouseEvent) => {
       if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
         onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
       }
     };
+    
+    // Click handler setup for air quality layer
+    const airLayerId = 'air-quality-layer';
+    const handleAirClick = (e: mapboxgl.MapLayerMouseEvent) => {
+      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
+        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+      }
+    };
+    
+    // Click handler setup for building layer
+    const buildingLayerId = 'buildings-layer';
+    const handleBuildingClick = (e: mapboxgl.MapLayerMouseEvent) => {
+      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
+        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+      }
+    };
+    
     const onMouseEnter = () => { if (map.getCanvas()) map.getCanvas().style.cursor = 'pointer'; };
     const onMouseLeave = () => { if (map.getCanvas()) map.getCanvas().style.cursor = ''; };
 
-    // Only add listeners if the layer might exist (i.e., treeData is present)
+    // Add event listeners to tree layer
     if (treeData && treeData.features.length > 0) {
-        // Ensure map and style are loaded and layer exists before adding listeners
-        if (map.isStyleLoaded() && map.getLayer(layerId)) {
-            map.on('click', layerId, handleClick);
-            map.on('mouseenter', layerId, onMouseEnter);
-            map.on('mouseleave', layerId, onMouseLeave);
-            // // console.log('[MapContainer] Click listeners attached to tree layer.');
+        if (map.isStyleLoaded() && map.getLayer(treeLayerId)) {
+            map.on('click', treeLayerId, handleTreeClick);
+            map.on('mouseenter', treeLayerId, onMouseEnter);
+            map.on('mouseleave', treeLayerId, onMouseLeave);
+        }
+    }
+    
+    // Add event listeners to air quality layer
+    if (airQualityData && airQualityData.length > 0) {
+        if (map.isStyleLoaded() && map.getLayer(airLayerId)) {
+            map.on('click', airLayerId, handleAirClick);
+            map.on('mouseenter', airLayerId, onMouseEnter);
+            map.on('mouseleave', airLayerId, onMouseLeave);
+        }
+    }
+    
+    // Add event listeners to building layer
+    if (buildingData && buildingData.features && buildingData.features.length > 0) {
+        if (map.isStyleLoaded() && map.getLayer(buildingLayerId)) {
+            map.on('click', buildingLayerId, handleBuildingClick);
+            map.on('mouseenter', buildingLayerId, onMouseEnter);
+            map.on('mouseleave', buildingLayerId, onMouseLeave);
         }
     }
 
     return () => {
       const currentMap = mapRef.current;
-      // Check if map instance and its style are valid before trying to remove listeners
       if (currentMap && currentMap.isStyleLoaded()) {
-        // map.off is generally safe even if listener/layer doesn't exist, but good to be defensive.
-        currentMap.off('click', layerId, handleClick);
-        currentMap.off('mouseenter', layerId, onMouseEnter);
-        currentMap.off('mouseleave', layerId, onMouseLeave);
-        // // console.log('[MapContainer] Attempted to remove click listeners from tree layer.');
+        // Remove tree layer event listeners
+        currentMap.off('click', treeLayerId, handleTreeClick);
+        currentMap.off('mouseenter', treeLayerId, onMouseEnter);
+        currentMap.off('mouseleave', treeLayerId, onMouseLeave);
+        
+        // Remove air quality layer event listeners
+        currentMap.off('click', airLayerId, handleAirClick);
+        currentMap.off('mouseenter', airLayerId, onMouseEnter);
+        currentMap.off('mouseleave', airLayerId, onMouseLeave);
+        
+        // Remove building layer event listeners
+        currentMap.off('click', buildingLayerId, handleBuildingClick);
+        currentMap.off('mouseenter', buildingLayerId, onMouseEnter);
+        currentMap.off('mouseleave', buildingLayerId, onMouseLeave);
       }
     };
-  }, [onClick, treeData, treeVisibility]); // treeVisibility ensures listeners are re-evaluated if layer visibility changes them
+  }, [onClick, treeData, treeVisibility, airQualityData, airQualityVisibility, buildingData, buildingVisibility]);
 
   return (
     <Box
