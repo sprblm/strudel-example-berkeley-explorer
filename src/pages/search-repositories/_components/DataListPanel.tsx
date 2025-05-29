@@ -14,7 +14,7 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
 
   // Update sorted results when searchResults or sortBy changes
   useEffect(() => {
-    let results = [...searchResults];
+    const results = [...searchResults];
     switch (sortBy) {
       case 'distance':
         // Assuming dataset has a distance property or we can calculate it
