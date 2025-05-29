@@ -50,8 +50,7 @@ interface BerkeleyDataMapProps {
  */
 const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width = '100%', onPointClick }) => {
   const [visibleLayers, setVisibleLayers] = useState<('tree' | 'air' | 'locations')[]>(['tree', 'air', 'locations']);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [layerData, setLayerData] = useState<any>({ trees: null, airQuality: [] });
+  const [layerData, setLayerData] = useState<any>({ trees: null, airQuality: [], buildings: null });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mapVisible, setMapVisible] = useState<boolean>(true);
 
@@ -100,12 +99,12 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
       try {
         // --- Process Tree Data ---
         // Fetch tree data from the public directory
-        const response = await fetch('/data/processed/berkeley_trees_processed.json');
-        if (!response.ok) {
-          // console.error("Failed to fetch tree data:", response.status, response.statusText);
-          throw new Error(`HTTP error! status: ${response.status} while fetching /data/processed/berkeley_trees_processed.json`);
+        const treeResponse = await fetch('/data/processed/berkeley_trees_processed.json');
+        if (!treeResponse.ok) {
+          // console.error("Failed to fetch tree data:", treeResponse.status, treeResponse.statusText);
+          throw new Error(`HTTP error! status: ${treeResponse.status} while fetching /data/processed/berkeley_trees_processed.json`);
         }
-        const fetchedBerkeleyTreesRawData = await response.json() as RawTreeDataItem[];
+        const fetchedBerkeleyTreesRawData = await treeResponse.json() as RawTreeDataItem[];
 
         const treeFeatures = fetchedBerkeleyTreesRawData.map(tree => ({
           type: 'Feature' as const,
@@ -130,9 +129,24 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         };
         // --- End Process Tree Data ---
 
+        // --- Process Building Data ---
+        let buildingsGeoJSON = null;
+        try {
+          const buildingResponse = await fetch('/data/processed/berkeley-bldgs.geojson');
+          if (buildingResponse.ok) {
+            buildingsGeoJSON = await buildingResponse.json();
+          } else {
+            // console.error("Failed to fetch building data:", buildingResponse.status, buildingResponse.statusText);
+          }
+        } catch (buildingError) {
+          // console.error("Error loading building data:", buildingError);
+        }
+        // --- End Process Building Data ---
+
         // Mock Air Quality Data (as before)
         const mockAirQualityData = [
           {
+            id: 'air-1',
             lat: 37.870, 
             lng: -122.270, 
             value: 42,
@@ -142,6 +156,7 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
             pollutant: 'PM2.5'
           },
           {
+            id: 'air-2',
             lat: 37.867, 
             lng: -122.255, 
             value: 35,
@@ -149,12 +164,23 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
             timestamp: new Date().toISOString(),
             source: 'EPA',
             pollutant: 'Ozone'
+          },
+          {
+            id: 'air-3',
+            lat: 37.862,
+            lng: -122.265,
+            value: 28,
+            unit: 'AQI',
+            timestamp: new Date().toISOString(),
+            source: 'EPA',
+            pollutant: 'NO2'
           }
         ];
 
         setLayerData({
           trees: treesGeoJSON, // Set the processed GeoJSON tree data
-          airQuality: mockAirQualityData
+          airQuality: mockAirQualityData,
+          buildings: buildingsGeoJSON
         });
       } catch (error) {
         // console.error("Error loading or processing data:", error); // Log errors
@@ -206,6 +232,10 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
             onClick={handleMapClick}
             treeData={layerData.trees} // Pass the loaded GeoJSON tree data
             treeVisibility={visibleLayers.includes('tree')} // Pass the visibility state for trees
+            airQualityData={layerData.airQuality} // Pass the air quality data
+            airQualityVisibility={visibleLayers.includes('air')} // Pass the visibility state for air quality
+            buildingData={layerData.buildings} // Pass the building data
+            buildingVisibility={visibleLayers.includes('locations')} // Pass the visibility state for buildings
           />
         </Suspense>
       ) : (
