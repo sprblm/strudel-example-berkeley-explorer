@@ -1,4 +1,9 @@
-// React is needed for JSX transformation
+/**
+ * Main App component for the Berkeley Environmental Health Explorer platform.
+ * Sets up the application routing structure and global layout.
+ * Provides routes to all major sections: Home, Search Repositories, Explore Data, Compare Data, Contribute, and About.
+ * Implements error boundaries for graceful error handling throughout the application.
+ */
 import { Box, CssBaseline, Typography, Button, Paper } from '@mui/material';
 import { Routes, Route } from 'react-router-dom';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -10,10 +15,6 @@ import CompareData from './pages/compare-data';
 import ContributePage from './pages/contribute';
 import { HomePage } from './pages/home/index';
 import AboutPage from './pages/about/index';
-
-/**
- * Main App component that sets up routing and global layout
- */
 const App = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

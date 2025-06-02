@@ -1,3 +1,11 @@
+/**
+ * Main entry point for the Berkeley Environmental Health Explorer platform.
+ * Sets up the React application with necessary providers:
+ * - BrowserRouter for routing
+ * - QueryClientProvider for data fetching and caching
+ * - ThemeProvider for consistent styling
+ * - Mapbox GL CSS for map rendering
+ */
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -7,9 +15,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import { theme } from './theme';
 import './index.css';
-
-// Create a QueryClient instance to manage server state and caching
-// This is the central hub for all React Query operations
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
