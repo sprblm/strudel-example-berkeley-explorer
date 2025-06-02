@@ -7,20 +7,99 @@
 import { Box, Container, Typography, Paper, Grid, CircularProgress } from '@mui/material';
 import { useState, useEffect } from 'react';
 import FiltersPanel from './_components/FiltersPanel'; 
-import { FilterContextProvider } from '../../components/FilterContext';
+import SearchInput from './_components/SearchInput';
+import { FilterContextProvider, useFilters } from '../../components/FilterContext';
 import { SearchIcon } from '../../components/Icons';
 import DataListPanel from './_components/DataListPanel';
 import type { Dataset } from '../../types/dataset.types';
 import BerkeleyDataMap from '../../components/BerkeleyDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
-const DatasetExplorer: React.FC = () => {
+const DatasetExplorerContent: React.FC = () => {
+  const { activeFilters } = useFilters();
   const [previewItem, setPreviewItem] = useState<Dataset | null>(null);
   const [searchResults, setSearchResults] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // State for real datasets
   const [datasets, setDatasets] = useState<Dataset[]>([]);
+  
+  // Handle search
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+  
+  // Handle input change
+  const handleInputChange = () => {
+    // This is called when the input changes but before search is triggered
+    // Could be used for analytics or other side effects
+  };
+
+  // State for active map layers
+  const [activeLayers, setActiveLayers] = useState<string[]>(['trees', 'air']);
+
+  // Filter datasets based on search term and active filters
+  useEffect(() => {
+    if (!datasets.length) return;
+    
+    let filtered = [...datasets];
+    
+    // Apply text search if searchTerm exists
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(dataset => 
+        dataset.title.toLowerCase().includes(term) || 
+        (dataset.summary?.toLowerCase().includes(term) ?? false) ||
+        (dataset.source?.toLowerCase().includes(term) ?? false)
+      );
+    }
+    
+    // Apply active filters
+    if (activeFilters.length > 0) {
+      // Track which types of data are being filtered
+      const typeFilter = activeFilters.find(f => f.field === 'type');
+      if (typeFilter) {
+        // Update active map layers based on type filter
+        const layerType = typeFilter.value as string;
+        setActiveLayers([layerType]);
+      }
+      
+      filtered = filtered.filter(dataset => {
+        // Check each filter
+        return activeFilters.every(filter => {
+          // Handle different filter types based on the field
+          switch (filter.field) {
+            case 'type':
+              return dataset.details?.type === filter.value;
+            case 'source':
+              return dataset.source === filter.value;
+            case 'species':
+              return dataset.details?.type === 'tree' && 
+                (dataset.details as any)?.fields?.includes(filter.value);
+            case 'health':
+              return dataset.details?.type === 'tree' && 
+                (dataset.details as any)?.fields?.includes('healthCondition');
+            case 'minHeight':
+            case 'maxHeight':
+              return dataset.details?.type === 'tree' && 
+                (dataset.details as any)?.fields?.includes('height');
+            case 'parameter':
+              return dataset.details?.type === 'air' && 
+                (dataset.details as any)?.parameters?.includes(filter.value);
+            // Add more filter cases as needed
+            default:
+              return true;
+          }
+        });
+      });
+    } else {
+      // If no filters, show all layers
+      setActiveLayers(['trees', 'air']);
+    }
+    
+    setSearchResults(filtered);
+  }, [datasets, searchTerm, activeFilters]);
   
   // Load real environmental data
   useEffect(() => {
@@ -114,6 +193,15 @@ const DatasetExplorer: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
+            
+            {/* Search input */}
+            <Box sx={{ mb: 3 }}>
+              <SearchInput 
+                onSearch={handleSearch}
+                onInputChange={handleInputChange}
+                suggestions={datasets.map(d => d.title)}
+              />
+            </Box>
           </Box>
 
           <Grid container spacing={3}>
@@ -140,6 +228,7 @@ const DatasetExplorer: React.FC = () => {
                 <BerkeleyDataMap 
                   height="100%" 
                   onPointClick={handleMapPointClick}
+                  activeLayers={activeLayers}
                 />
               </Paper>
 
@@ -183,5 +272,11 @@ const DatasetExplorer: React.FC = () => {
     </FilterContextProvider>
   );
 };
+
+const DatasetExplorer: React.FC = () => (
+  <FilterContextProvider>
+    <DatasetExplorerContent />
+  </FilterContextProvider>
+);
 
 export default DatasetExplorer;
