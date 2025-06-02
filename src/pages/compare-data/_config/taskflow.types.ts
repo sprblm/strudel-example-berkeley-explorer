@@ -1,12 +1,13 @@
+/**
+ * Type definitions for the Compare Data taskflow.
+ * Defines interfaces and types used throughout the comparison functionality.
+ * Includes configuration types, component props, and data structures for the comparison system.
+ */
 import { GridColDef } from '@mui/x-data-grid';
 
 export type CompareDataConfigColDef = GridColDef & {
   isComparisonMetric?: boolean;
 };
-
-/**
- * Type definitions for the Compare Data Task Flow config object
- */
 export interface CompareDataConfig {
   properties: {
     itemName: string;

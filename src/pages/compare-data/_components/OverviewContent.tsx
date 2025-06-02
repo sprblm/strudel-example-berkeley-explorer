@@ -1,3 +1,8 @@
+/**
+ * OverviewContent component for the Compare Data section.
+ * Displays a high-level summary comparison of environmental factors between two locations.
+ * Visualizes key metrics using charts and summary statistics for quick comparison insights.
+ */
 import React from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import Plot from 'react-plotly.js';
@@ -6,10 +11,6 @@ interface OverviewContentProps {
   locationA: string;
   locationB: string;
 }
-
-/**
- * Overview content component showing environmental factors and tree health comparisons
- */
 const OverviewContent: React.FC<OverviewContentProps> = ({
   locationA,
   locationB

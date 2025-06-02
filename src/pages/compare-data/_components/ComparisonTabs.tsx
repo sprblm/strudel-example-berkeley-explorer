@@ -1,3 +1,8 @@
+/**
+ * ComparisonTabs component for the Compare Data section.
+ * Provides a tabbed navigation interface for switching between different comparison views.
+ * Includes tabs for overview, trees, and air quality data with appropriate icons.
+ */
 import React, { useState } from 'react';
 import { Box, Button, ButtonGroup } from '@mui/material';
 import { OverviewIcon, TreeIcon, AirQualityIcon } from '../../../components/Icons';
@@ -8,10 +13,6 @@ interface ComparisonTabsProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
 }
-
-/**
- * Button group component for toggling between different comparison views
- */
 const ComparisonTabs: React.FC<ComparisonTabsProps> = ({
   activeTab,
   onTabChange

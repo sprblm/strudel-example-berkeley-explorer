@@ -1,22 +1,22 @@
+/**
+ * CompareDatasets component for the Compare Data section.
+ * Provides interactive side-by-side comparison of environmental datasets with configurable settings.
+ * Allows users to compare different locations, time periods, and data types through multiple visualization tabs.
+ */
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import React, { useState } from 'react';
-import { MapIcon, LocationIcon } from '../../components/Icons';
+import { LocationIcon } from '../../components/Icons';
 import ComparisonSettings, { ComparisonType, DataSource, Location } from './_components/ComparisonSettings';
 import ComparisonTabs, { TabType } from './_components/ComparisonTabs';
 import OverviewContent from './_components/OverviewContent';
 import TreesContent from './_components/TreesContent';
 import AirQualityContent from './_components/AirQualityContent';
 import LocationMap from '../../components/LocationMap';
-
-/**
- * Compare Datasets page
- * Shows side-by-side comparison of climate datasets with interactive charts
- */
 const CompareDatasets: React.FC = () => {
-  // State for comparison settings
-  const [comparisonType, setComparisonType] = useState<ComparisonType>('locations');
-  const [dataSourceA, setDataSourceA] = useState<DataSource>('Official Sensors');
-  const [dataSourceB, setDataSourceB] = useState<DataSource>('Student Contributions');
+  // State for comparison settings - only using setters in child components
+  const [, setComparisonType] = useState<ComparisonType>('locations');
+  const [, setDataSourceA] = useState<DataSource>('Official Sensors');
+  const [, setDataSourceB] = useState<DataSource>('Student Contributions');
   const [locationA, setLocationA] = useState<Location>('Memorial Glade');
   const [locationB, setLocationB] = useState<Location>('Hearst Greek Theatre');
   

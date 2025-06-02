@@ -1,3 +1,8 @@
+/**
+ * Action creators and types for the Compare Data context.
+ * Defines the available actions, their types, and creator functions for the comparison state management system.
+ * Used by the reducer to handle state transitions in a predictable way.
+ */
 import { CompareDataState } from './ContextProvider';
 
 export enum CompareDataActionType {

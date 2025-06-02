@@ -1,3 +1,8 @@
+/**
+ * TreesContent component for the Compare Data section.
+ * Visualizes tree-related data comparisons between two locations including species composition and health metrics.
+ * Uses Plotly.js to render interactive charts for comparing tree inventories from the Berkeley tree dataset.
+ */
 import React from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import Plot from 'react-plotly.js';
@@ -7,10 +12,6 @@ interface TreesContentProps {
   locationA: string;
   locationB: string;
 }
-
-/**
- * Trees content component showing tree species composition and dimensions
- */
 const TreesContent: React.FC<TreesContentProps> = ({
   locationA,
   locationB

@@ -1,3 +1,8 @@
+/**
+ * Configuration for the Compare Data taskflow.
+ * Defines the properties, data sources, and UI settings for the comparison functionality.
+ * Centralizes configuration to make the comparison workflow easily customizable.
+ */
 import { CompareDataConfig } from './taskflow.types';
 
 export const taskflow: CompareDataConfig = {

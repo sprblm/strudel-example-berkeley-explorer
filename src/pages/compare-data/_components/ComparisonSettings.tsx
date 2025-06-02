@@ -1,3 +1,8 @@
+/**
+ * ComparisonSettings component for the Compare Data section.
+ * Provides controls for configuring comparison parameters including comparison type, data sources, and locations.
+ * Allows users to customize their comparison view with dropdown selectors and radio button groups.
+ */
 import React, { useState } from 'react';
 import { 
   Box, 

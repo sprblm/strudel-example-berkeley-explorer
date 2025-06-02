@@ -1,3 +1,8 @@
+/**
+ * CompareDataProvider component and related hooks for the Compare Data section.
+ * Implements a React Context-based state management system for comparison data and settings.
+ * Provides global access to comparison state, actions, and selectors throughout the comparison workflow.
+ */
 import React, { useEffect, useReducer, useContext } from 'react';
 import {
   CompareDataAction,

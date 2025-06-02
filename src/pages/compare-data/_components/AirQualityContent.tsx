@@ -1,3 +1,9 @@
+/**
+ * AirQualityContent component for the Compare Data section.
+ * Visualizes air quality data comparisons between two locations with time-series charts.
+ * Displays PM2.5 levels, ozone readings, and other air quality metrics using Plotly.js charts.
+ * Loads data from pre-compiled JSON files containing historical air quality measurements.
+ */
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Grid, CircularProgress } from '@mui/material';
 import Plot from 'react-plotly.js';
@@ -8,10 +14,6 @@ interface AirQualityContentProps {
   locationA: string;
   locationB: string;
 }
-
-/**
- * Air Quality content component showing PM2.5 levels and ozone comparison
- */
 const AirQualityContent: React.FC<AirQualityContentProps> = ({
   locationA,
   locationB
