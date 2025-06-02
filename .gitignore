@@ -36,3 +36,6 @@ docs/
 /docs/ /docs/
 /docs/
 *.snap
+
+# Cline MCP settings
+cline_mcp_settings.json
