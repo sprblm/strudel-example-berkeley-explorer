@@ -15,12 +15,27 @@ import type { Dataset } from '../../types/dataset.types';
 import BerkeleyDataMap from '../../components/BerkeleyDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
+// Define the TreeDataPoint interface here to avoid import issues
+interface TreeDataPoint {
+  id: string;
+  type: 'tree';
+  lat: number;
+  lng: number;
+  title: string;
+  category: string;
+  health?: string;
+  details: any;
+}
+
 const DatasetExplorerContent: React.FC = () => {
   const { activeFilters } = useFilters();
   const [previewItem, setPreviewItem] = useState<Dataset | null>(null);
   const [searchResults, setSearchResults] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // State for selected tree data point
+  const [selectedTreePoint, setSelectedTreePoint] = useState<TreeDataPoint | null>(null);
 
   // State for real datasets
   const [datasets, setDatasets] = useState<Dataset[]>([]);
@@ -166,7 +181,12 @@ const DatasetExplorerContent: React.FC = () => {
 
   // Handle map point click
   const handleMapPointClick = (point: any) => {
-    // Find dataset related to this point type
+    // If it's a tree point, store the specific tree data
+    if (point.type === 'tree') {
+      setSelectedTreePoint(point);
+    }
+    
+    // Also highlight the related dataset in the list
     const relatedDataset = datasets.find(dataset => 
       dataset.details?.type === point.type
     );
@@ -229,6 +249,8 @@ const DatasetExplorerContent: React.FC = () => {
                   height="100%" 
                   onPointClick={handleMapPointClick}
                   activeLayers={activeLayers}
+                  selectedTree={selectedTreePoint}
+                  onTreeClose={() => setSelectedTreePoint(null)}
                 />
               </Paper>
 
