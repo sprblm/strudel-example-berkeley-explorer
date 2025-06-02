@@ -1,9 +1,18 @@
+/**
+ * MapContainer Component
+ * 
+ * Core map rendering component that initializes and manages the Mapbox GL map instance.
+ * Handles layer management, user interactions, and data visualization for various
+ * environmental data layers including trees, air quality, and building footprints.
+ * Provides a responsive, interactive map interface with customizable layers and controls.
+ */
+
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { FeatureCollection } from 'geojson';
 import { Box } from '@mui/material';
-import { mapContainerStyle } from './MapContainer.styles'; 
+import { mapContainerStyle } from './BerkeleyDataMap.styles'; 
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || '';
 
@@ -213,7 +222,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         }
       }
       
-      // Building layer setup
+      // Building layer setup - add this first to ensure it's below other layers
       const buildingSourceId = 'buildings';
       const buildingLayerId = 'buildings-layer';
       const existingBuildingSource = map.getSource(buildingSourceId) as mapboxgl.GeoJSONSource;
@@ -222,22 +231,27 @@ const MapContainer: React.FC<MapContainerProps> = ({
         if (existingBuildingSource) {
           existingBuildingSource.setData(buildingData);
         } else {
+          // Add the source
           map.addSource(buildingSourceId, { type: 'geojson', data: buildingData });
+          
+          // Add the building layer first, before any other layers
+          if (!map.getLayer(buildingLayerId)) {
+            map.addLayer({
+              id: buildingLayerId,
+              type: 'fill',
+              source: buildingSourceId,
+              layout: { visibility: buildingVisibility ? 'visible' : 'none' },
+              paint: { 
+                'fill-color': '#8a2be2', 
+                'fill-opacity': 0.3,
+                'fill-outline-color': '#000000'
+              }
+            }); // No beforeId, appends to the top of the layer stack
+          }
         }
         
-        if (!map.getLayer(buildingLayerId)) {
-          map.addLayer({
-            id: buildingLayerId,
-            type: 'fill',
-            source: buildingSourceId,
-            layout: { visibility: buildingVisibility ? 'visible' : 'none' },
-            paint: { 
-              'fill-color': '#8a2be2', 
-              'fill-opacity': 0.6,
-              'fill-outline-color': '#000000'
-            }
-          });
-        } else {
+        // Update visibility if layer already exists
+        if (map.getLayer(buildingLayerId)) {
           map.setLayoutProperty(buildingLayerId, 'visibility', buildingVisibility ? 'visible' : 'none');
         }
       } else {
