@@ -1,3 +1,7 @@
+/**
+ * Home page component that serves as the landing page for the Berkeley Environmental Health Explorer.
+ * Displays current air quality data, tree inventory statistics, and an interactive map.
+ */
 import { useState, useEffect } from 'react';
 import {
   Box,

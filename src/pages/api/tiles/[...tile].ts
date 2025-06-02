@@ -1,3 +1,8 @@
+/**
+ * Tile API endpoint handler for serving map vector tiles.
+ * Handles requests for map tiles, serving the appropriate tile data from the filesystem.
+ * Supports handling compressed (gzipped) tiles for improved performance.
+ */
 import { NextApiRequest, NextApiResponse } from 'next';
 import { promises as fs } from 'fs';
 import path from 'path';
