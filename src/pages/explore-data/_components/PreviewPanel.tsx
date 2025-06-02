@@ -1,3 +1,8 @@
+/**
+ * PreviewPanel component for the Explore Data section.
+ * Displays detailed information about a selected environmental data item.
+ * Shows metadata, related measurements, and interactive visualizations for the selected point.
+ */
 import * as React from 'react';
 import {
   Box,

@@ -1,3 +1,11 @@
+/**
+ * VisualizationView Component
+ * 
+ * Main visualization component that renders different types of data visualizations
+ * including maps, time series charts, histograms, and distribution plots.
+ * Handles data loading, error states, and user interactions for the visualization.
+ */
+
 import React, { useState, useEffect, useRef, FC } from 'react';
 import {
   Box,

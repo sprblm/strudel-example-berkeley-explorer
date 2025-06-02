@@ -1,3 +1,8 @@
+/**
+ * CardView component for the Explore Data section.
+ * Displays environmental data in a grid of cards with images and metadata.
+ * Allows users to browse and select items for detailed preview.
+ */
 import React from 'react';
 import { Box, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Stack } from '@mui/material';
 import { useFilters } from '@/contexts/FiltersContext';

@@ -1,3 +1,7 @@
+/**
+ * DataViewHeader component for the Explore Data section.
+ * Provides search, filter, and view mode controls for the data visualization interface.
+ */
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import TableChartIcon from '@mui/icons-material/TableChart';

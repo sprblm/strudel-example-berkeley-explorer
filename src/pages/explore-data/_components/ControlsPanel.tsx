@@ -1,3 +1,7 @@
+/**
+ * Controls Panel component for the Explore Data section.
+ * Provides a UI for users to control visualization options, filters, and data layers.
+ */
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -10,7 +14,6 @@ import {
   ListItemIcon,
   ListItemText,
   Button,
-
   IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';

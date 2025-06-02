@@ -1,3 +1,7 @@
+/**
+ * FiltersPanel component for the Explore Data section.
+ * Provides UI for filtering environmental data by various criteria such as location, date, and data types.
+ */
 import React from 'react';
 import {
   Box, 

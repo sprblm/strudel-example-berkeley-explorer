@@ -1,3 +1,8 @@
+/**
+ * DataView component for the Explore Data section.
+ * Provides a table-based visualization of environmental data with sorting, filtering, and pagination.
+ * Allows users to select items for detailed preview and analysis.
+ */
 import { Alert, Box, LinearProgress, Skeleton } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import React, { useState } from 'react';
@@ -12,9 +17,7 @@ interface DataViewProps {
   searchTerm: string;
   setPreviewItem: React.Dispatch<React.SetStateAction<any>>;
 }
-/**
- * Query the data rows and render as an interactive table
- */
+
 export const DataView: React.FC<DataViewProps> = ({
   searchTerm,
   setPreviewItem,

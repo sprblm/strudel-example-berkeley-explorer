@@ -1,3 +1,8 @@
+/**
+ * MapView component for the Explore Data section.
+ * Provides a map-based visualization of environmental data using Mapbox GL.
+ * Displays tree locations, air quality data points, and other geographic information.
+ */
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { useFilters } from '../../../components/FilterContext';
@@ -11,9 +16,6 @@ interface MapViewProps {
   searchTerm: string;
   setPreviewItem: React.Dispatch<React.SetStateAction<any>>;
 }
-
-/**
- * Map visualization view for the data
  */
 export const MapView: React.FC<MapViewProps> = ({
   searchTerm,

@@ -1,3 +1,7 @@
+/**
+ * Chart visualization component for the Explore Data section.
+ * Renders interactive charts using Plotly.js to visualize environmental data patterns.
+ */
 import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import { useFilters } from '../../../components/FilterContext';
