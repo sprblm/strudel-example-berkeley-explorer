@@ -1,3 +1,8 @@
+/**
+ * MapSelector component for the search-repositories section.
+ * Provides an interactive Leaflet map interface for selecting geographic areas
+ * to filter environmental data within the Berkeley campus area.
+ */
 import React, { useState } from 'react';
 import { Box, Typography, Paper, IconButton, Tooltip } from '@mui/material';
 import { MapContainer, TileLayer, Rectangle, useMap } from 'react-leaflet';

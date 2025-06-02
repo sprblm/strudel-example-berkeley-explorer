@@ -1,3 +1,7 @@
+/**
+ * SearchInput component for the search-repositories section.
+ * Provides a search box with auto-suggestions for finding environmental data.
+ */
 import { useState, useRef } from 'react';
 import { InputBase, Box, Popper, Paper, List, ListItem, ClickAwayListener } from '@mui/material';
 import { SearchIcon } from '../../../components/Icons';

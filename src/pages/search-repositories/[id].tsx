@@ -1,3 +1,8 @@
+/**
+ * Dataset detail page for the search-repositories section.
+ * Displays comprehensive information about a selected environmental dataset
+ * including metadata, visualizations, and download options.
+ */
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
