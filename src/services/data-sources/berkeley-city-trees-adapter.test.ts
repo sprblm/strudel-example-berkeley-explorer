@@ -15,9 +15,9 @@ describe('BerkeleyCityTreesAdapter', () => {
             coordinates: [-122.272743, 37.871592],
           },
           properties: {
-            SPP_NAME: 'Quercus agrifolia',
-            COMMON_NAM: 'Coast Live Oak',
-            DBH: 30,
+            SPECIES: 'Quercus agrifolia',
+            Common_Nam: 'Coast Live Oak',
+            DBH_IN: 30,
             CONDITION: 'Good',
           },
         },
