@@ -9,6 +9,7 @@ import {
   loadingTextSx 
 } from './BerkeleyDataMap/BerkeleyDataMap.styles';
 import DataLayersToggle from './DataLayersToggle';
+import TreeDetailsPopup from './TreeDetailsPopup';
 
 const MapContainer = React.lazy(() => import('./BerkeleyDataMap/MapContainer'));
 
@@ -41,6 +42,8 @@ interface BerkeleyDataMapProps {
   width?: number | string;
   onPointClick?: (point: DataPoint) => void;
   activeLayers?: string[];
+  selectedTree?: TreeDataPoint | null;
+  onTreeClose?: () => void;
 }
 
 /**
@@ -49,7 +52,14 @@ interface BerkeleyDataMapProps {
  * Displays a map of Berkeley with environmental data layers
  * including trees and air quality monitoring stations
  */
-const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width = '100%', onPointClick, activeLayers }) => {
+const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ 
+  height = 400, 
+  width = '100%', 
+  onPointClick, 
+  activeLayers,
+  selectedTree: externalSelectedTree,
+  onTreeClose: externalOnTreeClose
+}) => {
   // Define DataLayerType to match the one in DataLayersToggle
   type DataLayerType = 'tree' | 'air' | 'locations';
   const [layerData, setLayerData] = useState<any>({ trees: null, airQuality: [], buildings: null });
@@ -66,6 +76,12 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
   
   // State for map visibility
   const [mapVisible, setMapVisible] = useState<boolean>(true);
+  
+  // State for selected tree to show in popup - use external state if provided
+  const [internalSelectedTree, setInternalSelectedTree] = useState<TreeDataPoint | null>(null);
+  
+  // Use external selected tree if provided, otherwise use internal state
+  const selectedTree = externalSelectedTree !== undefined ? externalSelectedTree : internalSelectedTree;
   
   // Update visible layers when activeLayers prop changes
   useEffect(() => {
@@ -292,20 +308,39 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
       const properties = info.object.properties;
       const coordinates = info.object.coordinates;
       
+      // Create tree data point object
+      const treePoint: TreeDataPoint = {
+        id: properties.id || `tree-${Math.random().toString(36).slice(2, 9)}`,
+        type: 'tree' as const,
+        lat: coordinates?.lat || 0,
+        lng: coordinates?.lng || 0,
+        title: 'Tree',
+        category: properties.species || 'Unknown',
+        health: properties.healthCondition,
+        details: properties
+      };
+      
+      // If we're managing our own state, update it
+      if (externalSelectedTree === undefined) {
+        setInternalSelectedTree(treePoint);
+      }
+      
+      // Always call the original onPointClick handler if provided
       if (onPointClick) {
-        onPointClick({
-          id: properties.id || `tree-${Math.random().toString(36).slice(2, 9)}`,
-          type: 'tree' as const,
-          lat: coordinates?.lat || 0,
-          lng: coordinates?.lng || 0,
-          title: 'Tree',
-          category: properties.species || 'Unknown',
-          health: properties.health,
-          details: properties
-        });
+        onPointClick(treePoint);
       }
     }
-  }, [onPointClick]);
+  }, [onPointClick, externalSelectedTree]);
+  
+  // Handler to close the tree details popup
+  const handleClosePopup = useCallback(() => {
+    // If we're managing our own state, update it
+    if (externalOnTreeClose) {
+      externalOnTreeClose();
+    } else {
+      setInternalSelectedTree(null);
+    }
+  }, [externalOnTreeClose]);
 
   // Render the map container
   return (
@@ -315,6 +350,13 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
       width,
       position: 'relative'
     }}>
+      <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}>
+        <DataLayersToggle
+          visibleLayers={visibleLayers}
+          onToggle={toggleLayer}
+        />
+      </Box>
+
       {mapVisible ? (
         <Suspense fallback={
           <Box sx={loadingContainerSx}>
@@ -340,10 +382,23 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({ height = 400, width =
         </Box>
       )}
       
-      <DataLayersToggle
-            visibleLayers={visibleLayers}
-            onToggle={toggleLayer}
+      {/* Tree Details Popup */}
+      {selectedTree && (
+        <TreeDetailsPopup
+          tree={{
+            id: selectedTree.id,
+            species: selectedTree.category,
+            healthCondition: selectedTree.health,
+            dbh: selectedTree.details?.dbh,
+            height: selectedTree.details?.height,
+            observationDate: selectedTree.details?.observationDate,
+            lat: selectedTree.lat,
+            lng: selectedTree.lng,
+            ...selectedTree.details
+          }}
+          onClose={handleClosePopup}
         />
+      )}
     </Box>
   );
 };
