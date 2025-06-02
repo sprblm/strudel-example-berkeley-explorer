@@ -15,8 +15,9 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import { TreeIcon, AirQualityIcon, LocationIcon } from '../../../components/Icons';
+import { useFilters } from '../../../components/FilterContext';
 import { styled } from '@mui/material/styles';
- */
+
 const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected }) => ({
   border: '1.5px solid',
   borderColor: selected ? theme.palette.primary.main : theme.palette.grey[300],
@@ -38,6 +39,8 @@ const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected })
 }));
 
 const FiltersPanel: React.FC = () => {
+  const { setFilter, clearFilters } = useFilters();
+  
   // State for active tab
   const [activeTab, setActiveTab] = useState<number>(2); // Default to Locations tab
   
@@ -61,6 +64,82 @@ const FiltersPanel: React.FC = () => {
   
   const handleTabChange = (newValue: number) => {
     setActiveTab(newValue);
+  };
+  
+  // Handle search for Locations
+  const handleLocationSearch = () => {
+    clearFilters(); // Clear previous filters
+    
+    // Apply location-specific filters
+    setFilter('type', 'location');
+    
+    if (locationName && locationName !== '') {
+      setFilter('name', locationName);
+    }
+    
+    if (locationType && locationType !== 'Any') {
+      setFilter('location_type', locationType);
+    }
+  };
+  
+  // Handle search for Trees
+  const handleTreeSearch = () => {
+    clearFilters(); // Clear previous filters
+    
+    // Apply tree-specific filters
+    setFilter('type', 'tree');
+    
+    if (species && species !== '') {
+      setFilter('species', species);
+    }
+    
+    if (health && health !== 'Any') {
+      setFilter('health', health);
+    }
+    
+    if (minHeight > 0) {
+      // Use a custom field name to indicate filter type
+      setFilter('height_min', minHeight);
+    }
+    
+    if (maxHeight < 100) {
+      // Use a custom field name to indicate filter type
+      setFilter('height_max', maxHeight);
+    }
+  };
+  
+  // Handle search for Air Quality
+  const handleAirQualitySearch = () => {
+    clearFilters(); // Clear previous filters
+    
+    // Apply air quality-specific filters
+    setFilter('type', 'air');
+    
+    if (dataSource && dataSource !== 'Any') {
+      setFilter('source', dataSource);
+    }
+    
+    if (aqParam && aqParam !== 'Any') {
+      setFilter('parameter', aqParam);
+    }
+    
+    // Handle PM2.5 range
+    if (minPm25 > 0) {
+      setFilter('pm25_min', minPm25);
+    }
+    
+    if (maxPm25 < 100) {
+      setFilter('pm25_max', maxPm25);
+    }
+    
+    // Handle Ozone range
+    if (minOzone > 0) {
+      setFilter('ozone_min', minOzone);
+    }
+    
+    if (maxOzone < 200) {
+      setFilter('ozone_max', maxOzone);
+    }
   };
   
   // Trees filter content
@@ -176,6 +255,7 @@ const FiltersPanel: React.FC = () => {
           textTransform: 'none',
           py: 1.5
         }}
+        onClick={handleTreeSearch}
       >
         Search Trees
       </Button>
@@ -292,6 +372,7 @@ const FiltersPanel: React.FC = () => {
           textTransform: 'none',
           py: 1.5
         }}
+        onClick={handleAirQualitySearch}
       >
         Search Air Quality
       </Button>
@@ -343,6 +424,7 @@ const FiltersPanel: React.FC = () => {
           textTransform: 'none',
           py: 1.5
         }}
+        onClick={handleLocationSearch}
       >
         Search Locations
       </Button>
