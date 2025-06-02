@@ -1,3 +1,8 @@
+/**
+ * PreviewPanel component for the Search Repositories section.
+ * Displays detailed information about a selected dataset including metadata, quality ratings, and download options.
+ * Provides a comprehensive view of dataset attributes and allows users to explore or download the data.
+ */
 import React from 'react';
 import {
   Box,

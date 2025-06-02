@@ -1,12 +1,12 @@
+/**
+ * ExploreDataLayout component for the Explore Data section.
+ * Serves as the layout wrapper for all data exploration pages, providing consistent navigation and structure.
+ * Renders the TopBar navigation and contains the outlet for child route components.
+ */
 import { Box } from '@mui/material';
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { TopBar } from '../../components/TopBar';
-
-/**
- * Top-level wrapper for the explore-data Task Flow templates.
- * Inner pages are rendered inside the `<Outlet />` component
- */
 const ExploreDataLayout: React.FC = () => {
   return (
     <Box>

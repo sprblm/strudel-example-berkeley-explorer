@@ -1,3 +1,8 @@
+/**
+ * Main application entry point component for the Berkeley Environmental Health Explorer.
+ * Serves as the root page that provides navigation to all main sections of the application.
+ * Displays an overview of available features and quick access to key workflows.
+ */
 import {
   Box,
   Container,

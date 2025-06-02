@@ -1,3 +1,8 @@
+/**
+ * FiltersPanel component for the Search Repositories section.
+ * Provides a tabbed interface for filtering environmental data by Trees, Air Quality, and Locations.
+ * Includes sliders, selects, and other controls for refining search results based on various criteria.
+ */
 import { 
   Box, 
   Typography, 
@@ -11,9 +16,6 @@ import {
 import React, { useState } from 'react';
 import { TreeIcon, AirQualityIcon, LocationIcon } from '../../../components/Icons';
 import { styled } from '@mui/material/styles';
-
-/**
- * Filters panel component with tabbed interface for Trees, Air Quality, and Locations
  */
 const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected }) => ({
   border: '1.5px solid',

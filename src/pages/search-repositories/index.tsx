@@ -1,3 +1,9 @@
+/**
+ * DatasetExplorer component for the Search Repositories section.
+ * The main page for searching and discovering environmental datasets.
+ * Provides an interactive interface with filtering options, map visualization, and search results.
+ * Integrates map-based selection with textual filtering for comprehensive dataset discovery.
+ */
 import { Box, Container, Typography, Paper, Grid, CircularProgress } from '@mui/material';
 import { useState, useEffect } from 'react';
 import FiltersPanel from './_components/FiltersPanel'; 
@@ -7,11 +13,6 @@ import DataListPanel from './_components/DataListPanel';
 import type { Dataset } from '../../types/dataset.types';
 import BerkeleyDataMap from '../../components/BerkeleyDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
-
-/**
- * The main explore page for the search-data-repositories Task Flow.
- * Displays a page header, filters panel, map view, and search results.
- */
 
 const DatasetExplorer: React.FC = () => {
   const [previewItem, setPreviewItem] = useState<Dataset | null>(null);

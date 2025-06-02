@@ -1,13 +1,13 @@
+/**
+ * DataListPanel component for the Search Repositories section.
+ * Displays search results in a clean, modern format with sorting capabilities.
+ * Shows dataset titles, descriptions, and metadata with options to preview selected items.
+ */
 import { Box, Typography, Paper, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { ArrowRightIcon } from '../../../components/Icons';
 import { Button } from '../../../components/Button';
 import { DataListPanelProps } from '../_config/taskflow.types';
 import { useState, useEffect } from 'react';
-
-/**
- * Display search results in a clean, modern format
- * Shows dataset title, description, and metadata
- */
 const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListPanelProps) => {
   const [sortBy, setSortBy] = useState('relevance');
   const [sortedResults, setSortedResults] = useState(searchResults);
