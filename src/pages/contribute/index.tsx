@@ -1,3 +1,11 @@
+/**
+ * Contribute Data Page
+ * 
+ * Enables users to submit environmental data including tree measurements and air quality readings.
+ * Features a multi-step form with validation, file uploads, and location mapping.
+ * Integrates with the platform's data collection system for community contributions.
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 

@@ -1,3 +1,11 @@
+/**
+ * About Page
+ * 
+ * Main about page for the Berkeley Environmental Health Explorer platform.
+ * Provides an overview of the project, its goals, and how users can contribute.
+ * Includes information about the team, data sources, and project background.
+ */
+
 import React from 'react';
 import { Box, Container, Typography, Paper, Grid, Stack, Divider } from '@mui/material';
 import { PageHeader } from '../../components/PageHeader';
