@@ -1,4 +1,12 @@
 
+/**
+ * AirQualityLayer Component
+ * 
+ * Renders air quality monitoring points on the map using Deck.GL's IconLayer.
+ * Displays air quality measurement locations with custom icons and supports
+ * visibility toggling and click interactions.
+ */
+
 import { IconLayer } from '@deck.gl/layers';
 
 interface AirQualityLayerProps {

@@ -1,3 +1,11 @@
+/**
+ * LayerControls Component
+ * 
+ * Provides UI controls for toggling the visibility of different map layers.
+ * Currently a placeholder for future implementation to manage layer visibility
+ * through a user interface component.
+ */
+
 import React from 'react';
 
 interface LayerControlsProps {

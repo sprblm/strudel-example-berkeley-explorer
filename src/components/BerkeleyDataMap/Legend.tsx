@@ -1,3 +1,11 @@
+/**
+ * Legend Component
+ * 
+ * Renders the map legend that explains the symbols and colors used for different
+ * data layers. Currently a placeholder for future implementation to display
+ * legend information based on visible map layers.
+ */
+
 import React from 'react';
 
 interface LegendProps {
