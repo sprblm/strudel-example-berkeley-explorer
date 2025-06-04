@@ -1,16 +1,18 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  CircleMarker,
+} from 'react-leaflet';
 
 // This component is lazily loaded to avoid SSR issues with Leaflet
 const LeafletComponents = (props: any) => {
   const { children, center, zoom, style } = props;
-  
+
   return (
-    <MapContainer 
-      center={center} 
-      zoom={zoom} 
-      style={style}
-    >
+    <MapContainer center={center} zoom={zoom} style={style}>
       {children}
     </MapContainer>
   );

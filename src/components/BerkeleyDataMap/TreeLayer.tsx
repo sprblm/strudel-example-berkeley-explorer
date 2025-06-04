@@ -8,12 +8,12 @@ interface TreeLayerProps {
 export const TreeLayer = ({ data, visible }: TreeLayerProps) => {
   if (!visible) return null;
   return new IconLayer({
-    id: "tree-icon-layer",
+    id: 'tree-icon-layer',
     data,
     pickable: true,
-    iconAtlas: "/icons/tree.svg",
+    iconAtlas: '/icons/tree.svg',
     iconMapping: { marker: { x: 0, y: 0, width: 22, height: 22, mask: false } },
-    getIcon: () => "marker",
+    getIcon: () => 'marker',
     sizeScale: 1,
     getPosition: (d: any) => [d.lng, d.lat],
     getSize: 22,

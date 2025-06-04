@@ -19,7 +19,7 @@ interface State {
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
-    error: null
+    error: null,
   };
 
   static getDerivedStateFromError(error: Error): State {
@@ -48,7 +48,7 @@ class ErrorBoundary extends Component<Props, State> {
             m: 2,
             textAlign: 'center',
             bgcolor: 'error.light',
-            color: 'error.contrastText'
+            color: 'error.contrastText',
           }}
         >
           <ErrorOutlineIcon sx={{ fontSize: 60, mb: 2 }} />
@@ -56,7 +56,8 @@ class ErrorBoundary extends Component<Props, State> {
             Something went wrong
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            {this.state.error?.message || 'An error has occurred in this component.'}
+            {this.state.error?.message ||
+              'An error has occurred in this component.'}
           </Typography>
           <Button
             variant="contained"

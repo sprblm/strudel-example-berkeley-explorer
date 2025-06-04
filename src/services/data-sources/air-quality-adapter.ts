@@ -1,10 +1,20 @@
-import { DataSourceAdapter, HttpClientConfig, SearchOptions, SearchResult, SourceMetadata } from './types';
+import {
+  DataSourceAdapter,
+  HttpClientConfig,
+  SearchOptions,
+  SearchResult,
+  SourceMetadata,
+} from './types';
 
 export class AirQualityAdapter implements DataSourceAdapter {
   public id = 'air-quality';
+
   public name = 'Air Quality Data';
+
   public homepageUrl = 'https://example.com/air-quality';
+
   public logoUrl = 'https://example.com/air-quality-logo.png';
+
   public description = 'Air Quality Data';
 
   constructor(params: HttpClientConfig) {
@@ -17,7 +27,7 @@ export class AirQualityAdapter implements DataSourceAdapter {
       datasets: [], // Return mock or actual datasets
       total: 0, // Return total count of datasets
       page: options.page || 1,
-      limit: options.limit || 10
+      limit: options.limit || 10,
     };
   }
 

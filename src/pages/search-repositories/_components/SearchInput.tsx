@@ -2,8 +2,17 @@
  * SearchInput component for the search-repositories section.
  * Provides a search box with auto-suggestions for finding environmental data.
  */
+
 import { useState, useRef } from 'react';
-import { InputBase, Box, Popper, Paper, List, ListItem, ClickAwayListener } from '@mui/material';
+import {
+  InputBase,
+  Box,
+  Popper,
+  Paper,
+  List,
+  ListItem,
+  ClickAwayListener,
+} from '@mui/material';
 import { SearchIcon } from '../../../components/Icons';
 
 interface SearchInputProps {
@@ -20,14 +29,14 @@ export default function SearchInput({
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  
+
   // Close suggestions when user clicks outside
   const handleClickAway = () => {
     setOpen(false);
   };
 
   // Filter suggestions based on input value
-  const filteredSuggestions = suggestions.filter(suggestion => 
+  const filteredSuggestions = suggestions.filter((suggestion) =>
     suggestion.toLowerCase().includes(value.toLowerCase())
   );
 
@@ -63,22 +72,22 @@ export default function SearchInput({
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box 
+      <Box
         ref={anchorRef}
-        sx={{ 
+        sx={{
           position: 'relative',
-          width: '100%'
+          width: '100%',
         }}
       >
         <Box sx={{ position: 'relative' }}>
-          <SearchIcon 
-            size={18} 
-            style={{ 
+          <SearchIcon
+            size={18}
+            style={{
               position: 'absolute',
               left: '14px',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: '#6B7280'
+              color: '#6B7280',
             }}
           />
           <InputBase
@@ -88,7 +97,7 @@ export default function SearchInput({
             onFocus={handleFocus}
             placeholder="Search datasets..."
             fullWidth
-            sx={{ 
+            sx={{
               pl: 4.5,
               pr: 2,
               py: 0.75,
@@ -102,36 +111,39 @@ export default function SearchInput({
               '&.Mui-focused': {
                 backgroundColor: 'grey.200',
                 boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
-              }
+              },
             }}
             aria-label="Search input"
           />
         </Box>
 
         {/* Suggestions dropdown */}
-        <Popper 
+        <Popper
           open={open && filteredSuggestions.length > 0}
           anchorEl={anchorRef.current}
           placement="bottom-start"
-          style={{ 
+          style={{
             width: anchorRef.current?.clientWidth,
-            zIndex: 1200
+            zIndex: 1200,
           }}
         >
-          <Paper elevation={2} sx={{ mt: 0.5, maxHeight: 300, overflow: 'auto' }}>
+          <Paper
+            elevation={2}
+            sx={{ mt: 0.5, maxHeight: 300, overflow: 'auto' }}
+          >
             <List sx={{ py: 0.5 }}>
               {filteredSuggestions.map((suggestion, index) => (
-                <ListItem 
+                <ListItem
                   key={index}
                   onClick={() => handleSelect(suggestion)}
-                  sx={{ 
+                  sx={{
                     py: 0.75,
                     px: 2,
                     cursor: 'pointer',
                     fontSize: '0.875rem',
                     '&:hover': {
                       backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                    }
+                    },
                   }}
                 >
                   {suggestion}

@@ -5,10 +5,7 @@ import {
   setData,
   setFilteredData,
 } from './actions';
-import {
-  DataFilter,
-  FilterConfig,
-} from '../../../types/filters.types';
+import { DataFilter, FilterConfig } from '../../../types/filters.types';
 import { CardFields } from '../../../types/card.types';
 import { filterData } from '../../../utils/filters.utils';
 
@@ -65,7 +62,7 @@ const initialState: SearchDataRepositoriesState = {
     resolution: '',
     variables: '',
     citation: '',
-    download_url: ''
+    download_url: '',
   },
   columns: [],
   filters: [],

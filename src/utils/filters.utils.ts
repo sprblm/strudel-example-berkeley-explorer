@@ -32,7 +32,11 @@ export const filterByDataFilters = <T extends Record<string, unknown>>(
         switch (filterOperatorMap[f.field]) {
           case 'contains': {
             const fieldValue = d[f.field as keyof typeof d];
-            if (typeof fieldValue === 'string' && typeof f.value === 'string' && fieldValue.indexOf(f.value) > -1) {
+            if (
+              typeof fieldValue === 'string' &&
+              typeof f.value === 'string' &&
+              fieldValue.indexOf(f.value) > -1
+            ) {
               match = true;
             }
             break;

@@ -77,16 +77,20 @@ export const FilterContextProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [state, dispatch] = useReducer(filterReducer, initialState);
 
-const setFilter = (field: string, value: unknown, operator: FilterOperator = FilterOperator.EQUALS) => {
-  dispatch({
-    type: 'SET_FILTER',
-    payload: {
-      field,
-      value,
-      operator,
-    },
-  });
-};
+  const setFilter = (
+    field: string,
+    value: unknown,
+    operator: FilterOperator = FilterOperator.EQUALS
+  ) => {
+    dispatch({
+      type: 'SET_FILTER',
+      payload: {
+        field,
+        value,
+        operator,
+      },
+    });
+  };
   const clearFilters = () => {
     dispatch({ type: 'SET_ACTIVE_FILTERS', payload: [] });
   };

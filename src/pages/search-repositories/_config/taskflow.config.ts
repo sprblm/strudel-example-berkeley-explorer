@@ -1,3 +1,9 @@
+/**
+ * Configuration for the Search Data Repositories taskflow.
+ * This file defines the structure and types for the taskflow configuration
+ * used across the search data repositories application
+ */
+
 import { TaskflowConfig } from './taskflow.types';
 
 export const taskflow: TaskflowConfig = {
@@ -18,20 +24,25 @@ export const taskflow: TaskflowConfig = {
       queryMode: 'client',
     },
     repositories: [
-      { id: 'urban-tree-inventory', name: 'Urban Tree Inventory Data', enabled: true },
+      {
+        id: 'urban-tree-inventory',
+        name: 'Urban Tree Inventory Data',
+        enabled: true,
+      },
       { id: 'air-quality', name: 'Air Quality Monitoring Data', enabled: true },
       { id: 'user', name: 'User-contributed datasets', enabled: true },
     ],
   },
   pages: {
     index: {
-      description: 'Search across multiple urban environmental health data repositories',
+      description:
+        'Search across multiple urban environmental health data repositories',
       cardFields: {
         idField: 'id',
         titleField: 'title',
         contentField: 'summary',
         dateField: 'publication_date',
-        categoryField: 'category'
+        categoryField: 'category',
       },
       filters: {
         fields: [
@@ -96,8 +107,8 @@ export const taskflow: TaskflowConfig = {
               // Date range picker props
             },
           },
-        ]
-      }
-    }
-  }
+        ],
+      },
+    },
+  },
 };

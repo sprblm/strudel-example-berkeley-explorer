@@ -32,7 +32,7 @@ export const useListQuery = (dataQueryConfig: DataQueryConfig): any => {
   }, []);
 
   // If in server mode, create query params from the active filters
-  let queryParams =
+  const queryParams =
     dataQueryConfig.queryMode === 'server'
       ? createFilterParams(
           dataQueryConfig.activeFilters,
@@ -80,33 +80,40 @@ export const useListQuery = (dataQueryConfig: DataQueryConfig): any => {
         abortControllerRef.current.abort();
       }
       abortControllerRef.current = new AbortController();
-      
+
       const queryString = queryParams.toString();
       let fullDataSourcePath = dataQueryConfig.dataSource;
       if (queryString && queryString.length > 0) {
         fullDataSourcePath = `${dataQueryConfig.dataSource}?${queryString}`;
       }
-      
+
       console.log('useListQuery: Fetching data from', fullDataSourcePath);
-      const results = await fetchData(fullDataSourcePath, abortControllerRef.current.signal);
+      const results = await fetchData(
+        fullDataSourcePath,
+        abortControllerRef.current.signal
+      );
       console.log('useListQuery: Raw results from fetchData:', results);
-      
+
       // Normalize the data format
       // If the results is an array, return it directly
-      // If results has a datasets property, return it as an array 
+      // If results has a datasets property, return it as an array
       if (Array.isArray(results)) {
         console.log('useListQuery: Results is an array, returning directly');
         return results;
       } else if (results && typeof results === 'object') {
         if (results.datasets && Array.isArray(results.datasets)) {
-          console.log('useListQuery: Results has datasets array, returning datasets');
+          console.log(
+            'useListQuery: Results has datasets array, returning datasets'
+          );
           return results.datasets;
         } else if (results.results && Array.isArray(results.results)) {
-          console.log('useListQuery: Results has results array, returning results');
+          console.log(
+            'useListQuery: Results has results array, returning results'
+          );
           return results.results;
         }
       }
-      
+
       // If we can't normalize, return as is
       console.log('useListQuery: Could not normalize results, returning as is');
       return results;

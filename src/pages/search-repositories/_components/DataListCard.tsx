@@ -1,20 +1,26 @@
-import React from 'react';
-import { Box, Card, Stack, Typography, IconButton } from '@mui/material';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-
 /**
  * Card component that displays data in the DataListPanel
  * Clicking the card selects it for preview in the PreviewPanel
  */
+
+import React from 'react';
+import { Box, Card, Stack, Typography, IconButton } from '@mui/material';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+
 const cardStyles = {
   marginBottom: 2,
-  borderColor: 'primary.main'
+  borderColor: 'primary.main',
 };
 
 interface Dataset {
   title: string;
   summary: string;
-  attached_files?: { file_id: number; file_name: string; file_size: string; description: string }[];
+  attached_files?: {
+    file_id: number;
+    file_name: string;
+    file_size: string;
+    description: string;
+  }[];
 }
 
 interface DataListCardProps {
@@ -26,15 +32,17 @@ interface DataListCardProps {
 const DataListCard: React.FC<DataListCardProps> = ({
   dataset,
   onClick,
-  isSelected
+  isSelected,
 }) => {
   return (
-    <Card sx={{
-      ...cardStyles,
-      border: isSelected ? '1px solid' : 'none',
-      transition: 'all 0.2s',
-      ':hover': { boxShadow: 3 }
-    }}>
+    <Card
+      sx={{
+        ...cardStyles,
+        border: isSelected ? '1px solid' : 'none',
+        transition: 'all 0.2s',
+        ':hover': { boxShadow: 3 },
+      }}
+    >
       <Box onClick={onClick} sx={{ cursor: 'pointer' }}>
         <Box sx={{ p: 2 }}>
           <Stack direction="row" spacing={2} alignItems="center">

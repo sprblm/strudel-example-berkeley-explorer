@@ -64,7 +64,7 @@ import {
   AlertTriangle,
   Leaf,
   Cpu,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 
 /**

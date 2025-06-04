@@ -86,20 +86,30 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   // Generate some sample data for visualization based on the preview item
   const generateVisualizationData = () => {
     // For time series data (if available)
-    if (previewItem['Orbital Period Days'] && previewItem['Mass']) {
+    if (previewItem['Orbital Period Days'] && previewItem.Mass) {
       return {
         timeSeriesData: {
-          x: Array.from({ length: 20 }, (_, i) => i * (previewItem['Orbital Period Days'] / 20)),
-          y: Array.from({ length: 20 }, (_, i) => Math.sin(i * 0.5) * previewItem['Mass'] / 10 + previewItem['Mass']),
+          x: Array.from(
+            { length: 20 },
+            (_, i) => i * (previewItem['Orbital Period Days'] / 20)
+          ),
+          y: Array.from(
+            { length: 20 },
+            (_, i) =>
+              (Math.sin(i * 0.5) * previewItem.Mass) / 10 + previewItem.Mass
+          ),
         },
         scatterData: {
-          x: [previewItem['Orbital Period Days'] || 0, previewItem['Eccentricity'] * 100 || 0],
-          y: [previewItem['Mass'] || 0, previewItem['Mass'] * 0.8 || 0],
+          x: [
+            previewItem['Orbital Period Days'] || 0,
+            previewItem.Eccentricity * 100 || 0,
+          ],
+          y: [previewItem.Mass || 0, previewItem.Mass * 0.8 || 0],
           text: ['Current', 'Projected'],
-        }
+        },
       };
     }
-    
+
     // Default data if specific fields aren't available
     return {
       timeSeriesData: {
@@ -110,7 +120,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         x: [1, 2, 3, 4],
         y: [10, 15, 13, 17],
         text: ['A', 'B', 'C', 'D'],
-      }
+      },
     };
   };
 
@@ -144,12 +154,20 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             </IconButton>
           </Stack>
           <Typography variant="body2">
-            Detailed information and visualizations for {columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'}.
+            Detailed information and visualizations for{' '}
+            {columns?.[0]?.field
+              ? previewItem[columns?.[0]?.field]
+              : 'Unknown Item'}
+            .
           </Typography>
         </Stack>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleTabChange} aria-label="preview tabs">
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="preview tabs"
+          >
             <Tab label="Overview" />
             <Tab label="Visualizations" />
             <Tab label="Related Data" />
@@ -167,9 +185,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 rows={Object.entries(previewItem)
                   .filter(([key]) => !key.includes('Id') && key !== 'id')
                   .slice(0, 5)
-                  .map(([key, value]) => ({ 
-                    label: key, 
-                    value: value !== null && value !== undefined ? value.toString() : 'N/A' 
+                  .map(([key, value]) => ({
+                    label: key,
+                    value:
+                      value !== null && value !== undefined
+                        ? value.toString()
+                        : 'N/A',
                   }))}
               />
             </Box>
@@ -181,9 +202,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 rows={Object.entries(previewItem)
                   .filter(([key]) => !key.includes('Id') && key !== 'id')
                   .slice(5, 10)
-                  .map(([key, value]) => ({ 
-                    label: key, 
-                    value: value !== null && value !== undefined ? value.toString() : 'N/A' 
+                  .map(([key, value]) => ({
+                    label: key,
+                    value:
+                      value !== null && value !== undefined
+                        ? value.toString()
+                        : 'N/A',
                   }))}
               />
             </Box>
@@ -210,7 +234,9 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                     },
                   ]}
                   layout={{
-                    title: { text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Time Series` },
+                    title: {
+                      text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Time Series`,
+                    },
                     xaxis: { title: { text: 'Time (days)' } },
                     yaxis: { title: { text: 'Value' } },
                     autosize: true,
@@ -233,16 +259,18 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                       y: visualizationData.scatterData.y,
                       type: 'scatter',
                       mode: 'markers',
-                      marker: { 
+                      marker: {
                         color: ['red', 'blue'],
-                        size: 12 
+                        size: 12,
                       },
                       text: visualizationData.scatterData.text,
                       name: 'Comparison',
                     },
                   ]}
                   layout={{
-                    title: { text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Comparison` },
+                    title: {
+                      text: `${columns?.[0]?.field ? previewItem[columns?.[0]?.field] : 'Unknown Item'} - Comparison`,
+                    },
                     xaxis: { title: { text: 'Parameter 1' } },
                     yaxis: { title: { text: 'Parameter 2' } },
                     autosize: true,

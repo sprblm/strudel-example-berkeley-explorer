@@ -32,7 +32,10 @@ class HttpClient {
     };
 
     try {
-      const response: AxiosResponse<T> = await this.instance.get<T>(path, config);
+      const response: AxiosResponse<T> = await this.instance.get<T>(
+        path,
+        config
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -53,7 +56,11 @@ class HttpClient {
     };
 
     try {
-      const response: AxiosResponse<T> = await this.instance.post<T>(path, data, config);
+      const response: AxiosResponse<T> = await this.instance.post<T>(
+        path,
+        data,
+        config
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);

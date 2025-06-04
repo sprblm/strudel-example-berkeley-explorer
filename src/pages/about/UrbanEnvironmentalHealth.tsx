@@ -1,6 +1,6 @@
 /**
  * BEHE Component
- * 
+ *
  * Displays information about the Built Environment for Health and Equity (BEHE) concepts and their impact on communities.
  * Provides an overview of key environmental factors affecting urban populations.
  */
@@ -19,7 +19,9 @@ const BEHE: React.FC = () => {
         Berkeley Environmental Health Explorer
       </Typography>
       <Typography variant="body1" sx={{ mb: 2 }}>
-        The Berkeley Environmental Health Explorer focuses on the impact of environmental factors on human health in urban areas. Key aspects include:
+        The Berkeley Environmental Health Explorer focuses on the impact of
+        environmental factors on human health in urban areas. Key aspects
+        include:
       </Typography>
       <List sx={{ mb: 2 }}>
         <ListItem>

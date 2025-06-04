@@ -24,15 +24,18 @@ export const ChartView: React.FC<ChartViewProps> = ({
   setPreviewItem,
 }) => {
   const { activeFilters } = useFilters();
-  const filterConfigs = (taskflow.pages.index.tableFilters || []) as FilterConfig[];
+  const filterConfigs = (taskflow.pages.index.tableFilters ||
+    []) as FilterConfig[];
   const columns = (taskflow.pages.index.tableColumns || []) as any[]; // Cast to any[] to avoid GridColType issues
-  
+
   const { isPending, isError, data, error } = useListQuery({
     activeFilters,
     dataSource: 'urban-tree-inventory',
     filterConfigs,
     queryMode: 'client',
-    staticParams: { /* Add static params if necessary */ },
+    staticParams: {
+      /* Add static params if necessary */
+    },
     offset: 0,
     page: 1,
     pageSize: 100,
@@ -61,17 +64,22 @@ export const ChartView: React.FC<ChartViewProps> = ({
   if (isError) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography color="error">Error loading chart data: {error.message}</Typography>
+        <Typography color="error">
+          Error loading chart data: {error.message}
+        </Typography>
       </Box>
     );
   }
 
   // Filter data based on active filters and search term
-  const filteredTreeData = data ? filterData(data, activeFilters, filterConfigs, searchTerm) : [];
-  
+  const filteredTreeData = data
+    ? filterData(data, activeFilters, filterConfigs, searchTerm)
+    : [];
+
   // Get the first two columns for the chart
-  const numericColumns = columns?.filter((col: any) => col.type === 'number') || [];
-  
+  const numericColumns =
+    columns?.filter((col: any) => col.type === 'number') || [];
+
   // If we don't have numeric columns, show a message
   if (numericColumns.length === 0) {
     return (
@@ -83,13 +91,16 @@ export const ChartView: React.FC<ChartViewProps> = ({
 
   // Get the first two numeric columns for our default chart
   const xAxisField = numericColumns[0]?.field || columns[0]?.field || '';
-  const yAxisField = numericColumns[1]?.field || 
-    (numericColumns[0]?.field && numericColumns[0]?.field !== columns[0]?.field ? 
-      columns[0]?.field : 
-      columns[1]?.field) || '';
-  
+  const yAxisField =
+    numericColumns[1]?.field ||
+    (numericColumns[0]?.field && numericColumns[0]?.field !== columns[0]?.field
+      ? columns[0]?.field
+      : columns[1]?.field) ||
+    '';
+
   // Get a categorical field for grouping if available
-  const categoricalColumns = columns?.filter((col: any) => col.type !== 'number') || [];
+  const categoricalColumns =
+    columns?.filter((col: any) => col.type !== 'number') || [];
   const groupField = categoricalColumns[0]?.field;
 
   // Prepare data for scatter plot
@@ -103,7 +114,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
       size: 10,
       opacity: 0.7,
     },
-    name: 'Data Points'
+    name: 'Data Points',
   };
 
   // Prepare data for bar chart
@@ -111,11 +122,15 @@ export const ChartView: React.FC<ChartViewProps> = ({
   const barData = (() => {
     if (groupField) {
       // Get unique categories
-      const categories = [...new Set(filteredTreeData.map((item: any) => item[groupField]))];
-      
+      const categories = [
+        ...new Set(filteredTreeData.map((item: any) => item[groupField])),
+      ];
+
       // Create a bar for each category
-      return categories.map(category => {
-        const categoryData = filteredTreeData.filter((item: any) => item[groupField] === category);
+      return categories.map((category) => {
+        const categoryData = filteredTreeData.filter(
+          (item: any) => item[groupField] === category
+        );
         return {
           x: categoryData.map((item: any) => item[xAxisField]),
           y: categoryData.map((item: any) => item[yAxisField]),
@@ -125,12 +140,16 @@ export const ChartView: React.FC<ChartViewProps> = ({
       });
     } else {
       // Simple bar chart without grouping
-      return [{
-        x: filteredTreeData.slice(0, 20).map((item: any) => item[columns[0]?.field || '']),
-        y: filteredTreeData.slice(0, 20).map((item: any) => item[yAxisField]),
-        type: 'bar' as const,
-        name: yAxisField,
-      }];
+      return [
+        {
+          x: filteredTreeData
+            .slice(0, 20)
+            .map((item: any) => item[columns[0]?.field || '']),
+          y: filteredTreeData.slice(0, 20).map((item: any) => item[yAxisField]),
+          type: 'bar' as const,
+          name: yAxisField,
+        },
+      ];
     }
   })();
 
@@ -165,7 +184,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
                 layout={{
                   title: {
                     text: `${yAxisField} vs ${xAxisField}`,
-                    font: { size: 16 }
+                    font: { size: 16 },
                   },
                   xaxis: { title: xAxisField },
                   yaxis: { title: yAxisField },
@@ -179,7 +198,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
             </Box>
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
@@ -190,9 +209,15 @@ export const ChartView: React.FC<ChartViewProps> = ({
                 data={[
                   {
                     type: 'bar',
-                    x: filteredTreeData.slice(0, 20).map((item: any) => item[columns[0]?.field || '']),
-                    y: filteredTreeData.slice(0, 20).map((item: any) => item[numericColumns[0]?.field || '']),
-                    text: filteredTreeData.map((item: any) => item[columns[0]?.field || '']),
+                    x: filteredTreeData
+                      .slice(0, 20)
+                      .map((item: any) => item[columns[0]?.field || '']),
+                    y: filteredTreeData
+                      .slice(0, 20)
+                      .map((item: any) => item[numericColumns[0]?.field || '']),
+                    text: filteredTreeData.map(
+                      (item: any) => item[columns[0]?.field || '']
+                    ),
                     marker: {
                       color: 'rgb(55, 83, 109)',
                       opacity: 0.7,
@@ -203,8 +228,8 @@ export const ChartView: React.FC<ChartViewProps> = ({
                   title: {
                     text: `${numericColumns[0]?.headerName || 'Value'} by ${columns[0]?.headerName || 'Category'}`,
                     font: {
-                      size: 16
-                    }
+                      size: 16,
+                    },
                   },
                   xaxis: { title: columns[0]?.headerName || 'Category' },
                   yaxis: { title: numericColumns[0]?.headerName || 'Value' },
@@ -215,7 +240,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
             </Box>
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12}>
           <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
@@ -225,7 +250,9 @@ export const ChartView: React.FC<ChartViewProps> = ({
               <Plot
                 data={[
                   {
-                    x: filteredTreeData.slice(0, 20).map((item: any) => item[xAxisField]),
+                    x: filteredTreeData
+                      .slice(0, 20)
+                      .map((item: any) => item[xAxisField]),
                     type: 'histogram',
                     name: xAxisField,
                     marker: {
@@ -237,7 +264,7 @@ export const ChartView: React.FC<ChartViewProps> = ({
                 layout={{
                   title: {
                     text: `Distribution of ${xAxisField}`,
-                    font: { size: 16 }
+                    font: { size: 16 },
                   },
                   xaxis: { title: xAxisField },
                   yaxis: { title: 'Count' },

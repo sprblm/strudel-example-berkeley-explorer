@@ -1,13 +1,16 @@
 import { Repository } from './types';
 import { HttpClient } from './http-client';
-import { 
-  DataSourceAdapter, 
-  SearchOptions, 
-  SearchResult, 
+import {
+  DataSourceAdapter,
+  SearchOptions,
+  SearchResult,
   SourceMetadata,
-  HttpClientConfig
+  HttpClientConfig,
 } from './types';
-import { filterByDataFilters, filterBySearchText } from '../../utils/filters.utils';
+import {
+  filterByDataFilters,
+  filterBySearchText,
+} from '../../utils/filters.utils';
 import { DataFilter, FilterConfig } from '../../types/filters.types';
 
 /**
@@ -16,10 +19,15 @@ import { DataFilter, FilterConfig } from '../../types/filters.types';
  */
 export class WorldClimAdapter implements DataSourceAdapter {
   public id = 'worldclim';
+
   public name = 'WorldClim';
+
   public homepageUrl = 'https://www.worldclim.org/';
+
   public logoUrl = 'https://www.worldclim.org/img/worldclim_logo.png';
-  public description = 'WorldClim is a database of high spatial resolution global weather and climate data. These data can be used for mapping and spatial modeling.';
+
+  public description =
+    'WorldClim is a database of high spatial resolution global weather and climate data. These data can be used for mapping and spatial modeling.';
 
   private client: HttpClient;
 
@@ -39,37 +47,43 @@ export class WorldClimAdapter implements DataSourceAdapter {
   async searchDatasets(options: SearchOptions): Promise<SearchResult> {
     try {
       // Use client in a simulated API call
-      console.log('WorldClimAdapter: searchDatasets called with options:', options);
-      
+      console.log(
+        'WorldClimAdapter: searchDatasets called with options:',
+        options
+      );
+
       // Make a client request to show usage
-      this.client.get('datasets/search', { 
+      this.client.get('datasets/search', {
         query: options.query,
-        variables: options.variables?.join(',')
+        variables: options.variables?.join(','),
       });
-      
+
       // For demonstration, we'll simulate an API response
       const datasets = this.getMockDatasets();
-      console.log('WorldClimAdapter: mock datasets before filtering:', datasets.length);
-      
+      console.log(
+        'WorldClimAdapter: mock datasets before filtering:',
+        datasets.length
+      );
+
       // Convert search options to filters
       const filters: DataFilter[] = [];
-      
+
       // Add query filter if present
       if (options.query) {
         filters.push({
           field: 'name',
-          value: options.query
+          value: options.query,
         });
       }
-      
+
       // Add variables filter if present
       if (options.variables && options.variables.length > 0) {
         filters.push({
           field: 'variables',
-          value: options.variables
+          value: options.variables,
         });
       }
-      
+
       console.log('WorldClimAdapter: created filters:', filters);
 
       // Define filter configurations for different fields
@@ -79,58 +93,75 @@ export class WorldClimAdapter implements DataSourceAdapter {
           label: 'Name',
           operator: 'contains',
           filterComponent: 'TextInput',
-          transformValue: (value: string) => value.toLowerCase()
+          transformValue: (value: string) => value.toLowerCase(),
         } as FilterConfig,
         {
           field: 'variables',
           label: 'Variables',
           operator: 'contains-one-of',
           filterComponent: 'MultiSelect',
-          transformValue: (values: string[]) => values.map(v => v.toLowerCase())
+          transformValue: (values: string[]) =>
+            values.map((v) => v.toLowerCase()),
         } as FilterConfig,
         {
           field: 'temporalCoverage',
           label: 'Time Period',
           operator: 'between-dates-inclusive',
           filterComponent: 'DateRangePicker',
-          transformValue: (dates: string[]) => dates.map(d => new Date(d))
-        } as FilterConfig
+          transformValue: (dates: string[]) => dates.map((d) => new Date(d)),
+        } as FilterConfig,
       ];
-      
+
       console.log('WorldClimAdapter: using filterConfigs:', filterConfigs);
-      
+
       // Add source field to match UI filtering
-      let filteredDatasets = datasets.map(dataset => ({
+      let filteredDatasets = datasets.map((dataset) => ({
         ...dataset,
-        source: 'WorldClim'  // Add source to match UI filtering
+        source: 'WorldClim', // Add source to match UI filtering
       })) as Repository[];
 
-      console.log('WorldClimAdapter: datasets with source field added:', filteredDatasets.length);
-      
+      console.log(
+        'WorldClimAdapter: datasets with source field added:',
+        filteredDatasets.length
+      );
+
       // Apply text search if query is present
       if (options.query) {
-        filteredDatasets = filterBySearchText<Repository>(filteredDatasets, options.query);
-        console.log('WorldClimAdapter: after text search:', filteredDatasets.length);
+        filteredDatasets = filterBySearchText<Repository>(
+          filteredDatasets,
+          options.query
+        );
+        console.log(
+          'WorldClimAdapter: after text search:',
+          filteredDatasets.length
+        );
       }
-      
+
       // Apply other filters using the utility function
-      filteredDatasets = filterByDataFilters<Repository>(filteredDatasets, filters, filterConfigs);
-      console.log('WorldClimAdapter: after all filters:', filteredDatasets.length);
-      
+      filteredDatasets = filterByDataFilters<Repository>(
+        filteredDatasets,
+        filters,
+        filterConfigs
+      );
+      console.log(
+        'WorldClimAdapter: after all filters:',
+        filteredDatasets.length
+      );
+
       // Apply pagination
       const limit = options.limit || 25;
       const page = options.page || 1;
       const offset = (page - 1) * limit;
-      
+
       const result = {
         datasets: filteredDatasets.slice(offset, offset + limit),
         total: filteredDatasets.length,
         page: page,
         limit: limit,
       };
-      
+
       console.log('WorldClimAdapter: returning result:', result);
-      
+
       return result;
     } catch (error) {
       console.error('Error searching WorldClim datasets:', error);
@@ -151,18 +182,21 @@ export class WorldClimAdapter implements DataSourceAdapter {
       // Use client in a simulated API call
       console.log('Using client to get WorldClim dataset details:', datasetId);
       this.client.get(`datasets/${datasetId}`, {});
-      
+
       // For demonstration, return the mock dataset with the matching ID
       const allDatasets = this.getMockDatasets();
-      const dataset = allDatasets.find(ds => ds.id === datasetId);
-      
+      const dataset = allDatasets.find((ds) => ds.id === datasetId);
+
       if (!dataset) {
         throw new Error(`Dataset not found: ${datasetId}`);
       }
-      
+
       return { ...dataset, source: 'WorldClim' };
     } catch (error) {
-      console.error(`Error fetching WorldClim dataset details for ${datasetId}:`, error);
+      console.error(
+        `Error fetching WorldClim dataset details for ${datasetId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -184,12 +218,14 @@ export class WorldClimAdapter implements DataSourceAdapter {
           'Water Vapor Pressure',
           'Bioclimatic Variables',
         ],
-        regions: [
-          'Global',
-          'Land Only',
-        ],
+        regions: ['Global', 'Land Only'],
         resolutions: {
-          spatial: ['30 seconds (~1 km)', '2.5 minutes', '5 minutes', '10 minutes'],
+          spatial: [
+            '30 seconds (~1 km)',
+            '2.5 minutes',
+            '5 minutes',
+            '10 minutes',
+          ],
           temporal: ['Monthly', 'Annual'],
         },
         types: [
@@ -217,47 +253,60 @@ export class WorldClimAdapter implements DataSourceAdapter {
       {
         id: 'worldclim_1',
         name: 'WorldClim Current Climate (v2.1)',
-        description: 'WorldClim version 2.1 climate data for 1970-2000. This dataset includes monthly climate data for minimum, mean, and maximum temperature, precipitation, solar radiation, wind speed, and water vapor pressure, plus bioclimatic variables.',
+        description:
+          'WorldClim version 2.1 climate data for 1970-2000. This dataset includes monthly climate data for minimum, mean, and maximum temperature, precipitation, solar radiation, wind speed, and water vapor pressure, plus bioclimatic variables.',
         url: `${this.homepageUrl}data/worldclim21.html`,
-        variables: ['Temperature', 'Precipitation', 'Solar Radiation', 'Wind Speed', 'Water Vapor Pressure', 'Bioclimatic Variables'],
-        citation: 'Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: New 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.',
+        variables: [
+          'Temperature',
+          'Precipitation',
+          'Solar Radiation',
+          'Wind Speed',
+          'Water Vapor Pressure',
+          'Bioclimatic Variables',
+        ],
+        citation:
+          'Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: New 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.',
         license: 'CC BY 4.0',
         publisher: 'WorldClim',
         keywords: ['WorldClim', 'Climate', 'Bioclimatic', 'Baseline'],
         version: '2.1',
         temporalCoverage: {
           startDate: '1970-01-01',
-          endDate: '2000-12-31'
-        }
+          endDate: '2000-12-31',
+        },
       },
       {
         id: 'worldclim_2',
         name: 'WorldClim Future Climate (CMIP6)',
-        description: 'Future climate projections based on the Shared Socioeconomic Pathways (SSPs) from CMIP6 global climate models, downscaled and bias-corrected.',
+        description:
+          'Future climate projections based on the Shared Socioeconomic Pathways (SSPs) from CMIP6 global climate models, downscaled and bias-corrected.',
         url: `${this.homepageUrl}data/cmip6/`,
         variables: ['Temperature', 'Precipitation', 'Bioclimatic Variables'],
-        citation: 'WorldClim, 2020. Future climate data. Available at: https://www.worldclim.org/data/cmip6/cmip6_clim2.5m.html',
+        citation:
+          'WorldClim, 2020. Future climate data. Available at: https://www.worldclim.org/data/cmip6/cmip6_clim2.5m.html',
         license: 'CC BY 4.0',
         publisher: 'WorldClim',
         keywords: ['Future Climate', 'CMIP6', 'SSP', 'Projections'],
         version: '2.1',
         temporalCoverage: {
           startDate: '2021-01-01',
-          endDate: '2100-12-31'
-        }
+          endDate: '2100-12-31',
+        },
       },
       {
         id: 'worldclim_3',
         name: 'WorldClim Elevation Data',
-        description: 'Elevation data at various spatial resolutions derived from the SRTM DEM and GTOPO30.',
+        description:
+          'Elevation data at various spatial resolutions derived from the SRTM DEM and GTOPO30.',
         url: `${this.homepageUrl}data/worldclim21.html`,
         variables: ['Elevation'],
-        citation: 'WorldClim, 2020. Elevation data. Available at: https://www.worldclim.org/data/worldclim21.html',
+        citation:
+          'WorldClim, 2020. Elevation data. Available at: https://www.worldclim.org/data/worldclim21.html',
         license: 'CC BY 4.0',
         publisher: 'WorldClim',
         keywords: ['Elevation', 'Topography', 'SRTM', 'DEM'],
-        version: '2.1'
-      }
+        version: '2.1',
+      },
     ];
   }
 }

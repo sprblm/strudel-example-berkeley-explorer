@@ -10,7 +10,9 @@ import { GlobeIcon } from '../../components/Icons';
  * and analyze climate data through interactive charts and maps.
  */
 const ExploreData: React.FC = () => {
-  const [activeChart, setActiveChart] = useState<'timeSeries' | 'map' | 'histogram' | 'distribution'>('map');
+  const [activeChart, setActiveChart] = useState<
+    'timeSeries' | 'map' | 'histogram' | 'distribution'
+  >('map');
   const [showControls, setShowControls] = useState(true);
   const [dataType, setDataType] = useState<string>('trees');
   const [treesLayerEnabled, setTreesLayerEnabled] = useState(true);
@@ -22,12 +24,14 @@ const ExploreData: React.FC = () => {
 
   return (
     <FilterContextProvider>
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100vh',
-        bgcolor: '#fafafa' 
-      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          bgcolor: '#fafafa',
+        }}
+      >
         <Box sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
           {/* Page Header with Monitor-style formatting */}
           <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -37,19 +41,22 @@ const ExploreData: React.FC = () => {
                 Explore Data
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Visualize and analyze climate data through interactive charts and maps.
+                Visualize and analyze climate data through interactive charts
+                and maps.
               </Typography>
             </Box>
           </Box>
 
-          <Box sx={{ 
-            display: 'flex',
-            flex: 1,
-            gap: 3,
-            height: 'calc(100% - 60px)'
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              gap: 3,
+              height: 'calc(100% - 60px)',
+            }}
+          >
             {showControls && (
-              <ControlsPanel 
+              <ControlsPanel
                 activeChart={activeChart}
                 setActiveChart={setActiveChart}
                 dataType={dataType}
@@ -60,11 +67,11 @@ const ExploreData: React.FC = () => {
                 setSensorsLayerEnabled={setSensorsLayerEnabled}
               />
             )}
-            
+
             <Box sx={{ flex: 1 }}>
-              <Paper 
+              <Paper
                 elevation={0}
-                sx={{ 
+                sx={{
                   height: '100%',
                   border: '1px solid',
                   borderColor: 'grey.200',
@@ -72,10 +79,10 @@ const ExploreData: React.FC = () => {
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
-                  position: 'relative'
+                  position: 'relative',
                 }}
               >
-                <VisualizationView 
+                <VisualizationView
                   activeChart={activeChart}
                   onToggleControls={handleToggleControls}
                   showControls={showControls}

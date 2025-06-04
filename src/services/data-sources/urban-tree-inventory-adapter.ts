@@ -1,10 +1,20 @@
-import { DataSourceAdapter, HttpClientConfig, SearchOptions, SearchResult, SourceMetadata } from './types';
+import {
+  DataSourceAdapter,
+  HttpClientConfig,
+  SearchOptions,
+  SearchResult,
+  SourceMetadata,
+} from './types';
 
 export class UrbanTreeInventoryAdapter implements DataSourceAdapter {
   public id = 'urban-tree-inventory';
+
   public name = 'Urban Tree Inventory Data';
+
   public homepageUrl = 'https://example.com/urban-tree-inventory';
+
   public logoUrl = 'https://example.com/urban-tree-inventory-logo.png';
+
   public description = 'Urban Tree Inventory Data';
 
   constructor(params: HttpClientConfig) {
@@ -17,7 +27,7 @@ export class UrbanTreeInventoryAdapter implements DataSourceAdapter {
       datasets: [], // Return mock or actual datasets
       total: 0, // Return total count of datasets
       page: options.page || 1,
-      limit: options.limit || 10
+      limit: options.limit || 10,
     };
   }
 

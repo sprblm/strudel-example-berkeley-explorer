@@ -28,7 +28,8 @@ export const DataView: React.FC<DataViewProps> = ({
   const [offset, setOffest] = useState(page * pageSize);
   const dataIdField = taskflow.data.list.idField;
   const columns = (taskflow.pages.index.tableColumns || []) as any[]; // Cast to any[] to avoid GridColType issues
-  const filterConfigs = (taskflow.pages.index.tableFilters || []) as FilterConfig[];
+  const filterConfigs = (taskflow.pages.index.tableFilters ||
+    []) as FilterConfig[];
   const queryMode = taskflow.data.list.queryMode;
   const { isPending, isFetching, isError, data, error } = useListQuery({
     activeFilters,

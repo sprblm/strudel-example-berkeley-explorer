@@ -4,13 +4,13 @@
  * Allows users to customize their comparison view with dropdown selectors and radio button groups.
  */
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  FormControl, 
-  Select, 
-  MenuItem, 
+import {
+  Box,
+  Typography,
+  Paper,
+  FormControl,
+  Select,
+  MenuItem,
   SelectChangeEvent,
   Popover,
   List,
@@ -18,14 +18,24 @@ import {
   ListItemText,
   Radio,
   RadioGroup,
-  FormControlLabel
+  FormControlLabel,
 } from '@mui/material';
 import { ChevronDown, MapIcon } from '../../../components/Icons';
 
 // Types for comparison options
 export type ComparisonType = 'locations' | 'timePeriods' | 'dataSources';
-export type DataSource = 'Official Sensors' | 'Student Contributions' | 'Historical Records';
-export type Location = 'Memorial Glade' | 'Hearst Greek Theatre' | 'Campanile Esplanade' | 'Faculty Glade' | 'Doe Library' | 'Sather Tower (Campanile)' | 'Valley Life Sciences Building';
+export type DataSource =
+  | 'Official Sensors'
+  | 'Student Contributions'
+  | 'Historical Records';
+export type Location =
+  | 'Memorial Glade'
+  | 'Hearst Greek Theatre'
+  | 'Campanile Esplanade'
+  | 'Faculty Glade'
+  | 'Doe Library'
+  | 'Sather Tower (Campanile)'
+  | 'Valley Life Sciences Building';
 
 interface ComparisonSettingsProps {
   onComparisonTypeChange?: (type: ComparisonType) => void;
@@ -44,21 +54,30 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
   onDataSourceAChange,
   onDataSourceBChange,
   onLocationAChange,
-  onLocationBChange
+  onLocationBChange,
 }) => {
   // State for comparison settings
-  const [comparisonType, setComparisonType] = useState<ComparisonType>('dataSources');
-  const [dataSourceA, setDataSourceA] = useState<DataSource>('Official Sensors');
-  const [dataSourceB, setDataSourceB] = useState<DataSource>('Student Contributions');
+  const [comparisonType, setComparisonType] =
+    useState<ComparisonType>('dataSources');
+  const [dataSourceA, setDataSourceA] =
+    useState<DataSource>('Official Sensors');
+  const [dataSourceB, setDataSourceB] = useState<DataSource>(
+    'Student Contributions'
+  );
   const [locationA, setLocationA] = useState<Location>('Memorial Glade');
   const [locationB, setLocationB] = useState<Location>('Hearst Greek Theatre');
-  
+
   // State for dropdown menus
-  const [compareByAnchorEl, setCompareByAnchorEl] = useState<HTMLElement | null>(null);
-  const [dataSourceAAnchorEl, setDataSourceAAnchorEl] = useState<HTMLElement | null>(null);
-  const [dataSourceBAnchorEl, setDataSourceBAnchorEl] = useState<HTMLElement | null>(null);
-  const [locationAAnchorEl, setLocationAAnchorEl] = useState<HTMLElement | null>(null);
-  const [locationBAnchorEl, setLocationBAnchorEl] = useState<HTMLElement | null>(null);
+  const [compareByAnchorEl, setCompareByAnchorEl] =
+    useState<HTMLElement | null>(null);
+  const [dataSourceAAnchorEl, setDataSourceAAnchorEl] =
+    useState<HTMLElement | null>(null);
+  const [dataSourceBAnchorEl, setDataSourceBAnchorEl] =
+    useState<HTMLElement | null>(null);
+  const [locationAAnchorEl, setLocationAAnchorEl] =
+    useState<HTMLElement | null>(null);
+  const [locationBAnchorEl, setLocationBAnchorEl] =
+    useState<HTMLElement | null>(null);
 
   // Handle comparison type change
   const handleComparisonTypeChange = (type: ComparisonType) => {
@@ -118,14 +137,14 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
   };
 
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        p: 3, 
-        mb: 3, 
-        borderRadius: 2, 
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        mb: 3,
+        borderRadius: 2,
         border: '1px solid',
-        borderColor: 'grey.200'
+        borderColor: 'grey.200',
       }}
     >
       {/* Header */}
@@ -138,17 +157,17 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Select what you want to compare to see the differences
       </Typography>
-      
+
       {/* Comparison Type Selection */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           Compare By:
         </Typography>
-        
+
         {/* Custom Dropdown for Compare By */}
-        <Box 
+        <Box
           onClick={(e) => setCompareByAnchorEl(e.currentTarget)}
-          sx={{ 
+          sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -159,17 +178,20 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
             bgcolor: 'white',
             cursor: 'pointer',
             '&:hover': {
-              borderColor: 'grey.400'
-            }
+              borderColor: 'grey.400',
+            },
           }}
         >
           <Typography variant="body1">
-            {comparisonType === 'locations' ? 'Campus Locations' : 
-             comparisonType === 'timePeriods' ? 'Time Periods' : 'Data Sources'}
+            {comparisonType === 'locations'
+              ? 'Campus Locations'
+              : comparisonType === 'timePeriods'
+                ? 'Time Periods'
+                : 'Data Sources'}
           </Typography>
           <ChevronDown size={16} color="#666" />
         </Box>
-        
+
         <Popover
           open={Boolean(compareByAnchorEl)}
           anchorEl={compareByAnchorEl}
@@ -186,24 +208,24 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
             '& .MuiPaper-root': {
               width: compareByAnchorEl?.offsetWidth,
               mt: 0.5,
-              boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)'
-            }
+              boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+            },
           }}
         >
           <List sx={{ p: 0 }}>
-            <ListItemButton 
+            <ListItemButton
               selected={comparisonType === 'locations'}
               onClick={() => handleComparisonTypeChange('locations')}
             >
               <ListItemText primary="Campus Locations" />
             </ListItemButton>
-            <ListItemButton 
+            <ListItemButton
               selected={comparisonType === 'timePeriods'}
               onClick={() => handleComparisonTypeChange('timePeriods')}
             >
               <ListItemText primary="Time Periods" />
             </ListItemButton>
-            <ListItemButton 
+            <ListItemButton
               selected={comparisonType === 'dataSources'}
               onClick={() => handleComparisonTypeChange('dataSources')}
             >
@@ -212,7 +234,7 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
           </List>
         </Popover>
       </Box>
-      
+
       {/* Source Selection Row */}
       <Box sx={{ display: 'flex', gap: 2 }}>
         {/* Source A */}
@@ -220,12 +242,12 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {getSourceLabel()} A:
           </Typography>
-          
+
           {comparisonType === 'locations' ? (
             // Location A Dropdown
-            <Box 
+            <Box
               onClick={(e) => setLocationAAnchorEl(e.currentTarget)}
-              sx={{ 
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -236,8 +258,8 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
                 bgcolor: 'white',
                 cursor: 'pointer',
                 '&:hover': {
-                  borderColor: 'grey.400'
-                }
+                  borderColor: 'grey.400',
+                },
               }}
             >
               <Typography variant="body1">{locationA}</Typography>
@@ -245,9 +267,9 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
             </Box>
           ) : (
             // Data Source A Dropdown
-            <Box 
+            <Box
               onClick={(e) => setDataSourceAAnchorEl(e.currentTarget)}
-              sx={{ 
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -258,15 +280,15 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
                 bgcolor: 'white',
                 cursor: 'pointer',
                 '&:hover': {
-                  borderColor: 'grey.400'
-                }
+                  borderColor: 'grey.400',
+                },
               }}
             >
               <Typography variant="body1">{dataSourceA}</Typography>
               <ChevronDown size={16} color="#666" />
             </Box>
           )}
-          
+
           {/* Location A Popover */}
           <Popover
             open={Boolean(locationAAnchorEl)}
@@ -284,18 +306,29 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               '& .MuiPaper-root': {
                 width: locationAAnchorEl?.offsetWidth,
                 mt: 0.5,
-                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)'
-              }
+                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+              },
             }}
           >
-            <RadioGroup value={locationA} onChange={(e) => handleLocationAChange(e.target.value as Location)}>
+            <RadioGroup
+              value={locationA}
+              onChange={(e) =>
+                handleLocationAChange(e.target.value as Location)
+              }
+            >
               <List sx={{ p: 0 }}>
-                {['Memorial Glade', 'Hearst Greek Theatre', 'Doe Library', 'Sather Tower (Campanile)', 'Valley Life Sciences Building'].map((location) => (
+                {[
+                  'Memorial Glade',
+                  'Hearst Greek Theatre',
+                  'Doe Library',
+                  'Sather Tower (Campanile)',
+                  'Valley Life Sciences Building',
+                ].map((location) => (
                   <ListItemButton key={location} dense>
-                    <FormControlLabel 
-                      value={location} 
-                      control={<Radio size="small" />} 
-                      label={location} 
+                    <FormControlLabel
+                      value={location}
+                      control={<Radio size="small" />}
+                      label={location}
                       sx={{ m: 0 }}
                     />
                   </ListItemButton>
@@ -303,7 +336,7 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               </List>
             </RadioGroup>
           </Popover>
-          
+
           {/* Data Source A Popover */}
           <Popover
             open={Boolean(dataSourceAAnchorEl)}
@@ -321,24 +354,24 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               '& .MuiPaper-root': {
                 width: dataSourceAAnchorEl?.offsetWidth,
                 mt: 0.5,
-                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)'
-              }
+                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+              },
             }}
           >
             <List sx={{ p: 0 }}>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceA === 'Official Sensors'}
                 onClick={() => handleDataSourceAChange('Official Sensors')}
               >
                 <ListItemText primary="Official Sensors" />
               </ListItemButton>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceA === 'Student Contributions'}
                 onClick={() => handleDataSourceAChange('Student Contributions')}
               >
                 <ListItemText primary="Student Contributions" />
               </ListItemButton>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceA === 'Historical Records'}
                 onClick={() => handleDataSourceAChange('Historical Records')}
               >
@@ -347,18 +380,18 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
             </List>
           </Popover>
         </Box>
-        
+
         {/* Source B */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {getSourceLabel()} B:
           </Typography>
-          
+
           {comparisonType === 'locations' ? (
             // Location B Dropdown
-            <Box 
+            <Box
               onClick={(e) => setLocationBAnchorEl(e.currentTarget)}
-              sx={{ 
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -369,8 +402,8 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
                 bgcolor: 'white',
                 cursor: 'pointer',
                 '&:hover': {
-                  borderColor: 'grey.400'
-                }
+                  borderColor: 'grey.400',
+                },
               }}
             >
               <Typography variant="body1">{locationB}</Typography>
@@ -378,9 +411,9 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
             </Box>
           ) : (
             // Data Source B Dropdown
-            <Box 
+            <Box
               onClick={(e) => setDataSourceBAnchorEl(e.currentTarget)}
-              sx={{ 
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -391,15 +424,15 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
                 bgcolor: 'white',
                 cursor: 'pointer',
                 '&:hover': {
-                  borderColor: 'grey.400'
-                }
+                  borderColor: 'grey.400',
+                },
               }}
             >
               <Typography variant="body1">{dataSourceB}</Typography>
               <ChevronDown size={16} color="#666" />
             </Box>
           )}
-          
+
           {/* Location B Popover */}
           <Popover
             open={Boolean(locationBAnchorEl)}
@@ -417,18 +450,29 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               '& .MuiPaper-root': {
                 width: locationBAnchorEl?.offsetWidth,
                 mt: 0.5,
-                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)'
-              }
+                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+              },
             }}
           >
-            <RadioGroup value={locationB} onChange={(e) => handleLocationBChange(e.target.value as Location)}>
+            <RadioGroup
+              value={locationB}
+              onChange={(e) =>
+                handleLocationBChange(e.target.value as Location)
+              }
+            >
               <List sx={{ p: 0 }}>
-                {['Memorial Glade', 'Hearst Greek Theatre', 'Doe Library', 'Sather Tower (Campanile)', 'Valley Life Sciences Building'].map((location) => (
+                {[
+                  'Memorial Glade',
+                  'Hearst Greek Theatre',
+                  'Doe Library',
+                  'Sather Tower (Campanile)',
+                  'Valley Life Sciences Building',
+                ].map((location) => (
                   <ListItemButton key={location} dense>
-                    <FormControlLabel 
-                      value={location} 
-                      control={<Radio size="small" />} 
-                      label={location} 
+                    <FormControlLabel
+                      value={location}
+                      control={<Radio size="small" />}
+                      label={location}
                       sx={{ m: 0 }}
                     />
                   </ListItemButton>
@@ -436,7 +480,7 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               </List>
             </RadioGroup>
           </Popover>
-          
+
           {/* Data Source B Popover */}
           <Popover
             open={Boolean(dataSourceBAnchorEl)}
@@ -454,24 +498,24 @@ const ComparisonSettings: React.FC<ComparisonSettingsProps> = ({
               '& .MuiPaper-root': {
                 width: dataSourceBAnchorEl?.offsetWidth,
                 mt: 0.5,
-                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)'
-              }
+                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+              },
             }}
           >
             <List sx={{ p: 0 }}>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceB === 'Official Sensors'}
                 onClick={() => handleDataSourceBChange('Official Sensors')}
               >
                 <ListItemText primary="Official Sensors" />
               </ListItemButton>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceB === 'Student Contributions'}
                 onClick={() => handleDataSourceBChange('Student Contributions')}
               >
                 <ListItemText primary="Student Contributions" />
               </ListItemButton>
-              <ListItemButton 
+              <ListItemButton
                 selected={dataSourceB === 'Historical Records'}
                 onClick={() => handleDataSourceBChange('Historical Records')}
               >

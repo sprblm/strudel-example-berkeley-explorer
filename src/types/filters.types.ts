@@ -1,10 +1,22 @@
 export interface FilterConfig {
   field: string;
   label: string;
-  operator: 'contains' | 'contains-one-of' | 'equals' | 'equals-one-of' | 'between' | 'between-dates-inclusive';
+  operator:
+    | 'contains'
+    | 'contains-one-of'
+    | 'equals'
+    | 'equals-one-of'
+    | 'between'
+    | 'between-dates-inclusive';
   filterComponent: 'TextInput' | 'MultiSelect' | 'DateRangePicker';
   transformValue?: (value: any) => any;
-  paramType?: 'single' | 'multi' | 'range' | 'array-string' | 'repeated' | 'minmax';
+  paramType?:
+    | 'single'
+    | 'multi'
+    | 'range'
+    | 'array-string'
+    | 'repeated'
+    | 'minmax';
   paramTypeOptions?: {
     separator?: string;
     minParam?: string;

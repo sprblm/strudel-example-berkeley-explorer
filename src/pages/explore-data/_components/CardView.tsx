@@ -4,7 +4,17 @@
  * Allows users to browse and select items for detailed preview.
  */
 import React from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Stack } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActionArea,
+  Chip,
+  Stack,
+} from '@mui/material';
 import { useFilters } from '@/contexts/FiltersContext';
 import { DataCard, FilterConfig } from '@/types/filters.types';
 import { useListQuery } from '../../../utils/useListQuery';
@@ -23,39 +33,58 @@ export const CardView: React.FC<CardViewProps> = ({
   setPreviewItem,
 }) => {
   const { activeFilters } = useFilters();
-  const filterConfigs = taskflow.pages.index.tableFilters as Partial<FilterConfig>[];
-  
+  const filterConfigs = taskflow.pages.index
+    .tableFilters as Partial<FilterConfig>[];
+
   // Map the filter configs to match the expected FilterConfig type
   const mappedFilterConfigs: FilterConfig[] = React.useMemo(() => {
     if (!filterConfigs) return [];
-    return filterConfigs.filter((config): config is Partial<FilterConfig> => Boolean(config)).map(config => {
-      // Map the filterComponent to a valid value if needed
-      let mappedComponent: FilterConfig['filterComponent'] = 'TextInput';
-      if (config.filterComponent) {
-        if (config.filterComponent === 'CheckboxList') {
-          mappedComponent = 'MultiSelect';
-        } else if (['TextInput', 'MultiSelect', 'DateRangePicker'].includes(config.filterComponent)) {
-          mappedComponent = config.filterComponent as FilterConfig['filterComponent'];
+    return filterConfigs
+      .filter((config): config is Partial<FilterConfig> => Boolean(config))
+      .map((config) => {
+        // Map the filterComponent to a valid value if needed
+        let mappedComponent: FilterConfig['filterComponent'] = 'TextInput';
+        if (config.filterComponent) {
+          if (config.filterComponent === 'CheckboxList') {
+            mappedComponent = 'MultiSelect';
+          } else if (
+            ['TextInput', 'MultiSelect', 'DateRangePicker'].includes(
+              config.filterComponent
+            )
+          ) {
+            mappedComponent =
+              config.filterComponent as FilterConfig['filterComponent'];
+          }
         }
-      }
-      
-      // Ensure operator is one of the allowed types
-      const operator: FilterConfig['operator'] = 
-        (['contains', 'contains-one-of', 'equals', 'equals-one-of', 'between', 'between-dates-inclusive'] as const)
-          .includes(config.operator as any) 
-          ? config.operator as FilterConfig['operator']
+
+        // Ensure operator is one of the allowed types
+        const operator: FilterConfig['operator'] = (
+          [
+            'contains',
+            'contains-one-of',
+            'equals',
+            'equals-one-of',
+            'between',
+            'between-dates-inclusive',
+          ] as const
+        ).includes(config.operator as any)
+          ? (config.operator as FilterConfig['operator'])
           : 'contains';
-      
-      return {
-        field: config.field || '',
-        label: config.label || '',
-        operator,
-        filterComponent: mappedComponent,
-        ...(config.paramType && { paramType: config.paramType }),
-        ...(config.paramTypeOptions && { paramTypeOptions: config.paramTypeOptions }),
-        ...(config.transformValue && { transformValue: config.transformValue })
-      };
-    });
+
+        return {
+          field: config.field || '',
+          label: config.label || '',
+          operator,
+          filterComponent: mappedComponent,
+          ...(config.paramType && { paramType: config.paramType }),
+          ...(config.paramTypeOptions && {
+            paramTypeOptions: config.paramTypeOptions,
+          }),
+          ...(config.transformValue && {
+            transformValue: config.transformValue,
+          }),
+        };
+      });
   }, [filterConfigs]);
 
   const { isPending, isError, data, error } = useListQuery({
@@ -77,22 +106,31 @@ export const CardView: React.FC<CardViewProps> = ({
   if (isError) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography color="error">Error loading data: {error.message}</Typography>
+        <Typography color="error">
+          Error loading data: {error.message}
+        </Typography>
       </Box>
     );
   }
 
   // Filter the data based on active filters and search term
-  const filteredData = Array.isArray(data) ? filterData(data, activeFilters, filterConfigs, searchTerm) : [];
-  
+  const filteredData = Array.isArray(data)
+    ? filterData(data, activeFilters, filterConfigs, searchTerm)
+    : [];
+
   // Get the columns for display
   const columns = taskflow.pages.index.tableColumns || [];
   const titleField = columns[0]?.field || 'id';
   const subtitleField = columns[1]?.field || null;
-  
+
   // Get fields for tags
   const tagFields = columns
-    .filter((col: any) => col.type !== 'number' && col.field !== titleField && col.field !== subtitleField)
+    .filter(
+      (col: any) =>
+        col.type !== 'number' &&
+        col.field !== titleField &&
+        col.field !== subtitleField
+    )
     .map((col: any) => col.field)
     .slice(0, 2); // Limit to 2 tag fields
 
@@ -102,7 +140,7 @@ export const CardView: React.FC<CardViewProps> = ({
     .map((col: any) => ({
       field: col.field,
       label: col.headerName || col.field,
-      units: col.units || ''
+      units: col.units || '',
     }));
 
   return (
@@ -110,16 +148,16 @@ export const CardView: React.FC<CardViewProps> = ({
       <Grid container spacing={2}>
         {filteredData.map((item, index) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-            <Card 
-              sx={{ 
-                height: '100%', 
-                display: 'flex', 
+            <Card
+              sx={{
+                height: '100%',
+                display: 'flex',
                 flexDirection: 'column',
                 transition: 'transform 0.2s',
                 '&:hover': {
                   transform: 'scale(1.02)',
-                  boxShadow: 3
-                }
+                  boxShadow: 3,
+                },
               }}
             >
               <CardActionArea onClick={() => setPreviewItem(item)}>
@@ -130,7 +168,7 @@ export const CardView: React.FC<CardViewProps> = ({
                     backgroundColor: `hsl(${(index * 40) % 360}, 70%, 80%)`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
                 >
                   <Typography variant="h5" color="text.secondary">
@@ -147,7 +185,11 @@ export const CardView: React.FC<CardViewProps> = ({
                     </Typography>
                   )}
                   {tagFields.length > 0 && (
-                    <Stack direction="row" spacing={1} sx={{ mt: 1, mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mt: 1, mb: 1, flexWrap: 'wrap', gap: 0.5 }}
+                    >
                       {tagFields.map((field, idx) => {
                         const value = item[field];
                         return value != null && value !== '' ? (
@@ -166,8 +208,17 @@ export const CardView: React.FC<CardViewProps> = ({
                       {numericFields.slice(0, 3).map((field, idx) => {
                         const value = item[field.field];
                         return value != null ? (
-                          <Box key={`${field.field}-${idx}`} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="caption" color="text.secondary">
+                          <Box
+                            key={`${field.field}-${idx}`}
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {field.label}:
                             </Typography>
                             <Typography variant="body2">

@@ -15,7 +15,7 @@ vi.mock('../../../components/BerkeleyDataMap', () => ({
     <div data-testid="mock-berkeley-map" className="mock-map">
       Mock Map Component
     </div>
-  )
+  ),
 }));
 
 // Add a global style for the mock map to avoid inline styles
@@ -33,10 +33,8 @@ document.head.appendChild(mockStyles);
 vi.mock('../../../components/DataLayersToggle', () => ({
   __esModule: true,
   default: ({ visibleLayers, onToggle }) => (
-    <div data-testid="mock-layers-toggle">
-      Mock Layers Toggle
-    </div>
-  )
+    <div data-testid="mock-layers-toggle">Mock Layers Toggle</div>
+  ),
 }));
 
 // Mock fetch
@@ -59,12 +57,12 @@ const mockTreeDataset = {
   details: {
     type: 'tree',
     fields: ['species', 'healthCondition', 'height'],
-    count: 2
+    count: 2,
   },
   data: [
     { id: 1, species: 'Oak', healthCondition: 'Good', height: 50 },
     { id: 2, species: 'Maple', healthCondition: 'Fair', height: 30 },
-  ]
+  ],
 };
 
 const mockAirQualityDataset = {
@@ -75,18 +73,18 @@ const mockAirQualityDataset = {
   details: {
     type: 'air',
     parameters: ['PM2.5', 'OZONE'],
-    count: 2
+    count: 2,
   },
   data: [
     { ParameterName: 'PM2.5', Value: 10, DateObserved: '2023-01-01' },
     { ParameterName: 'OZONE', Value: 0.05, DateObserved: '2023-01-01' },
-  ]
+  ],
 };
 
 describe('SearchRepositories Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock the dataset fetch
     (global.fetch as jest.Mock).mockImplementation((url) => {
       if (url.includes('berkeley_trees_processed.json')) {
@@ -105,53 +103,64 @@ describe('SearchRepositories Integration', () => {
         <DatasetExplorer />
       </BrowserRouter>
     );
-    
+
     // Check that the page title is rendered
-    expect(screen.getByText('Search Urban Environmental Data')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText('Search Urban Environmental Data')
+    ).toBeInTheDocument();
+
     // Check that the filters panel is rendered
     expect(screen.getByText('Search Filters')).toBeInTheDocument();
-    
+
     // Check that the mock map is rendered
     expect(screen.getByTestId('mock-berkeley-map')).toBeInTheDocument();
-    
+
     // Wait for data to load
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    }, { timeout: 3000 });
-    
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+
     // Check for UI elements that indicate datasets are loaded
-    await waitFor(() => {
-      // Look for elements in the data list panel that would show dataset titles
-      const dataItems = screen.getAllByRole('button');
-      expect(dataItems.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        // Look for elements in the data list panel that would show dataset titles
+        const dataItems = screen.getAllByRole('button');
+        expect(dataItems.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 }
+    );
   });
 
   test('search input filters datasets', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <DatasetExplorer />
       </BrowserRouter>
     );
-    
+
     // Wait for data to load
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    }, { timeout: 3000 });
-    
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+
     // Type in the search input - using the correct placeholder text
     const searchInput = screen.getByPlaceholderText('Search datasets...');
     expect(searchInput).toBeInTheDocument();
-    
+
     // Type and search
     await user.type(searchInput, 'Tree');
-    
+
     // Since there might not be a separate search button, just press Enter
     await user.keyboard('{Enter}');
-    
+
     // Since we can't reliably test for specific dataset titles in the test environment,
     // we'll check that the search term was applied by looking at the URL or search input value
     expect(searchInput).toHaveValue('Tree');
@@ -159,35 +168,41 @@ describe('SearchRepositories Integration', () => {
 
   test('filter panel filters datasets', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <DatasetExplorer />
       </BrowserRouter>
     );
-    
+
     // Wait for data to load
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    }, { timeout: 3000 });
-    
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+
     // Click on the Trees tab
     const treesTab = screen.getByText('Trees');
     await user.click(treesTab);
-    
+
     // Verify the Trees tab exists
     expect(treesTab).toBeInTheDocument();
-    
+
     // Find and click the Search Trees button
     const searchButton = screen.getByText('Search Trees');
     await user.click(searchButton);
-    
+
     // Since we can't reliably test for specific dataset filtering in the test environment,
     // we'll verify that the filter was applied by checking if the active filters are updated
     // This is an indirect test of the filter functionality
-    await waitFor(() => {
-      // The map component should receive updated props when filters are applied
-      expect(screen.getByTestId('mock-berkeley-map')).toBeInTheDocument();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        // The map component should receive updated props when filters are applied
+        expect(screen.getByTestId('mock-berkeley-map')).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
   });
 });

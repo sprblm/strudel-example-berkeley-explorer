@@ -3,12 +3,23 @@
  * Displays search results in a clean, modern format with sorting capabilities.
  * Shows dataset titles, descriptions, and metadata with options to preview selected items.
  */
-import { Box, Typography, Paper, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Paper,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 import { ArrowRightIcon } from '../../../components/Icons';
 import { Button } from '../../../components/Button';
 import { DataListPanelProps } from '../_config/taskflow.types';
 import { useState, useEffect } from 'react';
-const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListPanelProps) => {
+const DataListPanel = ({
+  searchResults,
+  previewItem,
+  setPreviewItem,
+}: DataListPanelProps) => {
   const [sortBy, setSortBy] = useState('relevance');
   const [sortedResults, setSortedResults] = useState(searchResults);
 
@@ -21,13 +32,19 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
         results.sort((a, b) => (a.distance || 0) - (b.distance || 0));
         break;
       case 'species':
-        results.sort((a, b) => (a.species || '').localeCompare(b.species || ''));
+        results.sort((a, b) =>
+          (a.species || '').localeCompare(b.species || '')
+        );
         break;
       case 'dbh':
         results.sort((a, b) => (a.dbh || 0) - (b.dbh || 0));
         break;
       case 'date':
-        results.sort((a, b) => new Date(a.observationDate || '').getTime() - new Date(b.observationDate || '').getTime());
+        results.sort(
+          (a, b) =>
+            new Date(a.observationDate || '').getTime() -
+            new Date(b.observationDate || '').getTime()
+        );
         break;
       default:
         // Relevance or other default sorting
@@ -47,17 +64,16 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
     return count.toString();
   };
 
-
   if (!searchResults || searchResults.length === 0) {
     return (
-      <Paper 
-        elevation={0} 
-        sx={{ 
-          p: 3, 
-          borderRadius: 2, 
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          borderRadius: 2,
           border: '1px solid',
           borderColor: 'grey.200',
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         <Typography variant="body1" color="text.secondary">
@@ -69,19 +85,29 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
 
   return (
     <Box>
-      <Paper 
-        elevation={0} 
-        sx={{ 
-          p: 0, 
-          borderRadius: 2, 
+      <Paper
+        elevation={0}
+        sx={{
+          p: 0,
+          borderRadius: 2,
           border: '1px solid',
           borderColor: 'grey.200',
-          overflow: 'hidden'
+          overflow: 'hidden',
         }}
       >
         <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'grey.200' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{ fontWeight: 600, mb: 1 }}
+            >
               Search Results
             </Typography>
             <Box sx={{ minWidth: 120 }}>
@@ -106,33 +132,47 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
 
         <Box>
           {sortedResults.map((dataset, index) => (
-            <Box 
-              key={dataset.id} 
-              sx={{ 
+            <Box
+              key={dataset.id}
+              sx={{
                 p: 3,
-                borderBottom: index < searchResults.length - 1 ? '1px solid' : 'none',
+                borderBottom:
+                  index < searchResults.length - 1 ? '1px solid' : 'none',
                 borderColor: 'grey.200',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
-                backgroundColor: previewItem?.id === dataset.id ? 'grey.50' : 'transparent',
+                backgroundColor:
+                  previewItem?.id === dataset.id ? 'grey.50' : 'transparent',
                 '&:hover': {
-                  backgroundColor: 'grey.50'
-                }
+                  backgroundColor: 'grey.50',
+                },
               }}
               onClick={() => setPreviewItem(dataset)}
             >
               <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" component="h3" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
                   {dataset.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {dataset.summary}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 2 }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={500}
+                  >
                     Source:
                   </Typography>{' '}
                   <Typography variant="body2" component="span">
@@ -141,17 +181,26 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
                 </Box>
 
                 <Box>
-                  <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={500}
+                  >
                     Format:
                   </Typography>{' '}
                   <Typography variant="body2" component="span">
                     {/* Use the file extension or default to NetCDF */}
-                    {dataset.attached_files?.[0]?.file_name.split('.').pop() || 'NetCDF'}
+                    {dataset.attached_files?.[0]?.file_name.split('.').pop() ||
+                      'NetCDF'}
                   </Typography>
                 </Box>
 
                 <Box>
-                  <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight={500}
+                  >
                     Size:
                   </Typography>{' '}
                   <Typography variant="body2" component="span">
@@ -161,12 +210,18 @@ const DataListPanel = ({ searchResults, previewItem, setPreviewItem }: DataListP
                 </Box>
               </Box>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                   <Typography variant="caption" color="text.secondary">
                     Last updated: {dataset.publication_date}
                   </Typography>
-                  
+
                   <Typography variant="caption" color="text.secondary">
                     {/* Default download count since it's not in the Dataset type */}
                     {formatDownloads(1250)} downloads

@@ -10,7 +10,7 @@ export const validateComponents = () => {
   return {
     searchRepositories: { loaded: true },
     exploreData: { loaded: true },
-    navigation: { loaded: true }
+    navigation: { loaded: true },
   };
 };
 
@@ -21,7 +21,7 @@ export const validateComponents = () => {
 export const validateDataSources = () => {
   return {
     mockData: { loaded: true },
-    adapters: { loaded: true }
+    adapters: { loaded: true },
   };
 };
 
@@ -33,7 +33,7 @@ export const validateVisualizations = () => {
   return {
     plotly: { loaded: true },
     charts: { loaded: true },
-    maps: { loaded: true }
+    maps: { loaded: true },
   };
 };
 
@@ -45,9 +45,9 @@ export const createTestQueryClient = () => {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false
-      }
-    }
+        retry: false,
+      },
+    },
   });
 };
 
@@ -60,7 +60,7 @@ export const runAllTests = () => {
   const dataSourceResults = validateDataSources();
   const visualizationResults = validateVisualizations();
 
-  const allPassed = 
+  const allPassed =
     componentResults.searchRepositories.loaded &&
     componentResults.exploreData.loaded &&
     componentResults.navigation.loaded &&
@@ -74,6 +74,6 @@ export const runAllTests = () => {
     components: componentResults,
     dataSources: dataSourceResults,
     visualizations: visualizationResults,
-    allPassed
+    allPassed,
   };
 };

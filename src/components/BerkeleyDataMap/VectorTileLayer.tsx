@@ -50,8 +50,8 @@ export function createVectorTileLayer(options: {
         buffer: 64,
         extent: 4096,
         layerName: options.sourceLayer ?? 'trees',
-        workerUrl: ''
-      }
+        workerUrl: '',
+      },
     },
     // Spread any additional paint properties
     ...options.paint,

@@ -25,10 +25,46 @@ export interface CardFields {
 
 export interface DataListCardProps {
   id: string;
-  title: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
-  content: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
-  date?: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
-  category?: string | string[] | { title: string; url: string }[] | { file_id: number; file_name: string; file_size: string; description: string }[];
+  title:
+    | string
+    | string[]
+    | { title: string; url: string }[]
+    | {
+        file_id: number;
+        file_name: string;
+        file_size: string;
+        description: string;
+      }[];
+  content:
+    | string
+    | string[]
+    | { title: string; url: string }[]
+    | {
+        file_id: number;
+        file_name: string;
+        file_size: string;
+        description: string;
+      }[];
+  date?:
+    | string
+    | string[]
+    | { title: string; url: string }[]
+    | {
+        file_id: number;
+        file_name: string;
+        file_size: string;
+        description: string;
+      }[];
+  category?:
+    | string
+    | string[]
+    | { title: string; url: string }[]
+    | {
+        file_id: number;
+        file_name: string;
+        file_size: string;
+        description: string;
+      }[];
 }
 
 export interface Filter {
@@ -44,7 +80,12 @@ export interface Filter {
   options?: { value: string; label: string }[];
 }
 
-export type FilterType = 'range' | 'select' | 'toggle' | 'checkbox' | 'date-range';
+export type FilterType =
+  | 'range'
+  | 'select'
+  | 'toggle'
+  | 'checkbox'
+  | 'date-range';
 
 export interface FilterFieldProps {
   filter: Filter;

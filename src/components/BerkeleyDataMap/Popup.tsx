@@ -1,6 +1,6 @@
 /**
  * Popup Component
- * 
+ *
  * Renders detailed information in a popup when a map feature is clicked.
  * Currently a placeholder for future implementation to display feature attributes
  * and additional context in a user-friendly format.

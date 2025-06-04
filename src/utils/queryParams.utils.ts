@@ -88,8 +88,10 @@ export const buildParamsString = (
           toParamMinMax(
             filter.field,
             filter.value,
-            filterConfig.paramTypeOptions?.minParam || `min_${filterConfig.field}`,
-            filterConfig.paramTypeOptions?.maxParam || `max_${filterConfig.field}`
+            filterConfig.paramTypeOptions?.minParam ||
+              `min_${filterConfig.field}`,
+            filterConfig.paramTypeOptions?.maxParam ||
+              `max_${filterConfig.field}`
           )
         );
         break;
@@ -124,8 +126,14 @@ export const createFilterParams = (
           options?.minParam &&
           options?.maxParam
         ) {
-          params.append(options?.minParam || `min_${filter.field}`, filter.value[0].toString());
-          params.append(options?.maxParam || `max_${filter.field}`, filter.value[1].toString());
+          params.append(
+            options?.minParam || `min_${filter.field}`,
+            filter.value[0].toString()
+          );
+          params.append(
+            options?.maxParam || `max_${filter.field}`,
+            filter.value[1].toString()
+          );
         }
         break;
       case 'repeated':
@@ -162,55 +170,68 @@ export const cleanPath = (url: string): string => {
  * Parse an adapter URL to extract the adapter name and path
  * Example: "worldclim://datasets" -> { adapterName: "worldclim", path: "datasets" }
  */
-export const parseAdapterUrl = (url: string): { adapterName: string; path: string } | null => {
+export const parseAdapterUrl = (
+  url: string
+): { adapterName: string; path: string } | null => {
   const adapterUrlPattern = /^([a-z0-9-]+):\/\/(.*)$/i;
   const match = url.match(adapterUrlPattern);
-  
+
   if (!match) {
     return null;
   }
-  
+
   return {
     adapterName: match[1],
-    path: match[2]
+    path: match[2],
   };
 };
 
 /**
  * Handle a request via an adapter URL by calling the appropriate adapter's methods
  */
-export const handleAdapterUrl = async (url: string, queryParams: URLSearchParams): Promise<any> => {
-  console.log('handleAdapterUrl: Processing adapter URL', { url, queryParams: queryParams.toString() });
-  
+export const handleAdapterUrl = async (
+  url: string,
+  queryParams: URLSearchParams
+): Promise<any> => {
+  console.log('handleAdapterUrl: Processing adapter URL', {
+    url,
+    queryParams: queryParams.toString(),
+  });
+
   const parsedUrl = parseAdapterUrl(url);
   if (!parsedUrl) {
     throw new Error(`Invalid adapter URL format: ${url}`);
   }
-  
+
   const { adapterName, path } = parsedUrl;
   console.log('handleAdapterUrl: Parsed URL', { adapterName, path });
-  
+
   // Create the appropriate adapter instance
   const adapter = createDataSource(adapterName);
   if (!adapter) {
     throw new Error(`Unknown adapter: ${adapterName}`);
   }
-  
-  console.log(`handleAdapterUrl: Using ${adapterName} adapter to handle request`);
-  
+
+  console.log(
+    `handleAdapterUrl: Using ${adapterName} adapter to handle request`
+  );
+
   // Convert query params to options object
   const searchOptions: SearchOptions = {
     query: queryParams.get('query') || '',
     limit: parseInt(queryParams.get('limit') || '25', 10),
     page: parseInt(queryParams.get('page') || '1', 10),
   };
-  
+
   if (queryParams.has('variables')) {
     searchOptions.variables = queryParams.get('variables')?.split(',') || [];
   }
-  
+
   if (path === 'datasets') {
-    console.log('handleAdapterUrl: Calling searchDatasets with options', searchOptions);
+    console.log(
+      'handleAdapterUrl: Calling searchDatasets with options',
+      searchOptions
+    );
     return await adapter.searchDatasets(searchOptions);
   } else if (path.startsWith('datasets/')) {
     const datasetId = path.replace('datasets/', '');
@@ -227,7 +248,8 @@ export const handleAdapterUrl = async (url: string, queryParams: URLSearchParams
  */
 export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
   // Check if this is an adapter URL (e.g., worldclim://datasets)
-  const isAdapter = dataSource.includes('://') && !dataSource.startsWith('http');
+  const isAdapter =
+    dataSource.includes('://') && !dataSource.startsWith('http');
   if (isAdapter) {
     console.log('fetchData: Detected adapter URL, parsing query params');
     // Extract query params if they exist
@@ -238,9 +260,12 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
       queryParams = new URLSearchParams(queryString);
       dataSource = dataSource.substring(0, queryStringIndex);
     }
-    
+
     try {
-      console.log('fetchData: Handling adapter URL', { dataSource, queryParams: queryParams.toString() });
+      console.log('fetchData: Handling adapter URL', {
+        dataSource,
+        queryParams: queryParams.toString(),
+      });
       const result = await handleAdapterUrl(dataSource, queryParams);
       console.log('fetchData: Adapter returned result', result);
       return result;
@@ -262,17 +287,17 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
     ? cleanUrl(dataSource)
     : cleanUrl(`${basename}/${dataSource}`);
   let data: any = [];
-  
-  console.log('fetchData: Attempting to fetch data', { 
-    dataSource, 
-    fileExtension, 
+
+  console.log('fetchData: Attempting to fetch data', {
+    dataSource,
+    fileExtension,
     isExternal,
-    base, 
+    base,
     basePath,
     basename,
-    dataSourcePath 
+    dataSourcePath,
   });
-  
+
   try {
     if (fileExtension === 'csv') {
       // d3-fetch doesn't support AbortController, so we'll use fetch directly
@@ -302,16 +327,20 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
         }
         const result = await response.json();
         console.log('fetchData: Successfully loaded JSON data', result);
-        
+
         // Special handling for adapter responses like WorldClim
         if (isAdapter && result && result.datasets) {
-          console.log('fetchData: Detected adapter response with datasets property, extracting datasets');
+          console.log(
+            'fetchData: Detected adapter response with datasets property, extracting datasets'
+          );
           data = result.datasets;
         } else {
           data = result;
         }
-        
-        console.log('fetchData: Final data to return', { dataLength: Array.isArray(data) ? data.length : 'non-array' });
+
+        console.log('fetchData: Final data to return', {
+          dataLength: Array.isArray(data) ? data.length : 'non-array',
+        });
       } catch (fetchError) {
         console.error('fetchData: Error during fetch operation:', fetchError);
         throw fetchError;
@@ -320,7 +349,12 @@ export const fetchData = async (dataSource: string, signal?: AbortSignal) => {
     return data;
   } catch (error) {
     // Don't throw if it's an abort error
-    if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'name' in error &&
+      error.name === 'AbortError'
+    ) {
       console.log('Fetch request was cancelled');
       return null;
     }

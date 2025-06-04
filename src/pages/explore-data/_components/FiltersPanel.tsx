@@ -4,12 +4,12 @@
  */
 import React from 'react';
 import {
-  Box, 
-  Typography, 
-  Slider, 
-  Select, 
-  MenuItem, 
-  Paper, 
+  Box,
+  Typography,
+  Slider,
+  Select,
+  MenuItem,
+  Paper,
   Button,
   FormControl,
   FormControlLabel,
@@ -17,7 +17,7 @@ import {
   Checkbox,
   Stack,
   Divider,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useFilters } from '../../../components/FilterContext';
@@ -53,36 +53,51 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
 
   return (
     <Paper elevation={0} sx={{ height: '100%', p: 2 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={2}
+      >
         <Typography variant="h6">Filters</Typography>
         <IconButton onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
         </IconButton>
       </Stack>
-      
-      <Button 
-        variant="outlined" 
-        fullWidth 
+
+      <Button
+        variant="outlined"
+        fullWidth
         onClick={handleClearFilters}
         sx={{ mb: 3 }}
       >
         Clear All Filters
       </Button>
-      
+
       <Stack spacing={3}>
         {filterConfigs.map((filter: any) => {
           const { field, label, type, options } = filter;
           const filterValue = activeFilters[field];
-          
+
           // Range filter (for numeric values)
-          if (type === 'range' && options?.min !== undefined && options?.max !== undefined) {
-            const value = Array.isArray(filterValue) ? filterValue : [options.min, options.max];
+          if (
+            type === 'range' &&
+            options?.min !== undefined &&
+            options?.max !== undefined
+          ) {
+            const value = Array.isArray(filterValue)
+              ? filterValue
+              : [options.min, options.max];
             return (
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
                 <Slider
-                  value={Array.isArray(value) ? value : [options.min, options.max]}
-                  onChange={(_, newValue) => handleRangeFilterChange(field, newValue as number[])}
+                  value={
+                    Array.isArray(value) ? value : [options.min, options.max]
+                  }
+                  onChange={(_, newValue) =>
+                    handleRangeFilterChange(field, newValue as number[])
+                  }
                   valueLabelDisplay="auto"
                   min={options.min}
                   max={options.max}
@@ -101,17 +116,20 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           // Select filter (for dropdowns)
           if (type === 'select' && Array.isArray(options)) {
-            const value = typeof filterValue !== 'undefined' ? String(filterValue) : '';
+            const value =
+              typeof filterValue !== 'undefined' ? String(filterValue) : '';
             return (
               <Box key={field}>
                 <Typography gutterBottom>{label}</Typography>
                 <FormControl fullWidth size="small">
                   <Select
                     value={value}
-                    onChange={(e) => handleSelectFilterChange(field, e.target.value as string)}
+                    onChange={(e) =>
+                      handleSelectFilterChange(field, e.target.value as string)
+                    }
                     displayEmpty
                   >
                     <MenuItem value="">
@@ -128,7 +146,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           // Toggle filter (for boolean values)
           if (type === 'toggle') {
             const checked = Boolean(filterValue);
@@ -139,7 +157,9 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
                     control={
                       <Checkbox
                         checked={checked}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleToggleFilterChange(field, e.target.checked)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleToggleFilterChange(field, e.target.checked)
+                        }
                         size="small"
                       />
                     }
@@ -150,7 +170,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({ onClose }) => {
               </Box>
             );
           }
-          
+
           return null;
         })}
       </Stack>

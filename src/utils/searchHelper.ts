@@ -5,8 +5,11 @@ interface SearchResult extends Dataset {
 }
 
 export const searchHelper = {
-  searchDatasets: async (searchText: string, datasets: Dataset[]): Promise<SearchResult[]> => {
-    return datasets.filter(dataset => 
+  searchDatasets: async (
+    searchText: string,
+    datasets: Dataset[]
+  ): Promise<SearchResult[]> => {
+    return datasets.filter((dataset) =>
       dataset.title.toLowerCase().includes(searchText.toLowerCase())
     ) as SearchResult[];
   },
@@ -19,5 +22,5 @@ export const searchHelper = {
   getSuggestions: async (): Promise<string[]> => {
     // Implementation here
     return [];
-  }
+  },
 };

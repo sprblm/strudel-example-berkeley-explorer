@@ -6,22 +6,22 @@ export interface DataSourceAdapter {
    * Unique identifier for the data source
    */
   id: string;
-  
+
   /**
    * Descriptive name of the data source
    */
   name: string;
-  
+
   /**
    * Search for datasets in this data source with optional filters
    */
   searchDatasets(options: SearchOptions): Promise<SearchResult>;
-  
+
   /**
    * Get detailed information about a specific dataset
    */
   getDatasetDetails(datasetId: string): Promise<Repository>;
-  
+
   /**
    * Get metadata about the data source, including available variables,
    * regions, time periods, etc.
@@ -102,7 +102,7 @@ export interface Repository {
   id: string;
   name: string;
   description: string;
-  source?: string;  // Added source property for filtering by data source
+  source?: string; // Added source property for filtering by data source
   title?: string;
   summary?: string;
   variables?: string[];

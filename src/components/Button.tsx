@@ -1,13 +1,14 @@
 import React, { ReactNode } from 'react';
-import { 
-  Button as MuiButton, 
+import {
+  Button as MuiButton,
   ButtonProps as MuiButtonProps,
   IconButton as MuiIconButton,
   IconButtonProps as MuiIconButtonProps,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 
-export interface ButtonProps extends Omit<MuiButtonProps, 'startIcon' | 'endIcon'> {
+export interface ButtonProps
+  extends Omit<MuiButtonProps, 'startIcon' | 'endIcon'> {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   tooltip?: string;
@@ -16,12 +17,12 @@ export interface ButtonProps extends Omit<MuiButtonProps, 'startIcon' | 'endIcon
 /**
  * Enhanced Button component with modern styling and improved hover effects
  */
-export const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  startIcon, 
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  startIcon,
   endIcon,
   tooltip,
-  ...props 
+  ...props
 }) => {
   const button = (
     <MuiButton
@@ -34,14 +35,18 @@ export const Button: React.FC<ButtonProps> = ({
         fontWeight: 500,
         fontSize: '0.875rem',
         transition: 'all 0.2s ease-in-out',
-        boxShadow: props.variant === 'contained' ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none',
+        boxShadow:
+          props.variant === 'contained'
+            ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+            : 'none',
         '&:hover': {
           transform: 'translateY(-1px)',
-          boxShadow: props.variant === 'contained' 
-            ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' 
-            : 'none',
+          boxShadow:
+            props.variant === 'contained'
+              ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+              : 'none',
         },
-        ...props.sx
+        ...props.sx,
       }}
     >
       {children}
@@ -63,16 +68,16 @@ export interface IconButtonProps extends MuiIconButtonProps {
 /**
  * Enhanced IconButton component with tooltip support
  */
-export const IconButton: React.FC<IconButtonProps> = ({ 
-  children, 
+export const IconButton: React.FC<IconButtonProps> = ({
+  children,
   tooltip,
   size = 'medium',
-  ...props 
+  ...props
 }) => {
   const iconSizes = {
     small: 28,
     medium: 36,
-    large: 44
+    large: 44,
   };
 
   const button = (
@@ -85,11 +90,10 @@ export const IconButton: React.FC<IconButtonProps> = ({
         transition: 'all 0.2s ease-in-out',
         color: props.color === 'primary' ? 'primary.main' : 'grey.700',
         '&:hover': {
-          backgroundColor: props.color === 'primary' 
-            ? 'rgba(59, 130, 246, 0.08)'
-            : 'grey.100',
+          backgroundColor:
+            props.color === 'primary' ? 'rgba(59, 130, 246, 0.08)' : 'grey.100',
         },
-        ...props.sx
+        ...props.sx,
       }}
     >
       {children}

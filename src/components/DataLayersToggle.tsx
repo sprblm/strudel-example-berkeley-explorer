@@ -17,7 +17,10 @@ interface DataLayersToggleProps {
 }
 
 // DataLayersToggle is a functional React component that displays buttons to toggle data layers.
-const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, onToggle }) => (
+const DataLayersToggle: React.FC<DataLayersToggleProps> = ({
+  visibleLayers,
+  onToggle,
+}) => (
   // The root container for the toggle component.
   <div className={styles.toggleRoot}>
     {/* Title for the data layers section. */}
@@ -27,12 +30,9 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, onTo
       {/* Button for the 'Trees' data layer. */}
       <button
         // Apply base and conditional styles based on whether the 'tree' layer is visible.
-        className={clsx(
-          styles.toggleBtn,
-          {
-            [styles.toggleBtnActiveTree]: visibleLayers.includes('tree'),
-          },
-        )}
+        className={clsx(styles.toggleBtn, {
+          [styles.toggleBtnActiveTree]: visibleLayers.includes('tree'),
+        })}
         // Call `onToggle` with 'tree' when the button is clicked.
         onClick={() => onToggle('tree')}
       >
@@ -41,12 +41,9 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, onTo
       {/* Button for the 'Sensors' (air quality) data layer. */}
       <button
         // Apply base and conditional styles based on whether the 'air' layer is visible.
-        className={clsx(
-          styles.toggleBtn,
-          {
-            [styles.toggleBtnActiveAir]: visibleLayers.includes('air'),
-          },
-        )}
+        className={clsx(styles.toggleBtn, {
+          [styles.toggleBtnActiveAir]: visibleLayers.includes('air'),
+        })}
         // Call `onToggle` with 'air' when the button is clicked.
         onClick={() => onToggle('air')}
       >
@@ -55,12 +52,10 @@ const DataLayersToggle: React.FC<DataLayersToggleProps> = ({ visibleLayers, onTo
       {/* Button for the 'Locations' data layer. */}
       <button
         // Apply base and conditional styles based on whether the 'locations' layer is visible.
-        className={clsx(
-          styles.toggleBtn,
-          {
-            [styles.toggleBtnActiveLocations]: visibleLayers.includes('locations'),
-          },
-        )}
+        className={clsx(styles.toggleBtn, {
+          [styles.toggleBtnActiveLocations]:
+            visibleLayers.includes('locations'),
+        })}
         // Call `onToggle` with 'locations' when the button is clicked.
         onClick={() => onToggle('locations')}
       >

@@ -7,16 +7,19 @@ import { AirQualityAdapter } from './air-quality-adapter';
  * @param params Optional API parameters that will be applied to all adapters
  * @returns Array of all data source adapters
  */
-export function createAllDataSources(params: Partial<HttpClientConfig> = {}): DataSourceAdapter[] {
+export function createAllDataSources(
+  params: Partial<HttpClientConfig> = {}
+): DataSourceAdapter[] {
   return [
     new UrbanTreeInventoryAdapter({
-      baseUrl: import.meta.env.VITE_URBAN_TREE_INVENTORY_API_URL as string || '',
+      baseUrl:
+        (import.meta.env.VITE_URBAN_TREE_INVENTORY_API_URL as string) || '',
       ...params,
     }),
     new AirQualityAdapter({
-      baseUrl: import.meta.env.VITE_AIR_QUALITY_API_URL as string || '',
+      baseUrl: (import.meta.env.VITE_AIR_QUALITY_API_URL as string) || '',
       ...params,
-    })
+    }),
   ];
 }
 
@@ -26,16 +29,20 @@ export function createAllDataSources(params: Partial<HttpClientConfig> = {}): Da
  * @param params Optional API parameters
  * @returns The created data source adapter or null if not found
  */
-export function createDataSource(sourceId: string, params: Partial<HttpClientConfig> = {}): DataSourceAdapter | null {
+export function createDataSource(
+  sourceId: string,
+  params: Partial<HttpClientConfig> = {}
+): DataSourceAdapter | null {
   switch (sourceId) {
     case 'urban-tree-inventory':
       return new UrbanTreeInventoryAdapter({
-        baseUrl: import.meta.env.VITE_URBAN_TREE_INVENTORY_API_URL as string || '',
+        baseUrl:
+          (import.meta.env.VITE_URBAN_TREE_INVENTORY_API_URL as string) || '',
         ...params,
       });
     case 'air-quality':
       return new AirQualityAdapter({
-        baseUrl: import.meta.env.VITE_AIR_QUALITY_API_URL as string || '',
+        baseUrl: (import.meta.env.VITE_AIR_QUALITY_API_URL as string) || '',
         ...params,
       });
     default:

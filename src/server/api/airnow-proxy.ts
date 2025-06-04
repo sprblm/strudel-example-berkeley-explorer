@@ -26,7 +26,11 @@ class AirNowProxy {
       return aqReadings;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error('Axios error fetching AirNow data:', error.message, error.response?.status);
+        console.error(
+          'Axios error fetching AirNow data:',
+          error.message,
+          error.response?.status
+        );
         throw new Error(`Failed to fetch AirNow data: ${error.message}`);
       } else {
         console.error('Unexpected error fetching AirNow data:', error);

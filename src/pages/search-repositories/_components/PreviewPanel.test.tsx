@@ -75,17 +75,19 @@ describe('PreviewPanel', () => {
 
     // Check if the title is displayed
     expect(screen.getByText('Test Dataset')).toBeInTheDocument();
-    
+
     // Check if the summary is displayed
-    expect(screen.getByText('This is a test dataset summary.')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText('This is a test dataset summary.')
+    ).toBeInTheDocument();
+
     // Check if the source is displayed
     expect(screen.getByText('Test Source')).toBeInTheDocument();
-    
+
     // Check if temporal and spatial coverage are displayed
     expect(screen.getByText('2020-2023')).toBeInTheDocument();
     expect(screen.getByText('Berkeley, CA')).toBeInTheDocument();
-    
+
     // Check if the close button is rendered
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });
@@ -146,7 +148,7 @@ describe('PreviewPanel', () => {
 
     // Check if the title is still displayed
     expect(screen.getByText('Incomplete Dataset')).toBeInTheDocument();
-    
+
     // The component should not crash due to missing fields
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });

@@ -1,3 +1,9 @@
+/**
+ * SearchHistoryPanel component for the Search Repositories section.
+ * Displays saved searches and tags for logged-in users.
+ * Allows users to view, edit, and delete saved searches.
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,7 +20,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
-  ListItem
+  ListItem,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
@@ -41,7 +47,9 @@ interface SavedSearchItem {
 
 export const SearchHistoryPanel = () => {
   const { activeFilters, dispatch } = useFilters();
-  const [searchHistoryState, setSearchHistoryState] = useState<SearchHistoryItem[]>([]);
+  const [searchHistoryState, setSearchHistoryState] = useState<
+    SearchHistoryItem[]
+  >([]);
   const [tabValue, setTabValue] = useState(0);
   const [savedSearches, setSavedSearches] = useState<SavedSearchItem[]>([]);
 
@@ -69,22 +77,27 @@ export const SearchHistoryPanel = () => {
     if (activeFilters.length === 0) return;
 
     const filtersObj: Record<string, string> = {};
-    activeFilters.forEach(filter => {
+    activeFilters.forEach((filter) => {
       filtersObj[filter.field] = filter.value as string;
     });
-    
-    if (searchHistoryState.length > 0 && 
-        JSON.stringify(searchHistoryState[0].filters) === JSON.stringify(filtersObj)) {
+
+    if (
+      searchHistoryState.length > 0 &&
+      JSON.stringify(searchHistoryState[0].filters) ===
+        JSON.stringify(filtersObj)
+    ) {
       return;
     }
-    
+
     const newSearch: SearchHistoryItem = {
       id: `search-${Date.now()}`,
       filters: filtersObj,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
-    setSearchHistoryState(prevHistory => [newSearch, ...prevHistory].slice(0, 10));
+
+    setSearchHistoryState((prevHistory) =>
+      [newSearch, ...prevHistory].slice(0, 10)
+    );
   }, [activeFilters, searchHistoryState]);
 
   const formatTime = (timestamp: number): string => {
@@ -92,7 +105,7 @@ export const SearchHistoryPanel = () => {
     const date = new Date(timestamp);
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.round(diffMs / 60000);
-    
+
     if (diffMins < 1) {
       return 'just now';
     } else if (diffMins < 60) {
@@ -110,25 +123,29 @@ export const SearchHistoryPanel = () => {
     if (keys.length === 0) {
       return 'All Items';
     }
-    
+
     const labels = [];
     if (filters.variables) {
-      const vars = Array.isArray(filters.variables) ? filters.variables.join(', ') : String(filters.variables);
+      const vars = Array.isArray(filters.variables)
+        ? filters.variables.join(', ')
+        : String(filters.variables);
       labels.push(vars);
     }
     if (filters.spatial_coverage) {
-      const coverage = Array.isArray(filters.spatial_coverage) 
-        ? filters.spatial_coverage.join(', ') 
+      const coverage = Array.isArray(filters.spatial_coverage)
+        ? filters.spatial_coverage.join(', ')
         : String(filters.spatial_coverage);
       labels.push(coverage);
     }
     if (labels.length > 0) {
       return labels.join(' • ');
     }
-    
+
     const firstKey = keys[0];
     const value = filters[firstKey];
-    const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
+    const displayValue = Array.isArray(value)
+      ? value.join(', ')
+      : String(value);
     return `${firstKey.replace(/_/g, ' ')}: ${displayValue}`;
   };
 
@@ -139,8 +156,8 @@ export const SearchHistoryPanel = () => {
         payload: {
           field: 'search',
           value: '',
-          operator: FilterOperator.EQUALS
-        }
+          operator: FilterOperator.EQUALS,
+        },
       });
     }
     Object.entries(filters).forEach(([field, value]) => {
@@ -149,15 +166,17 @@ export const SearchHistoryPanel = () => {
         payload: {
           field,
           value,
-          operator: FilterOperator.EQUALS
-        }
+          operator: FilterOperator.EQUALS,
+        },
       });
     });
   };
 
   const handleRemoveSearch = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    setSearchHistoryState(prevHistory => prevHistory.filter(item => item.id !== id));
+    e.stopPropagation();
+    setSearchHistoryState((prevHistory) =>
+      prevHistory.filter((item) => item.id !== id)
+    );
   };
 
   const handleClearHistory = () => {
@@ -170,47 +189,59 @@ export const SearchHistoryPanel = () => {
   };
 
   const handleSaveSearch = (item: SearchHistoryItem) => {
-    const isAlreadySaved = savedSearches.some(saved => saved.id === item.id);
-    
+    const isAlreadySaved = savedSearches.some((saved) => saved.id === item.id);
+
     if (!isAlreadySaved) {
       const newSavedSearch: SavedSearchItem = {
         id: `saved-${Date.now()}`,
         name: getSearchLabel(item.filters),
         timestamp: new Date(item.timestamp).toISOString(),
-        filters: item.filters
+        filters: item.filters,
       };
       setSavedSearches([newSavedSearch, ...savedSearches]);
     }
   };
 
   const handleDeleteHistory = (id: string) => {
-    setSearchHistoryState(searchHistoryState.filter(item => item.id !== id));
+    setSearchHistoryState(searchHistoryState.filter((item) => item.id !== id));
   };
 
   const handleDeleteSaved = (id: string) => {
-    setSavedSearches(savedSearches.filter(item => item.id !== id));
+    setSavedSearches(savedSearches.filter((item) => item.id !== id));
   };
 
   if (searchHistoryState.length === 0) {
     return (
       <Paper elevation={0} className={styles.paper}>
         <Box className={styles.tabsContainer}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
-            variant="fullWidth"
-          >
-            <Tab icon={<HistoryIcon />} label="HISTORY" id="search-history-tab-0" />
-            <Tab icon={<BookmarkIcon />} label="SAVED" id="search-history-tab-1" />
+          <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+            <Tab
+              icon={<HistoryIcon />}
+              label="HISTORY"
+              id="search-history-tab-0"
+            />
+            <Tab
+              icon={<BookmarkIcon />}
+              label="SAVED"
+              id="search-history-tab-1"
+            />
           </Tabs>
         </Box>
         <TabPanel value={tabValue} index={0}>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', p: 3 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: 'center', p: 3 }}
+          >
             No search history yet
           </Typography>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', p: 3 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: 'center', p: 3 }}
+          >
             No saved searches yet
           </Typography>
         </TabPanel>
@@ -219,27 +250,24 @@ export const SearchHistoryPanel = () => {
   }
 
   return (
-    <Paper 
-      elevation={0} 
-      className={styles.paper}
-    >
+    <Paper elevation={0} className={styles.paper}>
       <Box className={styles.tabsContainer}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange} 
-          variant="fullWidth"
-        >
-          <Tab icon={<HistoryIcon />} label="HISTORY" id="search-history-tab-0" />
-          <Tab icon={<BookmarkIcon />} label="SAVED" id="search-history-tab-1" />
+        <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+          <Tab
+            icon={<HistoryIcon />}
+            label="HISTORY"
+            id="search-history-tab-0"
+          />
+          <Tab
+            icon={<BookmarkIcon />}
+            label="SAVED"
+            id="search-history-tab-1"
+          />
         </Tabs>
       </Box>
-      
+
       <TabPanel value={tabValue} index={0}>
-        <Stack 
-          direction="row" 
-          spacing={1} 
-          sx={{ flexWrap: 'wrap', gap: 1 }}
-        >
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
           {searchHistoryState.map((item) => (
             <Chip
               key={item.id}
@@ -254,16 +282,13 @@ export const SearchHistoryPanel = () => {
         </Stack>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
           <Tooltip title="Clear all history">
-            <IconButton 
-              size="small" 
-              onClick={handleClearHistory}
-            >
+            <IconButton size="small" onClick={handleClearHistory}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>
       </TabPanel>
-      
+
       <TabPanel value={tabValue} index={1}>
         <List>
           {searchHistoryState.map((item) => (
@@ -275,24 +300,41 @@ export const SearchHistoryPanel = () => {
                   </Typography>
                 }
                 secondary={
-                  <Typography component="div" variant="caption" color="text.secondary">
-                    {new Date(item.timestamp).toLocaleDateString()} • {new Date(item.timestamp).toLocaleTimeString()}
+                  <Typography
+                    component="div"
+                    variant="caption"
+                    color="text.secondary"
+                  >
+                    {new Date(item.timestamp).toLocaleDateString()} •{' '}
+                    {new Date(item.timestamp).toLocaleTimeString()}
                   </Typography>
                 }
               />
               <Box>
                 <Tooltip title="Apply Search">
-                  <IconButton edge="end" size="small" onClick={() => handleApplySearch(item.filters)}>
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => handleApplySearch(item.filters)}
+                  >
                     <SearchIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Save Search">
-                  <IconButton edge="end" size="small" onClick={() => handleSaveSearch(item)}>
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => handleSaveSearch(item)}
+                  >
                     <BookmarkBorderIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete from History">
-                  <IconButton edge="end" size="small" onClick={() => handleDeleteHistory(item.id)}>
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => handleDeleteHistory(item.id)}
+                  >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -303,9 +345,14 @@ export const SearchHistoryPanel = () => {
         <Typography component="div" variant="body1" sx={{ mt: 3 }}>
           Saved Searches
         </Typography>
-        
+
         {savedSearches.length === 0 ? (
-          <Typography component="div" variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+          <Typography
+            component="div"
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 1, textAlign: 'center' }}
+          >
             No saved searches yet
           </Typography>
         ) : (
@@ -316,32 +363,48 @@ export const SearchHistoryPanel = () => {
                   disablePadding
                   secondaryAction={
                     <Tooltip title="Delete Saved Search">
-                      <IconButton edge="end" size="small" onClick={() => handleDeleteSaved(item.id)}>
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        onClick={() => handleDeleteSaved(item.id)}
+                      >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   }
                 >
-                  <ListItemButton 
-                    dense 
+                  <ListItemButton
+                    dense
                     onClick={() => handleApplySearch(item.filters)}
                     sx={{ pr: 8 }}
                   >
                     <ListItemIcon sx={{ minWidth: '36px' }}>
                       <BookmarkIcon fontSize="small" color="primary" />
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={item.name}
                       secondary={
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 1,
+                            mt: 0.5,
+                          }}
+                        >
                           {Object.entries(item.filters).map(([key, value]) => (
-                            <Typography 
-                              key={key} 
-                              variant="caption" 
+                            <Typography
+                              key={key}
+                              variant="caption"
                               color="text.secondary"
                               sx={{ mr: 1 }}
                             >
-                              {key.split('_').join(' ')}: <strong>{Array.isArray(value) ? value.join(', ') : String(value)}</strong>
+                              {key.split('_').join(' ')}:{' '}
+                              <strong>
+                                {Array.isArray(value)
+                                  ? value.join(', ')
+                                  : String(value)}
+                              </strong>
                             </Typography>
                           ))}
                         </Box>

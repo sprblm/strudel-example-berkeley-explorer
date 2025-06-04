@@ -1,6 +1,6 @@
 /**
  * Map data types for Berkeley Environmental Health Explorer
- * 
+ *
  * These types define the structure of data points displayed on the map
  * and used throughout the application.
  */
@@ -17,7 +17,7 @@ export interface BaseDataPoint {
 
 /**
  * Tree data point interface
- * 
+ *
  * Represents a tree on the map with its properties
  */
 export interface TreeDataPoint extends BaseDataPoint {
@@ -36,7 +36,7 @@ export interface TreeDataPoint extends BaseDataPoint {
 
 /**
  * Air quality data point interface
- * 
+ *
  * Represents an air quality monitoring station on the map
  */
 export interface AirQualityDataPoint extends BaseDataPoint {
@@ -53,7 +53,7 @@ export interface AirQualityDataPoint extends BaseDataPoint {
 
 /**
  * Location data point interface
- * 
+ *
  * Represents a location of interest on the map
  */
 export interface LocationDataPoint extends BaseDataPoint {

@@ -14,7 +14,7 @@ interface DetailQueryConfig {
  * single detail item based on the config options supplied.
  */
 export const useDetailQuery = (queryConfig: DetailQueryConfig): any => {
-  let queryParams = { ...queryConfig.staticParams };
+  const queryParams = { ...queryConfig.staticParams };
   const queryString = new URLSearchParams(queryParams).toString();
   let queryFn;
   if (queryConfig.queryMode === 'server') {

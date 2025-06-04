@@ -12,6 +12,7 @@ export interface CachedAirQuality {
 
 class BerkeleyDexie extends Dexie {
   trees: Dexie.Table<CachedTree, string>;
+
   airQuality: Dexie.Table<CachedAirQuality, string>;
 
   constructor() {
@@ -50,4 +51,3 @@ export async function setCachedAirQuality(data: any, key = 'main') {
   console.log('[Dexie] setCachedAirQuality', key, result);
   return result;
 }
-

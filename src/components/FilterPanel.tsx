@@ -1,19 +1,19 @@
 import React, { ReactNode, useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Collapse, 
-  Paper, 
-  Divider, 
+import {
+  Box,
+  Typography,
+  Collapse,
+  Paper,
+  Divider,
   Badge,
-  Stack
+  Stack,
 } from '@mui/material';
 import { useFilters } from './FilterContext';
-import { 
-  FilterIcon, 
-  ChevronDownIcon, 
-  ChevronUpIcon, 
-  RefreshIcon 
+import {
+  FilterIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  RefreshIcon,
 } from './Icons';
 import { Button, IconButton } from './Button';
 
@@ -33,7 +33,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   icon,
   children,
   defaultExpanded = true,
-  filterCount = 0
+  filterCount = 0,
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -56,12 +56,12 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {icon}
-          <Typography 
-            variant="subtitle2" 
-            sx={{ 
+          <Typography
+            variant="subtitle2"
+            sx={{
               fontWeight: 600,
               ml: icon ? 1 : 0,
-              color: 'grey.800'
+              color: 'grey.800',
             }}
           >
             {title}
@@ -76,13 +76,15 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
           )}
         </Box>
         <Box>
-          {expanded ? <ChevronUpIcon size={18} /> : <ChevronDownIcon size={18} />}
+          {expanded ? (
+            <ChevronUpIcon size={18} />
+          ) : (
+            <ChevronDownIcon size={18} />
+          )}
         </Box>
       </Box>
       <Collapse in={expanded} timeout="auto">
-        <Box sx={{ pt: 1, pl: 0.5 }}>
-          {children}
-        </Box>
+        <Box sx={{ pt: 1, pl: 0.5 }}>{children}</Box>
       </Collapse>
       <Divider sx={{ mt: 2 }} />
     </Box>
@@ -152,9 +154,7 @@ export const FilterPanel: React.FC<{
           </Button>
         )}
       </Box>
-      <Stack spacing={1}>
-        {children}
-      </Stack>
+      <Stack spacing={1}>{children}</Stack>
     </Paper>
   );
 };

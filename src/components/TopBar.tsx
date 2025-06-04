@@ -1,13 +1,20 @@
-import { AppBar, Toolbar, Box, Button, Tooltip, IconButton } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Button,
+  Tooltip,
+  IconButton,
+} from '@mui/material';
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { 
-  GlobeIcon, 
-  InfoIcon, 
+import {
+  GlobeIcon,
+  InfoIcon,
   HomeIcon,
   UploadIcon,
   SearchIcon,
-  BarChartIcon
+  BarChartIcon,
 } from './Icons';
 
 /**
@@ -19,30 +26,30 @@ export const TopBar: React.FC = () => {
   // const location = useLocation();
 
   return (
-    <AppBar 
-      position="static" 
+    <AppBar
+      position="static"
       elevation={0}
       sx={{
         borderBottom: '1px solid',
         borderColor: 'grey.200',
         backgroundColor: 'white',
-        color: 'text.primary'
+        color: 'text.primary',
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button 
-            component={Link} 
+          <Button
+            component={Link}
             to="/"
             startIcon={<HomeIcon />}
-            sx={{ 
-              mr: 2, 
+            sx={{
+              mr: 2,
               fontWeight: 600,
               color: 'primary.main',
-              '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' }
+              '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' },
             }}
           >
-          BEHE
+            BEHE
           </Button>
         </Box>
 
@@ -52,53 +59,53 @@ export const TopBar: React.FC = () => {
             component={Link}
             to="/search-repositories"
             startIcon={<SearchIcon size={18} />}
-            sx={{ 
+            sx={{
               color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { 
+              '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                color: 'text.primary'
-              }
+                color: 'text.primary',
+              },
             }}
           >
             Search Data
           </Button>
-          
+
           <Button
             component={Link}
             to="/explore-data"
             startIcon={<GlobeIcon size={18} />}
-            sx={{ 
+            sx={{
               color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { 
+              '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                color: 'text.primary'
-              }
+                color: 'text.primary',
+              },
             }}
           >
             Explore Data
           </Button>
-          
+
           <Button
             component={Link}
             to="/compare-data"
             startIcon={<BarChartIcon size={18} />}
-            sx={{ 
+            sx={{
               color: 'text.secondary',
               mr: 1.5,
               fontSize: '0.875rem',
-              '&:hover': { 
+              '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                color: 'text.primary'
-              }
+                color: 'text.primary',
+              },
             }}
           >
             Compare Data
           </Button>
-          
+
           <Button
             component={Link}
             to="/contribute"
@@ -109,7 +116,7 @@ export const TopBar: React.FC = () => {
               fontSize: '0.875rem',
               border: '1px solid',
               borderColor: 'primary.main',
-              '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' }
+              '&:hover': { backgroundColor: 'rgba(59, 130, 246, 0.04)' },
             }}
           >
             Contribute
@@ -119,7 +126,7 @@ export const TopBar: React.FC = () => {
         {/* Right side buttons */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title="About">
-            <IconButton 
+            <IconButton
               component={Link}
               to="/about"
               size="small"

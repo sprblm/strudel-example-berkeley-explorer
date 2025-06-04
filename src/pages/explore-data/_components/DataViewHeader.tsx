@@ -7,7 +7,15 @@ import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import MapIcon from '@mui/icons-material/Map';
-import { Button, Stack, TextField, Typography, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from '@mui/material';
 import React from 'react';
 
 interface DataViewHeaderProps {
@@ -34,7 +42,7 @@ export const DataViewHeader: React.FC<DataViewHeaderProps> = ({
 
   const handleViewModeChange = (
     event: React.MouseEvent<HTMLElement>,
-    newViewMode: string,
+    newViewMode: string
   ) => {
     if (newViewMode !== null) {
       onViewModeChange(newViewMode);
@@ -54,7 +62,7 @@ export const DataViewHeader: React.FC<DataViewHeaderProps> = ({
       <Typography variant="h6" component="h2" flex={1}>
         Climate Data Explorer
       </Typography>
-      
+
       <ToggleButtonGroup
         value={viewMode}
         exclusive
@@ -83,16 +91,16 @@ export const DataViewHeader: React.FC<DataViewHeaderProps> = ({
           </ToggleButton>
         </Tooltip>
       </ToggleButtonGroup>
-      
-      <Button 
-        startIcon={<FilterListIcon />} 
+
+      <Button
+        startIcon={<FilterListIcon />}
         onClick={onToggleFiltersPanel}
         variant="outlined"
         size="small"
       >
         Filters
       </Button>
-      
+
       <TextField
         variant="outlined"
         label="Search"

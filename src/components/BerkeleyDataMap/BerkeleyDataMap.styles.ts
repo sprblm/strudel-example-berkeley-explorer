@@ -1,6 +1,6 @@
 /**
  * BerkeleyDataMap Styles
- * 
+ *
  * Contains all Material-UI style definitions for the BerkeleyDataMap component and its subcomponents.
  * Exports styled-system configurations for consistent theming and responsive design
  * across all map interface components, including MapContainer.
@@ -38,12 +38,12 @@ export const mapContainerStyle: SxProps<Theme> = {
   width: '100%',
   height: '100%',
   position: 'relative' as const,
-  overflow: 'hidden'
+  overflow: 'hidden',
 };
 
 export const mapElementStyle: SxProps<Theme> = {
   width: '100%',
-  height: '100%'
+  height: '100%',
 };
 
 export const loadingTextSx: SxProps<Theme> = {

@@ -1,18 +1,22 @@
 /**
  * MapContainer Component
- * 
+ *
  * Core map rendering component that initializes and manages the Mapbox GL map instance.
  * Handles layer management, user interactions, and data visualization for various
  * environmental data layers including trees, air quality, and building footprints.
  * Provides a responsive, interactive map interface with customizable layers and controls.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { FeatureCollection } from 'geojson';
 import { Box } from '@mui/material';
-import { mapContainerStyle } from './BerkeleyDataMap.styles'; 
+import {
+  cursorPointerStyle,
+  cursorDefaultStyle,
+  mapContainerDivStyle,
+} from './MapContainer.styles';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || '';
 
@@ -24,11 +28,11 @@ const MINIMAL_STYLE: mapboxgl.Style = {
       tiles: [
         'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
         'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       ],
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors'
-    }
+      attribution: ' OpenStreetMap contributors',
+    },
   },
   layers: [
     {
@@ -36,8 +40,8 @@ const MINIMAL_STYLE: mapboxgl.Style = {
       type: 'raster',
       source: 'osm-tiles',
       minzoom: 0,
-      maxzoom: 22
-    }
+      maxzoom: 22,
+    },
   ],
   glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
 };
@@ -45,9 +49,9 @@ const MINIMAL_STYLE: mapboxgl.Style = {
 interface MapContainerProps {
   height?: number | string;
   width?: number | string;
-  onClick?: (info: { object: { properties: any; coordinates: mapboxgl.LngLat } }) => void;
-  treeData: FeatureCollection | null;
-  treeVisibility: boolean;
+  onClick?: (info: any) => void;
+  treeData?: FeatureCollection | null;
+  treeVisibility?: boolean;
   airQualityData?: any[];
   airQualityVisibility?: boolean;
   buildingData?: FeatureCollection | null;
@@ -63,7 +67,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   airQualityData = [],
   airQualityVisibility = false,
   buildingData = null,
-  buildingVisibility = false
+  buildingVisibility = false,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -79,16 +83,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
         zoom: 14,
         attributionControl: true,
         maxZoom: 18,
-        minZoom: 10
+        minZoom: 10,
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      // console.log('[MapContainer] Map initialized.');
-    } catch (error) {
-      // console.error('[MapContainer] Error initializing Mapbox map:', error);
-    }
+    } catch (error) {}
     return () => {
       if (mapRef.current) {
-        // console.log('[MapContainer] Cleaning up map instance.');
         mapRef.current.remove();
         mapRef.current = null;
       }
@@ -104,15 +104,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
       const treeSourceId = 'trees';
       const treeLayerId = 'trees-layer';
       const treeLabelLayerId = 'tree-labels';
-      const existingTreeSource = map.getSource(treeSourceId) as mapboxgl.GeoJSONSource;
+      const existingTreeSource = map.getSource(
+        treeSourceId
+      ) as mapboxgl.GeoJSONSource;
 
       if (treeData && treeData.features.length > 0) {
         if (existingTreeSource) {
           existingTreeSource.setData(treeData);
-          // console.log('[MapContainer] Updated "trees" source data.');
         } else {
           map.addSource(treeSourceId, { type: 'geojson', data: treeData });
-          // console.log('[MapContainer] Added "trees" source.');
         }
 
         if (!map.getLayer(treeLayerId)) {
@@ -121,11 +121,19 @@ const MapContainer: React.FC<MapContainerProps> = ({
             type: 'circle',
             source: treeSourceId,
             layout: { visibility: treeVisibility ? 'visible' : 'none' },
-            paint: { 'circle-radius': 6, 'circle-color': '#2E8B57', 'circle-stroke-width': 1, 'circle-stroke-color': '#FFFFFF' }
+            paint: {
+              'circle-radius': 6,
+              'circle-color': '#2E8B57',
+              'circle-stroke-width': 1,
+              'circle-stroke-color': '#FFFFFF',
+            },
           });
-          // console.log('[MapContainer] Added "trees-layer". Initial visibility:', treeVisibility);
         } else {
-          map.setLayoutProperty(treeLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(
+            treeLayerId,
+            'visibility',
+            treeVisibility ? 'visible' : 'none'
+          );
         }
 
         if (!map.getLayer(treeLabelLayerId)) {
@@ -133,19 +141,26 @@ const MapContainer: React.FC<MapContainerProps> = ({
             id: treeLabelLayerId,
             type: 'symbol',
             source: treeSourceId,
-            layout: { 
-              'text-field': ['get', 'species'], 
-              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'], 
-              'text-offset': [0, 1.2], 
-              'text-size': 10, 
-              'text-allow-overlap': false, 
-              visibility: treeVisibility ? 'visible' : 'none' 
+            layout: {
+              'text-field': ['get', 'species'],
+              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+              'text-offset': [0, 1.2],
+              'text-size': 10,
+              'text-allow-overlap': false,
+              visibility: treeVisibility ? 'visible' : 'none',
             },
-            paint: { 'text-color': '#000000', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1 }
+            paint: {
+              'text-color': '#000000',
+              'text-halo-color': '#FFFFFF',
+              'text-halo-width': 1,
+            },
           });
-          // console.log('[MapContainer] Added "tree-labels" layer. Initial visibility:', treeVisibility);
         } else {
-          map.setLayoutProperty(treeLabelLayerId, 'visibility', treeVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(
+            treeLabelLayerId,
+            'visibility',
+            treeVisibility ? 'visible' : 'none'
+          );
         }
       } else {
         const currentMap = mapRef.current;
@@ -156,59 +171,63 @@ const MapContainer: React.FC<MapContainerProps> = ({
           if (currentMap.getLayer(treeLayerId)) {
             currentMap.removeLayer(treeLayerId);
           }
-          // Ensure source exists before attempting to remove it
           if (currentMap.getSource(treeSourceId)) {
             currentMap.removeSource(treeSourceId);
           }
-          // // console.log('[MapContainer] No treeData, attempted removal of tree layers/source.');
         }
       }
-      
+
       // Air Quality layer setup
       const airSourceId = 'air-quality';
       const airLayerId = 'air-quality-layer';
-      const existingAirSource = map.getSource(airSourceId) as mapboxgl.GeoJSONSource;
-      
+      const existingAirSource = map.getSource(
+        airSourceId
+      ) as mapboxgl.GeoJSONSource;
+
       if (airQualityData && airQualityData.length > 0) {
         // Convert air quality data to GeoJSON
-        const airFeatures = airQualityData.map(point => ({
+        const airFeatures = airQualityData.map((point) => ({
           type: 'Feature' as const,
           geometry: {
             type: 'Point' as const,
-            coordinates: [point.lng, point.lat]
+            coordinates: [point.lng, point.lat],
           },
           properties: {
             ...point,
             id: point.id || `air-${Math.random().toString(36).slice(2, 9)}`,
-          }
+          },
         }));
-        
+
         const airGeoJSON = {
           type: 'FeatureCollection' as const,
-          features: airFeatures
+          features: airFeatures,
         };
-        
+
         if (existingAirSource) {
           existingAirSource.setData(airGeoJSON);
         } else {
           map.addSource(airSourceId, { type: 'geojson', data: airGeoJSON });
         }
-        
+
         if (!map.getLayer(airLayerId)) {
           map.addLayer({
             id: airLayerId,
             type: 'circle',
             source: airSourceId,
             layout: { visibility: airQualityVisibility ? 'visible' : 'none' },
-            paint: { 
-              'circle-radius': 10, 
+            paint: {
+              'circle-radius': 10,
               'circle-color': '#4287f5',
-              'circle-stroke-width': 2, 
-              'circle-stroke-color': '#FFFFFF'
-            }
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#FFFFFF',
+            },
           });
         } else {
-          map.setLayoutProperty(airLayerId, 'visibility', airQualityVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(
+            airLayerId,
+            'visibility',
+            airQualityVisibility ? 'visible' : 'none'
+          );
         }
       } else {
         const currentMap = mapRef.current;
@@ -221,19 +240,28 @@ const MapContainer: React.FC<MapContainerProps> = ({
           }
         }
       }
-      
+
       // Building layer setup - add this first to ensure it's below other layers
       const buildingSourceId = 'buildings';
       const buildingLayerId = 'buildings-layer';
-      const existingBuildingSource = map.getSource(buildingSourceId) as mapboxgl.GeoJSONSource;
-      
-      if (buildingData && buildingData.features && buildingData.features.length > 0) {
+      const existingBuildingSource = map.getSource(
+        buildingSourceId
+      ) as mapboxgl.GeoJSONSource;
+
+      if (
+        buildingData &&
+        buildingData.features &&
+        buildingData.features.length > 0
+      ) {
         if (existingBuildingSource) {
           existingBuildingSource.setData(buildingData);
         } else {
           // Add the source
-          map.addSource(buildingSourceId, { type: 'geojson', data: buildingData });
-          
+          map.addSource(buildingSourceId, {
+            type: 'geojson',
+            data: buildingData,
+          });
+
           // Add the building layer first, before any other layers
           if (!map.getLayer(buildingLayerId)) {
             map.addLayer({
@@ -241,18 +269,22 @@ const MapContainer: React.FC<MapContainerProps> = ({
               type: 'fill',
               source: buildingSourceId,
               layout: { visibility: buildingVisibility ? 'visible' : 'none' },
-              paint: { 
-                'fill-color': '#8a2be2', 
+              paint: {
+                'fill-color': '#8a2be2',
                 'fill-opacity': 0.3,
-                'fill-outline-color': '#000000'
-              }
+                'fill-outline-color': '#000000',
+              },
             }); // No beforeId, appends to the top of the layer stack
           }
         }
-        
+
         // Update visibility if layer already exists
         if (map.getLayer(buildingLayerId)) {
-          map.setLayoutProperty(buildingLayerId, 'visibility', buildingVisibility ? 'visible' : 'none');
+          map.setLayoutProperty(
+            buildingLayerId,
+            'visibility',
+            buildingVisibility ? 'visible' : 'none'
+          );
         }
       } else {
         const currentMap = mapRef.current;
@@ -271,9 +303,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
       setupOrUpdateLayers();
     } else {
       map.once('load', setupOrUpdateLayers);
-      // console.log('[MapContainer] Map style not loaded, deferring layer setup for treeData.');
     }
-  }, [treeData, treeVisibility, airQualityData, airQualityVisibility, buildingData, buildingVisibility]);
+  }, [
+    treeData,
+    treeVisibility,
+    airQualityData,
+    airQualityVisibility,
+    buildingData,
+    buildingVisibility,
+  ]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -281,92 +319,283 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
     // Click handler setup for tree layer
     const treeLayerId = 'trees-layer';
-    const handleTreeClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
-        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+    const handleTreeClick = (
+      e: mapboxgl.MapMouseEvent & { features?: any[] }
+    ) => {
+      // Prevent event propagation to avoid multiple click handlers
+      e.preventDefault();
+
+      if (
+        e.features &&
+        e.features.length > 0 &&
+        e.features[0].properties &&
+        e.lngLat
+      ) {
+        console.log('Tree clicked:', e.features[0].properties);
+        onClick({
+          object: {
+            properties: e.features[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
       }
     };
-    
+
     // Click handler setup for air quality layer
     const airLayerId = 'air-quality-layer';
-    const handleAirClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
-        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+    const handleAirClick = (
+      e: mapboxgl.MapMouseEvent & { features?: any[] }
+    ) => {
+      e.preventDefault();
+
+      if (
+        e.features &&
+        e.features.length > 0 &&
+        e.features[0].properties &&
+        e.lngLat
+      ) {
+        console.log('Air quality sensor clicked:', e.features[0].properties);
+        onClick({
+          object: {
+            properties: e.features[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
       }
     };
-    
+
     // Click handler setup for building layer
     const buildingLayerId = 'buildings-layer';
-    const handleBuildingClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      if (e.features && e.features.length > 0 && e.features[0].properties && e.lngLat) {
-        onClick({ object: { properties: e.features[0].properties, coordinates: e.lngLat } });
+    const handleBuildingClick = (
+      e: mapboxgl.MapMouseEvent & { features?: any[] }
+    ) => {
+      e.preventDefault();
+
+      if (
+        e.features &&
+        e.features.length > 0 &&
+        e.features[0].properties &&
+        e.lngLat
+      ) {
+        console.log('Building clicked:', e.features[0].properties);
+        onClick({
+          object: {
+            properties: e.features[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
       }
     };
-    
-    const onMouseEnter = () => { if (map.getCanvas()) map.getCanvas().style.cursor = 'pointer'; };
-    const onMouseLeave = () => { if (map.getCanvas()) map.getCanvas().style.cursor = ''; };
 
-    // Add event listeners to tree layer
-    if (treeData && treeData.features.length > 0) {
-        if (map.isStyleLoaded() && map.getLayer(treeLayerId)) {
-            map.on('click', treeLayerId, handleTreeClick);
-            map.on('mouseenter', treeLayerId, onMouseEnter);
-            map.on('mouseleave', treeLayerId, onMouseLeave);
-        }
+    // Cursor handling for better user feedback
+    const onMouseEnter = () => {
+      const canvas = map.getCanvas();
+      if (canvas) {
+        Object.assign(canvas.style, cursorPointerStyle);
+      }
+    };
+
+    const onMouseLeave = () => {
+      const canvas = map.getCanvas();
+      if (canvas) {
+        Object.assign(canvas.style, cursorDefaultStyle);
+      }
+    };
+
+    // Function to set up event listeners for a layer
+    const setupLayerInteractions = (
+      layerId: string,
+      clickHandler: (e: mapboxgl.MapMouseEvent & { features?: any[] }) => void
+    ) => {
+      if (!map.getLayer(layerId)) return false;
+
+      // Remove any existing handlers to prevent duplicates
+      map.off('click', layerId, clickHandler);
+      map.off('mouseenter', layerId, onMouseEnter);
+      map.off('mouseleave', layerId, onMouseLeave);
+
+      // Add the event handlers
+      map.on('click', layerId, clickHandler);
+      map.on('mouseenter', layerId, onMouseEnter);
+      map.on('mouseleave', layerId, onMouseLeave);
+
+      return true;
+    };
+
+    // Function to attempt setting up interactions with retry logic
+    const attemptSetupInteractions = () => {
+      let treesSetup = false;
+      let airSetup = false;
+      let buildingsSetup = false;
+
+      console.log('Attempting to set up layer interactions...');
+      console.log(
+        'Available layers:',
+        map.getStyle().layers?.map((l) => l.id)
+      );
+
+      // Try to set up tree layer interactions
+      if (treeData && treeData.features && treeData.features.length > 0) {
+        console.log('Setting up tree layer interactions for', treeLayerId);
+        treesSetup = setupLayerInteractions(treeLayerId, handleTreeClick);
+        console.log('Tree layer setup successful:', treesSetup);
+      }
+
+      // Try to set up air quality layer interactions
+      if (airQualityData && airQualityData.length > 0) {
+        console.log(
+          'Setting up air quality layer interactions for',
+          airLayerId
+        );
+        airSetup = setupLayerInteractions(airLayerId, handleAirClick);
+        console.log('Air quality layer setup successful:', airSetup);
+      }
+
+      // Try to set up building layer interactions
+      if (
+        buildingData &&
+        buildingData.features &&
+        buildingData.features.length > 0
+      ) {
+        console.log(
+          'Setting up building layer interactions for',
+          buildingLayerId
+        );
+        buildingsSetup = setupLayerInteractions(
+          buildingLayerId,
+          handleBuildingClick
+        );
+        console.log('Building layer setup successful:', buildingsSetup);
+      }
+
+      // If any layer failed to set up and we have data for it, retry after a delay
+      const needsRetry =
+        (treeData &&
+          treeData.features &&
+          treeData.features.length > 0 &&
+          !treesSetup) ||
+        (airQualityData && airQualityData.length > 0 && !airSetup) ||
+        (buildingData &&
+          buildingData.features &&
+          buildingData.features.length > 0 &&
+          !buildingsSetup);
+
+      if (needsRetry) {
+        console.log('Some layers not set up, retrying in 100ms...');
+        setTimeout(attemptSetupInteractions, 100);
+      } else {
+        console.log('All layer interactions set up successfully!');
+      }
+    };
+
+    // Start the setup process
+    if (map.isStyleLoaded()) {
+      console.log(
+        'Map style already loaded, setting up interactions immediately'
+      );
+      attemptSetupInteractions();
+    } else {
+      console.log('Map style not loaded yet, waiting for load event');
+      map.once('load', () => {
+        console.log('Map load event fired, now setting up interactions');
+        // Wait a bit to ensure all layers are fully loaded
+        setTimeout(attemptSetupInteractions, 500);
+      });
     }
-    
-    // Add event listeners to air quality layer
-    if (airQualityData && airQualityData.length > 0) {
-        if (map.isStyleLoaded() && map.getLayer(airLayerId)) {
-            map.on('click', airLayerId, handleAirClick);
-            map.on('mouseenter', airLayerId, onMouseEnter);
-            map.on('mouseleave', airLayerId, onMouseLeave);
-        }
-    }
-    
-    // Add event listeners to building layer
-    if (buildingData && buildingData.features && buildingData.features.length > 0) {
-        if (map.isStyleLoaded() && map.getLayer(buildingLayerId)) {
-            map.on('click', buildingLayerId, handleBuildingClick);
-            map.on('mouseenter', buildingLayerId, onMouseEnter);
-            map.on('mouseleave', buildingLayerId, onMouseLeave);
-        }
-    }
+
+    // Add a direct click handler to the map for debugging
+    map.on('click', (e) => {
+      console.log('Map clicked at:', e.lngLat);
+
+      // Query features at click point for all layers
+      const treeFeatures = map.queryRenderedFeatures(e.point, {
+        layers: [treeLayerId],
+      });
+      const airFeatures = map.queryRenderedFeatures(e.point, {
+        layers: [airLayerId],
+      });
+      const buildingFeatures = map.queryRenderedFeatures(e.point, {
+        layers: [buildingLayerId],
+      });
+
+      console.log('Features at click point:', {
+        trees: treeFeatures.length > 0 ? treeFeatures : 'none',
+        air: airFeatures.length > 0 ? airFeatures : 'none',
+        buildings: buildingFeatures.length > 0 ? buildingFeatures : 'none',
+      });
+
+      // If we found features but the layer-specific handlers didn't fire,
+      // manually trigger the appropriate handler
+      if (treeFeatures.length > 0) {
+        console.log('Manually handling tree click');
+        onClick({
+          object: {
+            properties: treeFeatures[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
+      } else if (airFeatures.length > 0) {
+        console.log('Manually handling air quality click');
+        onClick({
+          object: {
+            properties: airFeatures[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
+      } else if (buildingFeatures.length > 0) {
+        console.log('Manually handling building click');
+        onClick({
+          object: {
+            properties: buildingFeatures[0].properties,
+            coordinates: e.lngLat,
+          },
+        });
+      }
+    });
+
+    // Also add a click handler to the entire map for debugging
+    const mapClickHandler = (e: mapboxgl.MapMouseEvent) => {
+      console.log('Map clicked at:', e.lngLat);
+    };
+    map.on('click', mapClickHandler);
 
     return () => {
       const currentMap = mapRef.current;
-      if (currentMap && currentMap.isStyleLoaded()) {
-        // Remove tree layer event listeners
-        currentMap.off('click', treeLayerId, handleTreeClick);
-        currentMap.off('mouseenter', treeLayerId, onMouseEnter);
-        currentMap.off('mouseleave', treeLayerId, onMouseLeave);
-        
-        // Remove air quality layer event listeners
-        currentMap.off('click', airLayerId, handleAirClick);
-        currentMap.off('mouseenter', airLayerId, onMouseEnter);
-        currentMap.off('mouseleave', airLayerId, onMouseLeave);
-        
-        // Remove building layer event listeners
-        currentMap.off('click', buildingLayerId, handleBuildingClick);
-        currentMap.off('mouseenter', buildingLayerId, onMouseEnter);
-        currentMap.off('mouseleave', buildingLayerId, onMouseLeave);
+      if (currentMap) {
+        // Remove all event handlers
+        if (currentMap.getLayer(treeLayerId)) {
+          currentMap.off('click', treeLayerId, handleTreeClick);
+          currentMap.off('mouseenter', treeLayerId, onMouseEnter);
+          currentMap.off('mouseleave', treeLayerId, onMouseLeave);
+        }
+
+        if (currentMap.getLayer(airLayerId)) {
+          currentMap.off('click', airLayerId, handleAirClick);
+          currentMap.off('mouseenter', airLayerId, onMouseEnter);
+          currentMap.off('mouseleave', airLayerId, onMouseLeave);
+        }
+
+        if (currentMap.getLayer(buildingLayerId)) {
+          currentMap.off('click', buildingLayerId, handleBuildingClick);
+          currentMap.off('mouseenter', buildingLayerId, onMouseEnter);
+          currentMap.off('mouseleave', buildingLayerId, onMouseLeave);
+        }
+
+        // Remove map click handler
+        currentMap.off('click', mapClickHandler);
       }
     };
-  }, [onClick, treeData, treeVisibility, airQualityData, airQualityVisibility, buildingData, buildingVisibility]);
+  }, [
+    onClick,
+    treeData,
+    treeVisibility,
+    airQualityData,
+    airQualityVisibility,
+    buildingData,
+    buildingVisibility,
+  ]);
 
-  return (
-    <Box
-      ref={mapContainerRef} // mapContainerRef is now on the Box itself
-      sx={{
-        ...mapContainerStyle, // Spread the base style from MapContainer.styles.ts
-        height: typeof height === 'number' ? `${height}px` : height, // Override with prop
-        width: typeof width === 'number' ? `${width}px` : width,     // Override with prop
-        // 'position' and 'overflow' are handled by mapContainerStyle
-      }}
-    >
-      {/* Mapbox will attach to the Box element directly */}
-    </Box>
-  );
+  return <Box ref={mapContainerRef} sx={mapContainerDivStyle(height, width)} />;
 };
 
 export default MapContainer;

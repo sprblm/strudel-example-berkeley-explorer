@@ -9,7 +9,14 @@ import CompareDatasets from './compare';
  */
 const CompareData: React.FC = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fafafa' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        bgcolor: '#fafafa',
+      }}
+    >
       <Box sx={{ p: 3, flex: 1 }}>
         {/* Updated Header with Monitor-style formatting */}
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -19,11 +26,12 @@ const CompareData: React.FC = () => {
               Compare Climate Datasets
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Explore and compare different climate datasets to identify patterns and variations.
+              Explore and compare different climate datasets to identify
+              patterns and variations.
             </Typography>
           </Box>
         </Box>
-        
+
         {/* Main content - directly show the comparison interface */}
         <CompareDatasets />
       </Box>

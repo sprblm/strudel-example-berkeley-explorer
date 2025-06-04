@@ -24,7 +24,10 @@ const App = () => {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/search-repositories/*" element={<SearchRepositories />} />
+            <Route
+              path="/search-repositories/*"
+              element={<SearchRepositories />}
+            />
             <Route path="/explore-data/*" element={<ExploreData />} />
             <Route path="/compare-data/*" element={<CompareData />} />
             <Route path="/contribute" element={<ContributePage />} />
@@ -33,23 +36,23 @@ const App = () => {
         </ErrorBoundary>
       </Box>
 
-      <Paper 
-        component="footer" 
-        square 
-        variant="outlined" 
-        sx={{ 
+      <Paper
+        component="footer"
+        square
+        variant="outlined"
+        sx={{
           mt: 'auto',
           py: 2,
           px: 2,
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Berkeley Environmental Health Explorer  {new Date().getFullYear()}
+          Berkeley Environmental Health Explorer {new Date().getFullYear()}
         </Typography>
-        <Button 
-          variant="text" 
-          size="small" 
+        <Button
+          variant="text"
+          size="small"
           color="inherit"
           href="https://github.com/superbloom/climate-study"
           target="_blank"

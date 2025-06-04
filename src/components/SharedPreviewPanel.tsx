@@ -83,7 +83,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
           x: [1, 2, 3, 4],
           y: [10, 15, 13, 17],
           text: ['A', 'B', 'C', 'D'],
-        }
+        },
       };
     } catch (error) {
       if (process.env.NODE_ENV !== 'production') {
@@ -100,7 +100,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
           x: [1, 2, 3, 4],
           y: [10, 15, 13, 17],
           text: ['A', 'B', 'C', 'D'],
-        }
+        },
       };
     }
   };
@@ -115,39 +115,41 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
   // Extract the item attributes to display in the details
   const attributes: LabelValuePair[] = useMemo(() => {
     if (columns?.length) {
-      return columns.map(col => ({
+      return columns.map((col) => ({
         label: col.headerName || col.field || '',
         value: previewItem[col.field] as React.ReactNode,
         type: col.type,
-        units: col.units
+        units: col.units,
       }));
     }
     return Object.entries(previewItem).map(([key, value]) => ({
       label: key,
       value: value as React.ReactNode,
-      type: typeof value === 'number' ? 'number' : 'string'
+      type: typeof value === 'number' ? 'number' : 'string',
     }));
   }, [columns, previewItem]);
 
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ 
-        height: '100%', 
-        display: 'flex', 
+    <Paper
+      elevation={0}
+      sx={{
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
         borderLeft: '1px solid',
-        borderColor: 'divider'
+        borderColor: 'divider',
       }}
     >
-      <Stack 
-        direction="row" 
-        alignItems="center" 
+      <Stack
+        direction="row"
+        alignItems="center"
         justifyContent="space-between"
         sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}
       >
         <Typography variant="h6" component="h2">
-          {previewItem.name || previewItem.title || `Item ${previewItem[idField]}`}
+          {previewItem.name ||
+            previewItem.title ||
+            `Item ${previewItem[idField]}`}
         </Typography>
         <IconButton onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
@@ -155,11 +157,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
       </Stack>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange}
-          variant="fullWidth"
-        >
+        <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
           <Tab label="Details" />
           <Tab label="Visualizations" />
           <Tab label="Related" />
@@ -171,10 +169,10 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
         {tabValue === 0 && (
           <Stack spacing={2}>
             <LabelValueTable rows={attributes} />
-            
+
             {detailsConfig.enabled && (
-              <Button 
-                component={RouterLink} 
+              <Button
+                component={RouterLink}
                 to={`${detailsConfig.path}/${previewItem[idField]}`}
                 variant="contained"
                 fullWidth
@@ -200,17 +198,17 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                     y: visualizationData.timeSeriesData.y,
                     type: 'scatter',
                     mode: 'lines+markers',
-                    marker: {color: 'blue'},
+                    marker: { color: 'blue' },
                   },
                 ]}
                 layout={{
                   autosize: true,
                   height: 300,
-                  margin: {l: 50, r: 50, t: 30, b: 50},
-                  xaxis: {title: {text: 'Time'}},
-                  yaxis: {title: {text: 'Value'}},
+                  margin: { l: 50, r: 50, t: 30, b: 50 },
+                  xaxis: { title: { text: 'Time' } },
+                  yaxis: { title: { text: 'Value' } },
                 }}
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
                 useResizeHandler={true}
                 onError={(error) => {
                   if (process.env.NODE_ENV !== 'production') {
@@ -220,7 +218,7 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                 }}
               />
             </Box>
-            
+
             <Box>
               <Typography variant="subtitle1" gutterBottom>
                 Data Distribution
@@ -242,11 +240,11 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
                 layout={{
                   autosize: true,
                   height: 300,
-                  margin: {l: 50, r: 50, t: 30, b: 50},
-                  xaxis: {title: {text: 'X Value'}},
-                  yaxis: {title: {text: 'Y Value'}},
+                  margin: { l: 50, r: 50, t: 30, b: 50 },
+                  xaxis: { title: { text: 'X Value' } },
+                  yaxis: { title: { text: 'Y Value' } },
                 }}
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
                 useResizeHandler={true}
                 onError={(error) => {
                   if (process.env.NODE_ENV !== 'production') {
@@ -266,16 +264,18 @@ export const SharedPreviewPanel: React.FC<SharedPreviewPanelProps> = ({
               Related Items
             </Typography>
             <DataGrid
-              rows={Array(5).fill(0).map((_, i) => ({
-                id: i,
-                name: `Related Item ${i + 1}`,
-                type: 'Dataset',
-                relation: 'Referenced'
-              }))}
+              rows={Array(5)
+                .fill(0)
+                .map((_, i) => ({
+                  id: i,
+                  name: `Related Item ${i + 1}`,
+                  type: 'Dataset',
+                  relation: 'Referenced',
+                }))}
               columns={[
                 { field: 'name', headerName: 'Name', flex: 1 },
                 { field: 'type', headerName: 'Type', width: 120 },
-                { field: 'relation', headerName: 'Relation', width: 120 }
+                { field: 'relation', headerName: 'Relation', width: 120 },
               ]}
               pageSizeOptions={[5]}
               initialState={{
