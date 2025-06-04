@@ -13,6 +13,9 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "scripts/**/*"
+    "scripts/**/*",
+    "vite.config.ts",
+    "vite.config.d.ts",
+    "vite.config.js"
   ]
 }

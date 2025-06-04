@@ -26,11 +26,15 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "test",
+    "test/**/*.ts",
+    "test/**/*.tsx",
+    "test/**/*.d.ts",
     "strudel.config.ts",
-    "cypress",
+    "cypress/**/*.ts",
+    "cypress/**/*.tsx",
     "cypress.config.ts",
     "vite-env.d.ts",
+    "vite.config.ts",
     "*.d.ts"
   ],
   "references": [
