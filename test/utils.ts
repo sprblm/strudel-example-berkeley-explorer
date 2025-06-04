@@ -4,8 +4,8 @@ export const createTestQueryClient = () => {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false
-      }
-    }
+        retry: false,
+      },
+    },
   });
 };
