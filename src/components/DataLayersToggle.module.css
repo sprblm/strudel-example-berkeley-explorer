@@ -2,9 +2,11 @@
   /* Remove absolute positioning to prevent conflicts with parent container */
   background: var(--mui-palette-background-paper, #fff);
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   padding: 16px;
   min-width: 180px;
+  margin-top: 0;
+  margin-right: 0;
 }
 .toggleTitle {
   font-weight: 500;

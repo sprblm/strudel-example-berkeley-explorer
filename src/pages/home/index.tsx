@@ -390,6 +390,11 @@ export const HomePage = () => {
               height: '600px',
               mb: 1,
               '& > div': { height: '100%' }, // Ensure inner divs take full height
+              '& .MuiBox-root:has(.toggleRoot)': {
+                top: '10px !important',
+                right: '10px !important',
+                zIndex: 1000,
+              },
             }}
           >
             {/* Interactive Campus Map */}

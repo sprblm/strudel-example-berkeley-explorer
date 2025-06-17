@@ -422,7 +422,18 @@ const BerkeleyDataMap: React.FC<BerkeleyDataMapProps> = ({
       }}
     >
       {showLayersToggle && (
-        <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 16,
+            left: 16,
+            zIndex: 1000,
+            '& .toggleRoot': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              border: '2px solid #fff',
+            },
+          }}
+        >
           <DataLayersToggle
             visibleLayers={visibleLayers}
             onToggle={toggleLayer}
