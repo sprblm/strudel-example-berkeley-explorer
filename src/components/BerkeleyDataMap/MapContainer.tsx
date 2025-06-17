@@ -86,6 +86,27 @@ const MapContainer: React.FC<MapContainerProps> = ({
         minZoom: 10,
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      // Load custom tree/leaf icon (black SVG) so we can colour it via SDF
+      const map = mapRef.current;
+      if (map) {
+        const addTreeIcon = () => {
+          if (!map.hasImage('tree-icon')) {
+            map.loadImage('/icons/tree.png', (error, image) => {
+              if (error || !image) {
+                console.error('Failed to load tree icon', error);
+                return;
+              }
+              map.addImage('tree-icon', image as any, { sdf: true });
+            });
+          }
+        };
+        if (map.isStyleLoaded()) {
+          addTreeIcon();
+        } else {
+          map.once('styledata', addTreeIcon);
+        }
+      }
     } catch (error) {}
     return () => {
       if (mapRef.current) {
@@ -118,14 +139,18 @@ const MapContainer: React.FC<MapContainerProps> = ({
         if (!map.getLayer(treeLayerId)) {
           map.addLayer({
             id: treeLayerId,
-            type: 'circle',
+            type: 'symbol',
             source: treeSourceId,
-            layout: { visibility: treeVisibility ? 'visible' : 'none' },
+            layout: {
+              visibility: treeVisibility ? 'visible' : 'none',
+              'icon-image': 'tree-icon',
+              'icon-size': 0.6,
+              'icon-allow-overlap': true,
+            },
             paint: {
-              'circle-radius': 6,
-              'circle-color': '#2E8B57',
-              'circle-stroke-width': 1,
-              'circle-stroke-color': '#FFFFFF',
+              'icon-color': '#2E8B57',
+              'icon-halo-color': '#FFFFFF',
+              'icon-halo-width': 1,
             },
           });
         } else {
