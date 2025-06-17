@@ -87,27 +87,36 @@ const MapContainer: React.FC<MapContainerProps> = ({
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Load custom tree/leaf icon (black SVG) so we can colour it via SDF
+      // Load custom icons for map features
       const map = mapRef.current;
       if (map) {
-        const addTreeIcon = () => {
+        const addIcons = () => {
+          // Tree icon
           if (!map.hasImage('tree-icon')) {
             map.loadImage('/icons/tree.png', (error, image) => {
-              if (error || !image) {
-                console.error('Failed to load tree icon', error);
-                return;
-              }
-              map.addImage('tree-icon', image as any, { sdf: true });
+              if (error || !image) return;
+              map.addImage('tree-icon', image as any);
+            });
+          }
+
+          // Air quality icon
+          if (!map.hasImage('air-icon')) {
+            map.loadImage('/icons/air.png', (error, image) => {
+              if (error || !image) return;
+              map.addImage('air-icon', image as any);
             });
           }
         };
+
         if (map.isStyleLoaded()) {
-          addTreeIcon();
+          addIcons();
         } else {
-          map.once('styledata', addTreeIcon);
+          map.once('styledata', addIcons);
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      // Map initialization error is handled by the component's error boundaries
+    }
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -124,7 +133,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
       // Trees layer setup
       const treeSourceId = 'trees';
       const treeLayerId = 'trees-layer';
-      const treeLabelLayerId = 'tree-labels';
       const existingTreeSource = map.getSource(
         treeSourceId
       ) as mapboxgl.GeoJSONSource;
@@ -147,11 +155,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
               'icon-size': 0.6,
               'icon-allow-overlap': true,
             },
-            paint: {
-              'icon-color': '#2E8B57',
-              'icon-halo-color': '#FFFFFF',
-              'icon-halo-width': 1,
-            },
           });
         } else {
           map.setLayoutProperty(
@@ -161,38 +164,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
           );
         }
 
-        if (!map.getLayer(treeLabelLayerId)) {
-          map.addLayer({
-            id: treeLabelLayerId,
-            type: 'symbol',
-            source: treeSourceId,
-            layout: {
-              'text-field': ['get', 'species'],
-              'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-              'text-offset': [0, 1.2],
-              'text-size': 10,
-              'text-allow-overlap': false,
-              visibility: treeVisibility ? 'visible' : 'none',
-            },
-            paint: {
-              'text-color': '#000000',
-              'text-halo-color': '#FFFFFF',
-              'text-halo-width': 1,
-            },
-          });
-        } else {
-          map.setLayoutProperty(
-            treeLabelLayerId,
-            'visibility',
-            treeVisibility ? 'visible' : 'none'
-          );
-        }
+        // No labels for trees - species will be shown in details popup instead
       } else {
         const currentMap = mapRef.current;
         if (currentMap && currentMap.isStyleLoaded()) {
-          if (currentMap.getLayer(treeLabelLayerId)) {
-            currentMap.removeLayer(treeLabelLayerId);
-          }
           if (currentMap.getLayer(treeLayerId)) {
             currentMap.removeLayer(treeLayerId);
           }
@@ -237,14 +212,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
         if (!map.getLayer(airLayerId)) {
           map.addLayer({
             id: airLayerId,
-            type: 'circle',
+            type: 'symbol',
             source: airSourceId,
-            layout: { visibility: airQualityVisibility ? 'visible' : 'none' },
-            paint: {
-              'circle-radius': 10,
-              'circle-color': '#4287f5',
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#FFFFFF',
+            layout: {
+              'icon-image': 'air-icon',
+              'icon-size': 0.7,
+              'icon-allow-overlap': true,
+              visibility: airQualityVisibility ? 'visible' : 'none',
             },
           });
         } else {
