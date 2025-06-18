@@ -34,7 +34,7 @@ export const config = {
     ],
   },
   footer: {
-    info: 'Berkeley Environmental Health Explorer  - A comprehensive tool for climate researchers to search, explore, compare, and analyze climate data.',
+    info: 'A comprehensive tool for climate researchers to search, explore, compare, and analyze climate data.',
     image: 'strudel-logo-header.png',
     links: [
       {
