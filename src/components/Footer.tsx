@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Stack, Typography } from '@mui/material';
+import { Box, Container, Grid, Stack } from '@mui/material';
 import React from 'react';
 import { config } from '../../strudel.config';
 import { AppLink } from './AppLink';
@@ -35,7 +35,6 @@ export const Footer: React.FC = () => {
           </Grid>
           <Grid item md={6}>
             <Stack alignItems="center">
-              <Typography>{config.footer.info}</Typography>
               {config.footer.image && (
                 <AppLink to="/">
                   <ImageWrapper height={60}>
@@ -43,6 +42,7 @@ export const Footer: React.FC = () => {
                       src={cleanPath(
                         `${import.meta.env.BASE_URL}/${config.footer.image}`
                       )}
+                      alt="Footer logo"
                     />
                   </ImageWrapper>
                 </AppLink>
