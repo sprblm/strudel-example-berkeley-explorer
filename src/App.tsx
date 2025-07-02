@@ -47,9 +47,7 @@ const App = () => {
           textAlign: 'center',
         }}
       >
-        <Typography variant="body2" color="text.secondary">
-          Berkeley Environmental Health Explorer {new Date().getFullYear()}
-        </Typography>
+      
         <Button
           variant="text"
           size="small"

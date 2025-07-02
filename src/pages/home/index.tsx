@@ -450,18 +450,7 @@ export const HomePage = () => {
                 into a cohesive educational experience, turning the campus into
                 a living laboratory.
               </Typography>
-              <Button
-                variant="outlined"
-                color="primary"
-                sx={{
-                  borderColor: '#1e3a8a',
-                  color: '#1e3a8a',
-                  '&:hover': {
-                    borderColor: '#3b82f6',
-                    bgcolor: 'rgba(59, 130, 246, 0.04)',
-                  },
-                }}
-              ></Button>
+              
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography
