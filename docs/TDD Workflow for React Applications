@@ -1,0 +1,37 @@
+# TDD Workflow for React Applications
+
+1. ALWAYS write tests before implementing features.
+
+2. For UI components:
+   - Write tests using React Testing Library or Jest
+   - Test both rendering and interactions
+   - Mock external dependencies like Mapbox
+
+3. For each feature requirement:
+   - Write a failing test that describes the expected behavior
+   - Implement the minimal code needed to pass the test
+   - Refactor while keeping tests passing
+   - Commit both tests and implementation together
+
+4. Test organization:
+   - Place tests in __tests__ directories or alongside components with .test.tsx extension
+   - Group related tests with describe blocks
+   - Use clear test descriptions that explain the expected behavior
+
+5. Common test patterns:
+   - Test component rendering
+   - Test user interactions (clicks, toggles)
+   - Test state changes
+   - Test prop changes
+   - Test error states
+
+6. For map-related features:
+   - Mock Mapbox GL JS objects
+   - Test layer visibility changes
+   - Test marker positioning and styling
+   - Test popup behavior
+
+7. Commit structure:
+   - First commit: Tests for the feature
+   - Second commit: Implementation that passes tests
+   - Third commit (if needed): Refactoring while tests pass
