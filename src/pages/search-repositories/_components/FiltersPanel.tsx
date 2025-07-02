@@ -16,7 +16,6 @@ import {
 import React, { useState } from 'react';
 import { TreeIcon, AirQualityIcon, LocationIcon } from '../../../components/Icons';
 import { styled } from '@mui/material/styles';
- */
 const LayerButton = styled(Button)<{ selected?: boolean }>(({ theme, selected }) => ({
   border: '1.5px solid',
   borderColor: selected ? theme.palette.primary.main : theme.palette.grey[300],
