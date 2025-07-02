@@ -24,6 +24,10 @@ vi.mock('../../../components/FilterContext', () => ({
 }));
 
 describe('FiltersPanel', () => {
+  beforeEach(() => {
+    // Clear all mocks before each test
+    vi.clearAllMocks();
+  });
   it('renders the component with tree filters visible by default', () => {
     render(<FiltersPanel />);
 
@@ -157,6 +161,45 @@ describe('FiltersPanel', () => {
     expect(screen.getByText('Search Locations')).toBeInTheDocument();
   });
 
+  it('enforces exclusive selection behavior when tabs are clicked', async () => {
+    const user = userEvent.setup();
+    render(<FiltersPanel />);
+    
+    // First, verify that Trees tab is active by default
+    expect(mockSetFilter).not.toHaveBeenCalled();
+    expect(screen.getByText('Species')).toBeInTheDocument();
+    
+    // Click on Air Quality tab
+    const airQualityTab = screen.getByText('Air Quality').closest('button');
+    await user.click(airQualityTab!);
+    
+    // Verify that Air Quality is now active and Trees is inactive
+    expect(mockClearFilters).toHaveBeenCalledTimes(1);
+    expect(mockSetFilter).toHaveBeenCalledWith('type', 'air');
+    expect(screen.getByText('Parameter')).toBeInTheDocument();
+    expect(screen.queryByText('Species')).not.toBeInTheDocument();
+    
+    // Now click on Location tab
+    const locationsTab = screen.getByText('Location').closest('button');
+    await user.click(locationsTab!);
+    
+    // Verify that Locations is now active and Air Quality is inactive
+    expect(mockClearFilters).toHaveBeenCalledTimes(2);
+    expect(mockSetFilter).toHaveBeenLastCalledWith('type', 'building');
+    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.queryByText('Parameter')).not.toBeInTheDocument();
+    
+    // Finally, click back on Trees tab
+    const treesTab = screen.getByText('Trees').closest('button');
+    await user.click(treesTab!);
+    
+    // Verify that Trees is active again and Locations is inactive
+    expect(mockClearFilters).toHaveBeenCalledTimes(3);
+    expect(mockSetFilter).toHaveBeenLastCalledWith('type', 'tree');
+    expect(screen.getByText('Species')).toBeInTheDocument();
+    expect(screen.queryByText('Name')).not.toBeInTheDocument();
+  });
+  
   it('updates location name input when typed', async () => {
     const user = userEvent.setup();
     render(<FiltersPanel />);
@@ -173,26 +216,49 @@ describe('FiltersPanel', () => {
     expect(locationNameInput).toHaveValue('Berkeley');
   });
 
-  it('can select multiple tabs/filters simultaneously', async () => {
+  it('enforces exclusive selection behavior like radio buttons', async () => {
     // Start with fresh mocks
     mockSetFilter.mockClear();
     mockClearFilters.mockClear();
 
     const user = userEvent.setup();
     render(<FiltersPanel />);
-
-    // Get the Air Quality tab
+    
+    // Verify Trees tab shows by checking for specific tree content elements
+    // Look for health select which is only in the tree panel
+    expect(screen.getByText('Health')).toBeInTheDocument();
+    expect(screen.getByText('Search Trees')).toBeInTheDocument();
+    
+    // Get the Air Quality tab and click it
     const airQualityTab = screen.getByText('Air Quality').closest('button');
-
-    // Click on Air Quality tab to enable it alongside Trees
     await user.click(airQualityTab!);
 
     // Verify that filters were cleared
-    expect(mockClearFilters).toHaveBeenCalled();
-
-    // Both tree and air filters should have been applied
-    // Since the order may vary, just check that both were called
-    expect(mockSetFilter).toHaveBeenCalledWith('type', 'tree');
+    expect(mockClearFilters).toHaveBeenCalledTimes(1);
+    
+    // Air quality filter should be applied, replacing any previous filters
     expect(mockSetFilter).toHaveBeenCalledWith('type', 'air');
+    
+    // Trees content should be hidden, Air Quality content should be visible
+    expect(screen.queryByText('Species')).not.toBeInTheDocument();
+    expect(screen.queryByText('Health')).not.toBeInTheDocument();
+    
+    // Check for Air Quality specific elements
+    expect(screen.getByText('Sensor')).toBeInTheDocument();
+    expect(screen.getByText('Search Air Quality')).toBeInTheDocument();
+    
+    // Get the Location tab and click it
+    const locationTab = screen.getByText('Location').closest('button');
+    await user.click(locationTab!);
+    
+    // Verify filters were cleared again
+    expect(mockClearFilters).toHaveBeenCalledTimes(2);
+    
+    // Location filter should be applied, replacing air quality filter
+    expect(mockSetFilter).toHaveBeenLastCalledWith('type', 'building');
+    
+    // Air Quality content should be hidden, Location content should be visible
+    expect(screen.queryByText('Parameter')).not.toBeInTheDocument();
+    expect(screen.getByText('Name')).toBeInTheDocument();
   });
 });

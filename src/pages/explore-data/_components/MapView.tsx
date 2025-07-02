@@ -16,7 +16,6 @@ interface MapViewProps {
   searchTerm: string;
   setPreviewItem: React.Dispatch<React.SetStateAction<any>>;
 }
- */
 export const MapView: React.FC<MapViewProps> = ({
   searchTerm,
   setPreviewItem,
