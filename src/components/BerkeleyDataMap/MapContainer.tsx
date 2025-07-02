@@ -87,25 +87,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Load custom icons for air quality features only (not trees)
-      const map = mapRef.current;
-      if (map) {
-        const addIcons = () => {
-          // Air quality icon
-          if (!map.hasImage('air-icon')) {
-            map.loadImage('/icons/air.png', (error, image) => {
-              if (error || !image) return;
-              map.addImage('air-icon', image as any);
-            });
-          }
-        };
-
-        if (map.isStyleLoaded()) {
-          addIcons();
-        } else {
-          map.once('styledata', addIcons);
-        }
-      }
+      // No custom icons needed - using circle markers for both trees and air quality
     } catch (error) {
       // Map initialization error is handled by the component's error boundaries
     }
@@ -222,13 +204,24 @@ const MapContainer: React.FC<MapContainerProps> = ({
         if (!map.getLayer(airLayerId)) {
           map.addLayer({
             id: airLayerId,
-            type: 'symbol',
+            type: 'circle',
             source: airSourceId,
             layout: {
-              'icon-image': 'air-icon',
-              'icon-size': 0.7,
-              'icon-allow-overlap': true,
               visibility: airQualityVisibility ? 'visible' : 'none',
+            },
+            paint: {
+              'circle-radius': 6,
+              'circle-color': '#FFA500', // Amber color
+              'circle-opacity': 0.9,
+              'circle-stroke-width': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                2,
+                ['boolean', ['feature-state', 'selected'], false],
+                2,
+                0
+              ],
+              'circle-stroke-color': '#000000',
             },
           });
         } else {
@@ -346,13 +339,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
       ) {
         const clickedFeatureId = e.features[0].id;
         const clickedFeature = e.features[0];
-        console.log(
-          'Tree clicked:',
-          clickedFeature.properties,
-          'ID:',
-          clickedFeatureId
-        );
-        
+        // Tree clicked with properties and ID
+        // Tree feature clicked
+
         // Remove previous selection state
         if (selectedTreeIdRef.current !== null) {
           map.removeFeatureState({
@@ -360,7 +349,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             id: selectedTreeIdRef.current,
           });
         }
-        
+
         // Set new selection state
         if (clickedFeatureId !== undefined) {
           map.setFeatureState(
@@ -369,304 +358,341 @@ const MapContainer: React.FC<MapContainerProps> = ({
           );
           selectedTreeIdRef.current = clickedFeatureId;
         }
-        
+
         onClick({
           object: {
             properties: clickedFeature.properties,
             coordinates: e.lngLat,
           },
         });
-      }
-    };
 
-    // Click handler setup for air quality layer
-    const airLayerId = 'air-quality-layer';
-    const handleAirClick = (
-      e: mapboxgl.MapMouseEvent & { features?: any[] }
-    ) => {
-      e.preventDefault();
+  // Click handler setup for tree layer
+  const treeLayerId = 'trees-layer';
+  const handleTreeClick = (
+    e: mapboxgl.MapMouseEvent & { features?: any[] }
+  ) => {
+    // Prevent event propagation to avoid multiple click handlers
+    e.preventDefault();
 
-      if (
-        e.features &&
-        e.features.length > 0 &&
-        e.features[0].properties &&
-        e.lngLat
-      ) {
-        console.log('Air quality sensor clicked:', e.features[0].properties);
-        onClick({
-          object: {
-            properties: e.features[0].properties,
-            coordinates: e.lngLat,
-          },
-        });
-      }
-    };
+    if (
+      e.features &&
+      e.features.length > 0 &&
+      e.features[0].properties &&
+      e.lngLat
+    ) {
+      const clickedFeatureId = e.features[0].id;
+      const clickedFeature = e.features[0];
+      // Tree clicked with properties and ID
+      // Tree feature clicked
 
-    // Click handler setup for building layer
-    const buildingLayerId = 'buildings-layer';
-    const handleBuildingClick = (
-      e: mapboxgl.MapMouseEvent & { features?: any[] }
-    ) => {
-      e.preventDefault();
-
-      if (
-        e.features &&
-        e.features.length > 0 &&
-        e.features[0].properties &&
-        e.lngLat
-      ) {
-        console.log('Building clicked:', e.features[0].properties);
-        onClick({
-          object: {
-            properties: e.features[0].properties,
-            coordinates: e.lngLat,
-          },
-        });
-      }
-    };
-
-    // Cursor handling and hover state for better user feedback
-    const onMouseEnter = (e: mapboxgl.MapMouseEvent & { features?: any[] }) => {
-      const canvas = map.getCanvas();
-      if (canvas) {
-        Object.assign(canvas.style, cursorPointerStyle);
-      }
-      
-      // Add hover effect for trees
-      if (e.features && e.features.length > 0) {
-        const hoveredFeatureId = e.features[0].id;
-        if (hoveredFeatureId !== undefined) {
-          // Remove hover state from previous feature
-          if (hoveredTreeIdRef.current !== null) {
-            map.removeFeatureState({
-              source: 'trees',
-              id: hoveredTreeIdRef.current,
-            }, 'hover');
-          }
-          
-          // Add hover state to current feature
-          map.setFeatureState({
-            source: 'trees',
-            id: hoveredFeatureId,
-          }, { hover: true });
-          hoveredTreeIdRef.current = hoveredFeatureId;
-        }
-      }
-    };
-
-    const onMouseLeave = () => {
-      const canvas = map.getCanvas();
-      if (canvas) {
-        Object.assign(canvas.style, cursorDefaultStyle);
-      }
-      
-      // Remove hover state when mouse leaves the feature
-      if (hoveredTreeIdRef.current !== null) {
+      // Remove previous selection state
+      if (selectedTreeIdRef.current !== null) {
         map.removeFeatureState({
           source: 'trees',
-          id: hoveredTreeIdRef.current,
-        }, 'hover');
-        hoveredTreeIdRef.current = null;
-      }
-    };
-
-    // Function to set up event listeners for a layer
-    const setupLayerInteractions = (
-      layerId: string,
-      clickHandler: (e: mapboxgl.MapMouseEvent & { features?: any[] }) => void
-    ) => {
-      if (!map.getLayer(layerId)) return false;
-
-      // Remove any existing handlers to prevent duplicates
-      map.off('click', layerId, clickHandler);
-      map.off('mouseenter', layerId, onMouseEnter);
-      map.off('mouseleave', layerId, onMouseLeave);
-
-      // Add the event handlers
-      map.on('click', layerId, clickHandler);
-      map.on('mouseenter', layerId, onMouseEnter);
-      map.on('mouseleave', layerId, onMouseLeave);
-
-      return true;
-    };
-
-    // Function to attempt setting up interactions with retry logic
-    const attemptSetupInteractions = () => {
-      let treesSetup = false;
-      let airSetup = false;
-      let buildingsSetup = false;
-
-      console.log('Attempting to set up layer interactions...');
-      console.log(
-        'Available layers:',
-        map.getStyle().layers?.map((l) => l.id)
-      );
-
-      // Try to set up tree layer interactions
-      if (treeData && treeData.features && treeData.features.length > 0) {
-        console.log('Setting up tree layer interactions for', treeLayerId);
-        treesSetup = setupLayerInteractions(treeLayerId, handleTreeClick);
-        console.log('Tree layer setup successful:', treesSetup);
+          id: selectedTreeIdRef.current,
+        });
       }
 
-      // Try to set up air quality layer interactions
-      if (airQualityData && airQualityData.length > 0) {
-        console.log(
-          'Setting up air quality layer interactions for',
-          airLayerId
+      // Set new selection state
+      if (clickedFeatureId !== undefined) {
+        map.setFeatureState(
+          { source: 'trees', id: clickedFeatureId },
+          { selected: true }
         );
-        airSetup = setupLayerInteractions(airLayerId, handleAirClick);
-        console.log('Air quality layer setup successful:', airSetup);
+        selectedTreeIdRef.current = clickedFeatureId;
       }
 
-      // Try to set up building layer interactions
-      if (
-        buildingData &&
-        buildingData.features &&
-        buildingData.features.length > 0
-      ) {
-        console.log(
-          'Setting up building layer interactions for',
-          buildingLayerId
-        );
-        buildingsSetup = setupLayerInteractions(
-          buildingLayerId,
-          handleBuildingClick
-        );
-        console.log('Building layer setup successful:', buildingsSetup);
-      }
-
-      // If any layer failed to set up and we have data for it, retry after a delay
-      const needsRetry =
-        (treeData &&
-          treeData.features &&
-          treeData.features.length > 0 &&
-          !treesSetup) ||
-        (airQualityData && airQualityData.length > 0 && !airSetup) ||
-        (buildingData &&
-          buildingData.features &&
-          buildingData.features.length > 0 &&
-          !buildingsSetup);
-
-      if (needsRetry) {
-        console.log('Some layers not set up, retrying in 100ms...');
-        setTimeout(attemptSetupInteractions, 100);
-      } else {
-        console.log('All layer interactions set up successfully!');
-      }
-    };
-
-    // Start the setup process
-    if (map.isStyleLoaded()) {
-      console.log(
-        'Map style already loaded, setting up interactions immediately'
-      );
-      attemptSetupInteractions();
-    } else {
-      console.log('Map style not loaded yet, waiting for load event');
-      map.once('load', () => {
-        console.log('Map load event fired, now setting up interactions');
-        // Wait a bit to ensure all layers are fully loaded
-        setTimeout(attemptSetupInteractions, 500);
+      onClick({
+        object: {
+          properties: clickedFeature.properties,
+          coordinates: e.lngLat,
+        },
       });
     }
+  };
 
-    // Add a direct click handler to the map for debugging
-    map.on('click', (e) => {
-      console.log('Map clicked at:', e.lngLat);
+  // Click handler setup for air quality layer
+  const airLayerId = 'air-quality-layer';
+  const handleAirQualityClick = (
+    e: mapboxgl.MapMouseEvent & { features?: any[] }
+  ) => {
+    e.preventDefault();
 
-      // Query features at click point for all layers
-      const treeFeatures = map.queryRenderedFeatures(e.point, {
-        layers: [treeLayerId],
+    if (
+      e.features &&
+      e.features.length > 0 &&
+      e.features[0].properties &&
+      e.lngLat
+    ) {
+      console.log('Air quality sensor clicked:', e.features[0].properties);
+      onClick({
+        object: {
+          properties: e.features[0].properties,
+          coordinates: e.lngLat,
+        },
       });
-      const airFeatures = map.queryRenderedFeatures(e.point, {
-        layers: [airLayerId],
+    }
+  };
+
+  // Click handler setup for building layer
+  const buildingLayerId = 'buildings-layer';
+  const handleBuildingClick = (
+    e: mapboxgl.MapMouseEvent & { features?: any[] }
+  ) => {
+    e.preventDefault();
+
+    if (
+      e.features &&
+      e.features.length > 0 &&
+      e.features[0].properties &&
+      e.lngLat
+    ) {
+      console.log('Building clicked:', e.features[0].properties);
+      onClick({
+        object: {
+          properties: e.features[0].properties,
+          coordinates: e.lngLat,
+        },
       });
-      const buildingFeatures = map.queryRenderedFeatures(e.point, {
-        layers: [buildingLayerId],
-      });
+    }
+  };
 
-      console.log('Features at click point:', {
-        trees: treeFeatures.length > 0 ? treeFeatures : 'none',
-        air: airFeatures.length > 0 ? airFeatures : 'none',
-        buildings: buildingFeatures.length > 0 ? buildingFeatures : 'none',
-      });
+  // Cursor handling and hover state for better user feedback
+  const handleMapMouseEnter = (
+    e: mapboxgl.MapMouseEvent & { features?: any[] }
+  ) => {
+    const canvas = map.getCanvas();
+    if (canvas) {
+      Object.assign(canvas.style, cursorPointerStyle);
+    }
 
-      // If we found features but the layer-specific handlers didn't fire,
-      // manually trigger the appropriate handler
-      if (treeFeatures.length > 0) {
-        console.log('Manually handling tree click');
-        onClick({
-          object: {
-            properties: treeFeatures[0].properties,
-            coordinates: e.lngLat,
-          },
-        });
-      } else if (airFeatures.length > 0) {
-        console.log('Manually handling air quality click');
-        onClick({
-          object: {
-            properties: airFeatures[0].properties,
-            coordinates: e.lngLat,
-          },
-        });
-      } else if (buildingFeatures.length > 0) {
-        console.log('Manually handling building click');
-        onClick({
-          object: {
-            properties: buildingFeatures[0].properties,
-            coordinates: e.lngLat,
-          },
-        });
-      }
-    });
-
-    // Also add a click handler to the entire map for debugging
-    const mapClickHandler = (e: mapboxgl.MapMouseEvent) => {
-      console.log('Map clicked at:', e.lngLat);
-    };
-    map.on('click', mapClickHandler);
-
-    return () => {
-      const currentMap = mapRef.current;
-      if (currentMap) {
-        // Remove all event handlers
-        if (currentMap.getLayer(treeLayerId)) {
-          currentMap.off('click', treeLayerId, handleTreeClick);
-          currentMap.off('mouseenter', treeLayerId, onMouseEnter);
-          currentMap.off('mouseleave', treeLayerId, onMouseLeave);
-          
-          // Clean up feature states
-          if (hoveredTreeIdRef.current !== null) {
-            currentMap.removeFeatureState({
+    // Add hover effect for trees
+    if (e.features && e.features.length > 0) {
+      const hoveredFeatureId = e.features[0].id;
+      if (hoveredFeatureId !== undefined) {
+        // Remove hover state from previous feature
+        if (hoveredTreeIdRef.current !== null) {
+          map.removeFeatureState(
+            {
               source: 'trees',
               id: hoveredTreeIdRef.current,
-            });
-          }
-          if (selectedTreeIdRef.current !== null) {
-            currentMap.removeFeatureState({
-              source: 'trees',
-              id: selectedTreeIdRef.current,
-            });
-          }
+            },
+            'hover'
+          );
         }
 
-        if (currentMap.getLayer(airLayerId)) {
-          currentMap.off('click', airLayerId, handleAirClick);
-          currentMap.off('mouseenter', airLayerId, onMouseEnter);
-          currentMap.off('mouseleave', airLayerId, onMouseLeave);
-        }
-
-        if (currentMap.getLayer(buildingLayerId)) {
-          currentMap.off('click', buildingLayerId, handleBuildingClick);
-          currentMap.off('mouseenter', buildingLayerId, onMouseEnter);
-          currentMap.off('mouseleave', buildingLayerId, onMouseLeave);
-        }
-
-        // Remove map click handler
-        currentMap.off('click', mapClickHandler);
+        // Add hover state to current feature
+        map.setFeatureState(
+          {
+            source: 'trees',
+            id: hoveredFeatureId,
+          },
+          { hover: true }
+        );
+        hoveredTreeIdRef.current = hoveredFeatureId;
       }
-    };
+    }
+  };
+
+  const handleMapMouseLeave = () => {
+    const canvas = map.getCanvas();
+    if (canvas) {
+      Object.assign(canvas.style, cursorDefaultStyle);
+    }
+
+    // Remove hover state when mouse leaves the feature
+    if (hoveredTreeIdRef.current !== null) {
+      map.removeFeatureState(
+        {
+          source: 'trees',
+          id: hoveredTreeIdRef.current,
+        },
+        'hover'
+      );
+      hoveredTreeIdRef.current = null;
+    }
+  };
+
+  // Function to set up event listeners for a layer
+  const setupLayerInteractions = (
+    layerId: string,
+    clickHandler: (e: mapboxgl.MapMouseEvent & { features?: any[] }) => void
+  ) => {
+    if (!map.getLayer(layerId)) return false;
+
+    // Remove any existing handlers to prevent duplicates
+    map.off('click', layerId, clickHandler);
+    map.off('mouseenter', layerId, handleMapMouseEnter);
+    map.off('mouseleave', layerId, handleMapMouseLeave);
+
+    // Handle events only once
+    map.once('click', layerId, clickHandler);
+    map.on('mouseenter', layerId, handleMapMouseEnter);
+    map.on('mouseleave', layerId, handleMapMouseLeave);
+
+    return true;
+  };
+
+  // Function to attempt setting up interactions with retry logic
+  const attemptSetupInteractions = () => {
+    let treesSetup = false;
+    let airSetup = false;
+    let buildingsSetup = false;
+
+    console.log('Attempting to set up layer interactions...');
+    console.log(
+      'Available layers:',
+      map.getStyle().layers?.map((l) => l.id)
+    );
+
+    // Try to set up tree layer interactions
+    if (treeData && treeData.features && treeData.features.length > 0) {
+      console.log('Setting up tree layer interactions for', treeLayerId);
+      treesSetup = setupLayerInteractions(treeLayerId, handleTreeClick);
+      console.log('Tree layer setup successful:', treesSetup);
+    }
+
+    // Try to set up air quality layer interactions
+    if (airQualityData && airQualityData.length > 0) {
+      console.log(
+        'Setting up air quality layer interactions for',
+        airLayerId
+      );
+      airSetup = setupLayerInteractions(airLayerId, handleAirQualityClick);
+      console.log('Air quality layer setup successful:', airSetup);
+    }
+
+    // Try to set up building layer interactions
+    if (
+      buildingData &&
+      buildingData.features &&
+      buildingData.features.length > 0
+    ) {
+      console.log(
+        'Setting up building layer interactions for',
+        buildingLayerId
+      );
+      buildingsSetup = setupLayerInteractions(
+        buildingLayerId,
+        handleBuildingClick
+      );
+      console.log('Building layer setup successful:', buildingsSetup);
+    }
+
+    // If any layer failed to set up and we have data for it, retry after a delay
+    const needsRetry =
+      (treeData &&
+        treeData.features &&
+        treeData.features.length > 0 &&
+        !treesSetup) ||
+      (airQualityData && airQualityData.length > 0 && !airSetup) ||
+      (buildingData &&
+        buildingData.features &&
+        buildingData.features.length > 0 &&
+        !buildingsSetup);
+
+    if (needsRetry) {
+      console.log('Some layers not set up, retrying in 100ms...');
+      setTimeout(attemptSetupInteractions, 100);
+    } else {
+      console.log('All layer interactions set up successfully!');
+    }
+  };
+
+  // Start the setup process
+  if (map.isStyleLoaded()) {
+    console.log(
+      'Map style already loaded, setting up interactions immediately'
+    );
+    attemptSetupInteractions();
+  } else {
+    console.log('Map style not loaded yet, waiting for load event');
+    map.once('load', () => {
+      console.log('Map load event fired, now setting up interactions');
+      // Wait a bit to ensure all layers are fully loaded
+      setTimeout(attemptSetupInteractions, 500);
+    });
+  }
+
+  // Add a direct click handler to the map for debugging
+  map.on('click', (e) => {
+    console.log('Map clicked at:', e.lngLat);
+
+    // Query features at click point for all layers
+    const treeFeatures = map.queryRenderedFeatures(e.point, {
+      layers: [treeLayerId],
+    });
+    const airFeatures = map.queryRenderedFeatures(e.point, {
+      layers: [airLayerId],
+    });
+    const buildingFeatures = map.queryRenderedFeatures(e.point, {
+      layers: [buildingLayerId],
+    });
+
+    console.log('Features at click point:', {
+      trees: treeFeatures.length > 0 ? treeFeatures : 'none',
+      air: airFeatures.length > 0 ? airFeatures : 'none',
+      buildings: buildingFeatures.length > 0 ? buildingFeatures : 'none',
+    });
+
+    // If we found features but the layer-specific handlers didn't fire,
+    // manually trigger the appropriate handler
+    if (treeFeatures.length > 0) {
+      console.log('Manually handling tree click');
+      onClick({
+        object: {
+          properties: treeFeatures[0].properties,
+          coordinates: e.lngLat,
+        },
+      });
+    } else if (airFeatures.length > 0) {
+      console.log('Manually handling air quality click');
+      onClick({
+        object: {
+          properties: airFeatures[0].properties,
+          coordinates: e.lngLat,
+        },
+      });
+    } else if (buildingFeatures.length > 0) {
+      console.log('Manually handling building click');
+      onClick({
+        object: {
+          properties: buildingFeatures[0].properties,
+          coordinates: e.lngLat,
+        },
+      });
+    }
+  });
+
+  // Also add a click handler to the entire map for debugging
+  const mapClickHandler = (e: mapboxgl.MapMouseEvent) => {
+    console.log('Map clicked at:', e.lngLat);
+  };
+  map.on('click', mapClickHandler);
+
+  return () => {
+    const currentMap = mapRef.current;
+    if (currentMap) {
+      // Remove all event handlers
+      if (currentMap.getLayer(treeLayerId)) {
+        currentMap.off('click', treeLayerId, handleTreeClick);
+        currentMap.off('mouseenter', treeLayerId, handleMapMouseEnter);
+        currentMap.off('mouseleave', treeLayerId, handleMapMouseLeave);
+
+        // Clean up feature states
+        if (hoveredTreeIdRef.current !== null) {
+          currentMap.removeFeatureState({
+            source: 'trees',
+            id: hoveredTreeIdRef.current,
+          });
+        }
+        if (selectedTreeIdRef.current !== null) {
+          currentMap.removeFeatureState({
+            source: 'trees',
+            id: selectedTreeIdRef.current,
+          });
+        }
+      }
   }, [
     onClick,
     treeData,
