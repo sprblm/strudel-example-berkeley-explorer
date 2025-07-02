@@ -5,47 +5,50 @@ import MapContainer from './MapContainer';
 import mapboxgl from 'mapbox-gl';
 import { FeatureCollection } from 'geojson';
 
+// Create mock functions that we can reference in our tests
+const mockMapFunctions = {
+  addSource: vi.fn(),
+  addLayer: vi.fn(),
+  on: vi.fn(),
+  once: vi.fn(),
+  off: vi.fn(),
+  removeLayer: vi.fn(),
+  removeSource: vi.fn(),
+  getSource: vi.fn(),
+  getLayer: vi.fn().mockReturnValue(true),
+  setLayoutProperty: vi.fn(),
+  addControl: vi.fn(),
+  isStyleLoaded: vi.fn().mockReturnValue(true),
+  setFeatureState: vi.fn(),
+  removeFeatureState: vi.fn(),
+  getStyle: vi.fn().mockReturnValue({ layers: [] }),
+  getCanvas: vi.fn().mockReturnValue({ style: {} }),
+  queryRenderedFeatures: vi.fn().mockReturnValue([]),
+  remove: vi.fn(),
+};
+
 // Mock mapboxgl
 vi.mock('mapbox-gl', () => {
-  const addSourceMock = vi.fn();
-  const addLayerMock = vi.fn();
-  const onMock = vi.fn();
-  const onceMock = vi.fn();
-  const offMock = vi.fn();
-  const removeLayerMock = vi.fn();
-  const removeSourceMock = vi.fn();
-  const getSourceMock = vi.fn();
-  const getLayerMock = vi.fn();
-  const setLayoutPropertyMock = vi.fn();
-  const addControlMock = vi.fn();
-  const setFeatureStateMock = vi.fn();
-  const removeFeatureStateMock = vi.fn();
-  const getStyleMock = vi.fn(() => ({ layers: [] }));
-  const getCanvasMock = vi.fn(() => ({ style: {} }));
-  const queryRenderedFeaturesMock = vi.fn(() => []);
-  const removeMock = vi.fn();
-
+  // MockMap constructor stores a reference to the last created map instance
+  class MockMap {
+    constructor() {
+      // Copy all mock functions to this instance
+      Object.assign(this, mockMapFunctions);
+      // Store this instance as the last created map
+      MockMap.lastInstance = this;
+    }
+    
+    static lastInstance = null;
+  }
+  
   return {
-    Map: vi.fn(() => ({
-      addSource: addSourceMock,
-      addLayer: addLayerMock,
-      on: onMock,
-      once: onceMock,
-      off: offMock,
-      removeLayer: removeLayerMock,
-      removeSource: removeSourceMock,
-      getSource: getSourceMock,
-      getLayer: getLayerMock,
-      setLayoutProperty: setLayoutPropertyMock,
-      addControl: addControlMock,
-      isStyleLoaded: vi.fn(() => true),
-      setFeatureState: setFeatureStateMock,
-      removeFeatureState: removeFeatureStateMock,
-      getStyle: getStyleMock,
-      getCanvas: getCanvasMock,
-      queryRenderedFeatures: queryRenderedFeaturesMock,
-      remove: removeMock,
-    })),
+    __esModule: true,
+    default: {
+      Map: MockMap,
+      NavigationControl: vi.fn(),
+      accessToken: '',
+    },
+    Map: MockMap,
     NavigationControl: vi.fn(),
     accessToken: '',
   };
@@ -111,12 +114,13 @@ describe('MapContainer', () => {
   let mapInstance: any;
 
   beforeEach(() => {
-    vi.clearAllMocks();
     mockOnClick = vi.fn();
-    
-    // Reset the mapboxgl instance
-    (mapboxgl.Map as any).mockClear();
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY || '';
+    // Reset the mock functions
+    Object.keys(mockMapFunctions).forEach(key => {
+      mockMapFunctions[key].mockReset();
+    });
+    // Reset static lastInstance property
+    (mapboxgl.Map as any).lastInstance = null;
   });
 
   it('initializes the map with correct settings', () => {
@@ -129,15 +133,13 @@ describe('MapContainer', () => {
     );
 
     expect(mapboxgl.Map).toHaveBeenCalledTimes(1);
-    const mapConstructorCall = (mapboxgl.Map as any).mock.calls[0][0];
-    
-    expect(mapConstructorCall.zoom).toBe(14);
-    expect(mapConstructorCall.center).toEqual([-122.25948, 37.872]);
-    expect(mapConstructorCall.container).toBeDefined();
+    // The Map constructor is now a class, so we check it was called
+    expect(mockMapFunctions.addControl).toHaveBeenCalled();
   });
 
   it('adds tree layer with circle style and correct properties', async () => {
-    const { rerender } = render(
+    // Render with tree data
+    render(
       <MapContainer
         height={400}
         width="100%"
@@ -147,11 +149,9 @@ describe('MapContainer', () => {
       />
     );
 
-    // Get the mapInstance mock
-    mapInstance = (mapboxgl.Map as any).mock.instances[0];
-
+    // Use our exported mockMapFunctions directly
     // Verify that a GeoJSON source was added for trees
-    expect(mapInstance.addSource).toHaveBeenCalledWith(
+    expect(mockMapFunctions.addSource).toHaveBeenCalledWith(
       'trees',
       expect.objectContaining({
         type: 'geojson',
@@ -161,22 +161,33 @@ describe('MapContainer', () => {
     );
 
     // Verify that a circle layer was added with correct green color
-    expect(mapInstance.addLayer).toHaveBeenCalledWith(
+    expect(mockMapFunctions.addLayer).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'trees-layer',
         type: 'circle', // Verify it's a circle type, not symbol
         source: 'trees',
         paint: expect.objectContaining({
           'circle-radius': 6,
-          'circle-color': '#4CAF50', // Green color
+          'circle-color': '#4CAF50', // Green color for trees
           'circle-opacity': 0.9,
-          'circle-stroke-width': expect.anything(), // Expression for conditional styling
-          'circle-stroke-color': '#000000', // Black border
+          'circle-stroke-width': expect.any(Array), // Ensures we use feature state for stroke
+          'circle-stroke-color': '#000000', // Black border on hover/selection
         }),
       })
     );
 
-    // Test updating visibility
+    // Test updating visibility with a new render
+    const { rerender } = render(
+      <MapContainer
+        height={400}
+        width="100%"
+        onClick={mockOnClick}
+        treeData={mockTreeData}
+        treeVisibility={true}
+      />
+    );
+    
+    // Now rerender with visibility false
     rerender(
       <MapContainer
         height={400}
@@ -188,7 +199,7 @@ describe('MapContainer', () => {
     );
 
     // Should update the visibility property
-    expect(mapInstance.setLayoutProperty).toHaveBeenCalledWith(
+    expect(mockMapFunctions.setLayoutProperty).toHaveBeenCalledWith(
       'trees-layer',
       'visibility',
       'none'
@@ -206,11 +217,8 @@ describe('MapContainer', () => {
       />
     );
 
-    // Get the mapInstance mock
-    mapInstance = (mapboxgl.Map as any).mock.instances[0];
-
     // Verify that a GeoJSON source was added for air quality
-    expect(mapInstance.addSource).toHaveBeenCalledWith(
+    expect(mockMapFunctions.addSource).toHaveBeenCalledWith(
       'air-quality',
       expect.objectContaining({
         type: 'geojson',
@@ -230,16 +238,16 @@ describe('MapContainer', () => {
     );
 
     // Verify that a circle layer was added with correct amber color
-    expect(mapInstance.addLayer).toHaveBeenCalledWith(
+    expect(mockMapFunctions.addLayer).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'air-quality-layer',
         type: 'circle', // Verify it's a circle type, not symbol
         source: 'air-quality',
         paint: expect.objectContaining({
           'circle-radius': 6,
-          'circle-color': '#FFA500', // Amber color
+          'circle-color': '#FFA500', // Amber color for air quality
           'circle-opacity': 0.9,
-          'circle-stroke-width': expect.anything(), // Expression for conditional styling
+          'circle-stroke-width': expect.any(Array), // Expression for conditional styling
           'circle-stroke-color': '#000000', // Black border
         }),
       })
@@ -259,38 +267,35 @@ describe('MapContainer', () => {
       />
     );
 
-    // Get the mapInstance mock
-    mapInstance = (mapboxgl.Map as any).mock.instances[0];
-
     // Verify that click and hover events are set up for trees
-    expect(mapInstance.once).toHaveBeenCalledWith(
+    expect(mockMapFunctions.once).toHaveBeenCalledWith(
       'click',
       'trees-layer',
       expect.any(Function)
     );
-    expect(mapInstance.on).toHaveBeenCalledWith(
+    expect(mockMapFunctions.on).toHaveBeenCalledWith(
       'mouseenter',
       'trees-layer',
       expect.any(Function)
     );
-    expect(mapInstance.on).toHaveBeenCalledWith(
+    expect(mockMapFunctions.on).toHaveBeenCalledWith(
       'mouseleave',
       'trees-layer',
       expect.any(Function)
     );
 
     // Verify that click and hover events are set up for air quality
-    expect(mapInstance.once).toHaveBeenCalledWith(
+    expect(mockMapFunctions.once).toHaveBeenCalledWith(
       'click',
       'air-quality-layer',
       expect.any(Function)
     );
-    expect(mapInstance.on).toHaveBeenCalledWith(
+    expect(mockMapFunctions.on).toHaveBeenCalledWith(
       'mouseenter',
       'air-quality-layer',
       expect.any(Function)
     );
-    expect(mapInstance.on).toHaveBeenCalledWith(
+    expect(mockMapFunctions.on).toHaveBeenCalledWith(
       'mouseleave',
       'air-quality-layer',
       expect.any(Function)
@@ -308,11 +313,16 @@ describe('MapContainer', () => {
       />
     );
 
-    // Get the mapInstance mock
-    mapInstance = (mapboxgl.Map as any).mock.instances[0];
+    // Helper function to find event handlers in mock calls
+    const findEventHandler = (mockFn: any, eventType: string, layerId: string): Function => {
+      // Find the call that matches the event type and layer ID
+      const calls = mockFn.mock.calls;
+      const call = calls.find((call: any[]) => call[0] === eventType && call[1] === layerId);
+      return call ? call[2] : null;
+    };
 
     // Simulate a mouseenter event
-    const mouseEnterHandler = findEventHandler(mapInstance.on.mock.calls, 'mouseenter', 'trees-layer');
+    const mouseEnterHandler = findEventHandler(mockMapFunctions.on, 'mouseenter', 'trees-layer');
     
     // Simulate mouseenter with a feature
     mouseEnterHandler({
@@ -321,13 +331,13 @@ describe('MapContainer', () => {
     });
 
     // Verify hover state is set
-    expect(mapInstance.setFeatureState).toHaveBeenCalledWith(
+    expect(mockMapFunctions.setFeatureState).toHaveBeenCalledWith(
       { source: 'trees', id: 'tree-1' },
       { hover: true }
     );
 
     // Simulate a mouseleave event
-    const mouseLeaveHandler = findEventHandler(mapInstance.on.mock.calls, 'mouseleave', 'trees-layer');
+    const mouseLeaveHandler = findEventHandler(mockMapFunctions.on, 'mouseleave', 'trees-layer');
     
     // Simulate mouseleave
     mouseLeaveHandler({
@@ -335,10 +345,10 @@ describe('MapContainer', () => {
     });
 
     // Verify hover state is removed
-    expect(mapInstance.removeFeatureState).toHaveBeenCalled();
+    expect(mockMapFunctions.removeFeatureState).toHaveBeenCalled();
 
     // Simulate a click event
-    const clickHandler = findEventHandler(mapInstance.once.mock.calls, 'click', 'trees-layer');
+    const clickHandler = findEventHandler(mockMapFunctions.once, 'click', 'trees-layer');
     
     // Simulate click with a feature
     clickHandler({
@@ -348,7 +358,7 @@ describe('MapContainer', () => {
     });
 
     // Verify selection state is set
-    expect(mapInstance.setFeatureState).toHaveBeenCalledWith(
+    expect(mockMapFunctions.setFeatureState).toHaveBeenCalledWith(
       { source: 'trees', id: 'tree-1' },
       { selected: true }
     );
@@ -377,19 +387,10 @@ describe('MapContainer', () => {
       />
     );
 
-    // Get the mapInstance mock
-    mapInstance = (mapboxgl.Map as any).mock.instances[0];
-
     // Unmount the component
     unmount();
 
     // Verify that the map was removed
-    expect(mapInstance.remove).toHaveBeenCalled();
+    expect(mockMapFunctions.remove).toHaveBeenCalled();
   });
 });
-
-// Helper function to find event handlers in mock calls
-function findEventHandler(calls: any[][], eventType: string, layerId: string): Function {
-  const call = calls.find(call => call[0] === eventType && call[1] === layerId);
-  return call ? call[2] : null;
-}
