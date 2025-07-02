@@ -73,31 +73,26 @@ const FiltersPanel: React.FC = () => {
   const [locationName, setLocationName] = useState('');
   const [locationType, setLocationType] = useState('Any');
 
+  /**
+   * Handles tab changes in the filter panel with exclusive selection behavior
+   * Only one tab can be active at a time (radio button behavior)
+   * 
+   * @param newValue - The index of the newly selected tab
+   * @param type - The data type associated with the tab ('tree', 'air', or 'building')
+   */
   const handleTabChange = (newValue: number, type: string) => {
+    // Set the active tab index
     setActiveTab(newValue);
 
-    // Toggle the active type
-    const newActiveTypes = new Set(activeTypes);
-    if (newActiveTypes.has(type)) {
-      newActiveTypes.delete(type);
-    } else {
-      newActiveTypes.add(type);
-    }
-    setActiveTypes(newActiveTypes);
+    // Radio button behavior: ensure ONLY the clicked layer is active
+    // Create a new Set with just the selected type
+    setActiveTypes(new Set([type]));
 
-    // Clear existing filters
+    // Clear all existing filters first
     clearFilters();
 
-    // Apply all active type filters
-    if (newActiveTypes.size > 0) {
-      Array.from(newActiveTypes).forEach((activeType) => {
-        setFilter('type', activeType);
-      });
-    } else {
-      // If all layers are toggled off, show trees by default
-      setActiveTypes(new Set(['tree']));
-      setFilter('type', 'tree');
-    }
+    // Apply new type filter for the selected layer
+    setFilter('type', type);
   };
 
   // Handle search for Locations
