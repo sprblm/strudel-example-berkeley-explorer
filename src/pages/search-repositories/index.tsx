@@ -22,7 +22,7 @@ import {
 import { SearchIcon } from '../../components/Icons';
 import DataListPanel from './_components/DataListPanel';
 import type { Dataset } from '../../types/dataset.types';
-import BerkeleyDataMap from '../../components/BerkeleyDataMap';
+import ExclusiveDataMap from './_components/ExclusiveDataMap';
 import type { AirQualityObservation } from '../../types/air-quality.interfaces';
 
 // Define the TreeDataPoint interface here to avoid import issues
@@ -65,6 +65,33 @@ const DatasetExplorerContent: React.FC = () => {
   // State for active map layers - default to showing trees only
   const [activeLayers, setActiveLayers] = useState<string[]>(['trees']);
 
+  // Set up a separate effect just for managing active layers based on type filters
+  // This ensures map layers update immediately when filters change
+  useEffect(() => {
+    // Map filter values to layer names
+    const layerMap: Record<string, string> = {
+      tree: 'trees',
+      air: 'air',
+      building: 'locations',
+    };
+    
+    // Determine which layers should be visible based on type filters
+    const typeFilters = activeFilters
+      .filter((f) => f.field === 'type')
+      .map((f) => f.value as string);
+    
+    if (typeFilters.length > 0) {
+      // Convert type filters to layer names - only one layer should be visible at a time
+      const visibleLayers = typeFilters.map(
+        (filterType) => layerMap[filterType] || filterType
+      );
+      setActiveLayers(visibleLayers);
+    } else {
+      // If no type filters are active, show no layers
+      setActiveLayers([]);
+    }
+  }, [activeFilters]); // This effect runs whenever filters change
+  
   // Filter datasets based on search term and active filters
   useEffect(() => {
     if (!datasets.length) return;
@@ -84,27 +111,6 @@ const DatasetExplorerContent: React.FC = () => {
 
     // Apply active filters
     if (activeFilters.length > 0) {
-      // Determine which layers should be visible based on type filters
-      const typeFilters = activeFilters
-        .filter((f) => f.field === 'type')
-        .map((f) => f.value as string);
-
-      if (typeFilters.length > 0) {
-        // Map filter values to layer names
-        const layerMap: Record<string, string> = {
-          tree: 'trees',
-          air: 'air',
-          building: 'locations',
-        };
-
-        // Convert type filters to layer names
-        const visibleLayers = typeFilters.map(
-          (filterType) => layerMap[filterType] || filterType
-        );
-        setActiveLayers(visibleLayers);
-      } else {
-        // If we have active filters but none are type filters, maintain existing layers
-      }
 
       filtered = filtered.filter((dataset) => {
         // Check each filter
@@ -291,13 +297,12 @@ const DatasetExplorerContent: React.FC = () => {
                   overflow: 'hidden',
                 }}
               >
-                <BerkeleyDataMap
+                <ExclusiveDataMap
                   height="100%"
                   onPointClick={handleMapPointClick}
                   activeLayers={activeLayers}
                   selectedTree={selectedTreePoint}
                   onTreeClose={() => setSelectedTreePoint(null)}
-                  showLayersToggle={false} // Hide layers toggle on search page as it's controlled by filters
                 />
               </Paper>
 
