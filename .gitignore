@@ -4,8 +4,8 @@
 node_modules/
 .aider*
 .claude*
+.windsurf*
 .env
-
 
 # macOS
 .DS_Store*
