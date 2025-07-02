@@ -87,18 +87,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
       });
       mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Load custom icons for map features
+      // Load custom icons for air quality features only (not trees)
       const map = mapRef.current;
       if (map) {
         const addIcons = () => {
-          // Tree icon
-          if (!map.hasImage('tree-icon')) {
-            map.loadImage('/icons/tree.png', (error, image) => {
-              if (error || !image) return;
-              map.addImage('tree-icon', image as any);
-            });
-          }
-
           // Air quality icon
           if (!map.hasImage('air-icon')) {
             map.loadImage('/icons/air.png', (error, image) => {
@@ -141,19 +133,37 @@ const MapContainer: React.FC<MapContainerProps> = ({
         if (existingTreeSource) {
           existingTreeSource.setData(treeData);
         } else {
-          map.addSource(treeSourceId, { type: 'geojson', data: treeData });
+          map.addSource(treeSourceId, {
+            type: 'geojson',
+            data: treeData,
+            generateId: true, // Generate unique IDs for features
+          });
         }
 
+        // Tree circle layer
         if (!map.getLayer(treeLayerId)) {
           map.addLayer({
             id: treeLayerId,
-            type: 'symbol',
+            type: 'circle',
             source: treeSourceId,
             layout: {
               visibility: treeVisibility ? 'visible' : 'none',
-              'icon-image': 'tree-icon',
-              'icon-size': 0.6,
-              'icon-allow-overlap': true,
+            },
+            paint: {
+              // Regular green dot for trees
+              'circle-radius': 6,
+              'circle-color': '#4CAF50', // Green color
+              'circle-opacity': 0.9,
+              // Thin border that appears on hover or selection using feature state
+              'circle-stroke-width': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                2,
+                ['boolean', ['feature-state', 'selected'], false],
+                2,
+                0
+              ],
+              'circle-stroke-color': '#000000',
             },
           });
         } else {
@@ -312,6 +322,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
     buildingVisibility,
   ]);
 
+  // State refs to track hovered and selected tree feature IDs
+  const hoveredTreeIdRef = useRef<number | null>(null);
+  const selectedTreeIdRef = useRef<number | null>(null);
+  
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !onClick) return;
@@ -330,10 +344,35 @@ const MapContainer: React.FC<MapContainerProps> = ({
         e.features[0].properties &&
         e.lngLat
       ) {
-        console.log('Tree clicked:', e.features[0].properties);
+        const clickedFeatureId = e.features[0].id;
+        const clickedFeature = e.features[0];
+        console.log(
+          'Tree clicked:',
+          clickedFeature.properties,
+          'ID:',
+          clickedFeatureId
+        );
+        
+        // Remove previous selection state
+        if (selectedTreeIdRef.current !== null) {
+          map.removeFeatureState({
+            source: 'trees',
+            id: selectedTreeIdRef.current,
+          });
+        }
+        
+        // Set new selection state
+        if (clickedFeatureId !== undefined) {
+          map.setFeatureState(
+            { source: 'trees', id: clickedFeatureId },
+            { selected: true }
+          );
+          selectedTreeIdRef.current = clickedFeatureId;
+        }
+        
         onClick({
           object: {
-            properties: e.features[0].properties,
+            properties: clickedFeature.properties,
             coordinates: e.lngLat,
           },
         });
@@ -386,11 +425,32 @@ const MapContainer: React.FC<MapContainerProps> = ({
       }
     };
 
-    // Cursor handling for better user feedback
-    const onMouseEnter = () => {
+    // Cursor handling and hover state for better user feedback
+    const onMouseEnter = (e: mapboxgl.MapMouseEvent & { features?: any[] }) => {
       const canvas = map.getCanvas();
       if (canvas) {
         Object.assign(canvas.style, cursorPointerStyle);
+      }
+      
+      // Add hover effect for trees
+      if (e.features && e.features.length > 0) {
+        const hoveredFeatureId = e.features[0].id;
+        if (hoveredFeatureId !== undefined) {
+          // Remove hover state from previous feature
+          if (hoveredTreeIdRef.current !== null) {
+            map.removeFeatureState({
+              source: 'trees',
+              id: hoveredTreeIdRef.current,
+            }, 'hover');
+          }
+          
+          // Add hover state to current feature
+          map.setFeatureState({
+            source: 'trees',
+            id: hoveredFeatureId,
+          }, { hover: true });
+          hoveredTreeIdRef.current = hoveredFeatureId;
+        }
       }
     };
 
@@ -398,6 +458,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
       const canvas = map.getCanvas();
       if (canvas) {
         Object.assign(canvas.style, cursorDefaultStyle);
+      }
+      
+      // Remove hover state when mouse leaves the feature
+      if (hoveredTreeIdRef.current !== null) {
+        map.removeFeatureState({
+          source: 'trees',
+          id: hoveredTreeIdRef.current,
+        }, 'hover');
+        hoveredTreeIdRef.current = null;
       }
     };
 
@@ -566,6 +635,20 @@ const MapContainer: React.FC<MapContainerProps> = ({
           currentMap.off('click', treeLayerId, handleTreeClick);
           currentMap.off('mouseenter', treeLayerId, onMouseEnter);
           currentMap.off('mouseleave', treeLayerId, onMouseLeave);
+          
+          // Clean up feature states
+          if (hoveredTreeIdRef.current !== null) {
+            currentMap.removeFeatureState({
+              source: 'trees',
+              id: hoveredTreeIdRef.current,
+            });
+          }
+          if (selectedTreeIdRef.current !== null) {
+            currentMap.removeFeatureState({
+              source: 'trees',
+              id: selectedTreeIdRef.current,
+            });
+          }
         }
 
         if (currentMap.getLayer(airLayerId)) {
