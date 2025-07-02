@@ -18,12 +18,11 @@ type MapMouseEventWithFeatures = mapboxgl.MapMouseEvent & {
   features?: mapboxgl.MapboxGeoJSONFeature[];
 };
 
-// Define cursor styles
-const cursorPointerStyle = { cursor: 'pointer' };
-const cursorDefaultStyle = { cursor: '' };
-
 // Define container style
-const mapContainerStyle = (height: string | number, width: string | number) => ({
+const mapContainerStyle = (
+  height: string | number,
+  width: string | number
+) => ({
   height,
   width,
 });
@@ -60,6 +59,7 @@ const MINIMAL_STYLE: mapboxgl.Style = {
 interface MapContainerProps {
   height?: number | string;
   width?: number | string;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   onClick?: (info: any) => void;
   treeData?: FeatureCollection | null;
   treeVisibility?: boolean;
@@ -107,6 +107,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
       mapRef.current = map;
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error('Error initializing map:', error);
     }
 
@@ -215,7 +216,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
           // Set hover state on the current feature
           const hoveredFeatureId =
-            e.features[0].id || e.features[0].properties.id;
+            e.features[0].id || e.features[0].properties?.id;
           hoveredTreeIdRef.current = hoveredFeatureId;
 
           map.setFeatureState(
@@ -392,7 +393,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
           // Set hover state on the current feature
           const hoveredFeatureId =
-            e.features[0].id || e.features[0].properties.id;
+            e.features[0].id || e.features[0].properties?.id;
           hoveredAirQualityIdRef.current = hoveredFeatureId;
 
           map.setFeatureState(
